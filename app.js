@@ -729,14 +729,6 @@ function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.se
     if(key==="rules"){var keep=state.step;["A","B","L","R"].forEach(function(k){place(k,posAt(keep)[k],true)})}
     renderStep()}})}
 seg("seg-side","side");seg("seg-rules","rules");
-/* Layout preview: A = step text beside the court, B = step text under the court and tips beside it */
-var stepHome=$("stepbox").parentNode,stepNext=$("stepbox").nextSibling,cardsHome=$("cards").parentNode;
-function applyLayout(v){var b=v==="b"&&window.matchMedia("(min-width:901px)").matches,panel=document.querySelector(".panel"),cc=document.querySelector(".court-card");
-  if(b){cc.appendChild($("stepbox"));panel.insertBefore($("cards"),panel.firstChild);document.body.classList.add("lay-b")}
-  else{stepHome.insertBefore($("stepbox"),stepNext);cardsHome.appendChild($("cards"));document.body.classList.remove("lay-b")}
-  [].forEach.call($("seg-layout").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))})}
-[].forEach.call($("seg-layout").children,function(x){x.onclick=function(){save("layout",x.dataset.v);applyLayout(x.dataset.v)}});
-applyLayout(load("layout","a"));
 /* Light sand court with soft blue 3 m and 6 m lines */
 courtFill.setAttribute("fill","#FBF3DF");DASH.forEach(function(d){d.setAttribute("stroke","#0077B6");d.setAttribute("stroke-opacity",0.55)});
 state.zones=false;
