@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beach Tennis University</title>
+<meta name="description" content="Learn beach tennis tactics: every shot, when to play it, and where both players move, with animated top-down court diagrams.">
+<meta name="theme-color" content="#0077B6">
+<meta property="og:title" content="Beach Tennis University">
+<meta property="og:description" content="Every beach tennis shot, when to play it, and where both players move. Learn. Play. Win.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+  <header class="hero">
+    <div class="hero-in">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+          <defs>
+            <linearGradient id="lg-sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4D6D"/><stop offset=".55" stop-color="#FF9F1C"/><stop offset="1" stop-color="#FFD23F"/></linearGradient>
+            <clipPath id="lg-disc"><circle cx="50" cy="50" r="46"/></clipPath>
+          </defs>
+          <g clip-path="url(#lg-disc)">
+            <rect width="100" height="64" fill="url(#lg-sun)"/>
+            <rect y="62" width="100" height="40" fill="#00C2B8"/>
+            <rect y="70" width="100" height="4" fill="#F7F4E9" opacity=".85"/>
+            <rect y="79" width="100" height="6" fill="#0077B6"/>
+            <rect y="89" width="100" height="12" fill="#FF4D6D"/>
+          </g>
+          <path d="M53 63 Q49 46 57 30" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+          <path d="M57 30 Q45 20 30 28 Q45 25 57 31Z" fill="#FFFFFF"/>
+          <path d="M57 30 Q70 19 84 27 Q69 24 57 31Z" fill="#FFFFFF"/>
+          <path d="M57 30 Q42 30 36 44 Q46 33 57 31Z" fill="#FFFFFF"/>
+          <path d="M57 30 Q72 31 76 45 Q67 34 57 31Z" fill="#FFFFFF"/>
+          <path d="M57 30 Q55 17 62 10 Q59 20 58 30Z" fill="#FFFFFF"/>
+          <circle cx="50" cy="50" r="46" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+        </svg>
+        <div>
+          <h1>Beach Tennis<span>University</span></h1>
+          <div class="tag">Learn. Play. Win.</div>
+        </div>
+      </div>
+      <div class="hero-side">
+        <div class="eyebrow">Tactics playbook</div>
+        <p class="lede">Every shot, when to play it, and where both players move. Positions and patterns come from point-by-point analysis of pro finals.</p>
+      </div>
+    </div>
+    <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+  </header>
+
+  <div class="bar">
+    <div class="tabs" role="tablist">
+      <button id="tab-shots" role="tab" aria-selected="true" data-tab="shots">Shots</button>
+      <button id="tab-play" role="tab" aria-selected="false" data-tab="play">When to play</button>
+      <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Which shot?</button>
+    </div>
+    <div class="toggles">
+      <div class="tg">I play
+        <div class="seg" id="seg-side">
+          <button id="side-L" data-v="L" aria-pressed="true">Left</button>
+          <button id="side-R" data-v="R" aria-pressed="false">Right</button>
+        </div>
+      </div>
+      <div class="tg">Rules
+        <div class="seg" id="seg-rules">
+          <button id="rules-men" data-v="men" aria-pressed="true">Men's pro</button>
+          <button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; social</button>
+        </div>
+      </div>
+      <label class="chk" for="zones"><input type="checkbox" id="zones"> Target zones</label>
+    </div>
+  </div>
+
+  <div class="main">
+    <nav class="list" id="list" aria-label="Plays"></nav>
+    <aside class="picker" id="picker" hidden>
+      <div class="pgroup"><span>The ball comes to my</span><div class="seg" id="pk-side"><button id="pk-side-bh" data-v="bh">Backhand</button><button id="pk-side-body" data-v="body">Body</button><button id="pk-side-fh" data-v="fh">Forehand</button></div></div>
+      <div class="pgroup"><span>I'm standing</span><div class="seg" id="pk-depth"><button id="pk-depth-front" data-v="front">Inside 3 m</button><button id="pk-depth-mid" data-v="mid">3–6 m</button><button id="pk-depth-back" data-v="back">6–8 m</button></div></div>
+      <div class="pgroup"><span>Ball speed</span><div class="seg" id="pk-speed"><button id="pk-speed-fast" data-v="fast">Fast</button><button id="pk-speed-med" data-v="med">Medium</button><button id="pk-speed-slow" data-v="slow">Slow</button></div></div>
+      <div class="pgroup"><span>Height when I hit it</span><div class="seg" id="pk-height"><button id="pk-height-low" data-v="low">Low</button><button id="pk-height-med" data-v="med">Medium</button><button id="pk-height-high" data-v="high">High</button></div><p class="hint">Low is below the net. Medium is net to shoulder. High is overhead.</p></div>
+      <div class="pgroup"><span>Opponents</span><p class="hint">Tap their side of the court to place them: front, middle or back, and left, middle or right. <b id="pk-next"></b></p></div>
+    </aside>
+
+    <section class="stage" aria-live="polite">
+      <div class="stage-head">
+        <h2 id="title">Serve</h2>
+        <span class="cat" id="cat"></span>
+      </div>
+
+      <div class="court-box">
+        <svg id="court" viewBox="0 0 760 400" role="img" aria-labelledby="court-t">
+          <title id="court-t">Top-down beach tennis court showing player positions and the ball</title>
+          <defs>
+            <marker id="ar-you" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#0077B6"/></marker>
+            <marker id="ar-opp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#E2365A"/></marker>
+          </defs>
+          <g id="g-court"></g>
+          <g id="g-zones"></g>
+          <g id="g-grid"></g>
+          <g id="g-lines"></g>
+          <g id="g-moves"></g>
+          <g id="g-trail"></g>
+          <g id="g-players"></g>
+          <g id="g-ball"></g>
+        </svg>
+      </div>
+
+      <div class="legend">
+        <span><i class="dot" style="background:#0077B6"></i>Your team (ring = you)</span>
+        <span><i class="dot" style="background:#FF4D6D"></i>Opponents</span>
+        <span><i class="dot" style="background:#FFD23F;border:1px solid #8A6A00"></i>Ball grows as it rises</span>
+        <span>Arrows: where each player moves</span>
+      </div>
+
+      <div class="result" id="result" hidden>
+        <div class="res-top"><div><span class="kicker">Play</span><h3 id="r-shot"></h3></div><button class="shotchip" id="r-open">How to play it</button></div>
+        <p class="say" id="r-why"></p>
+        <div class="cards">
+          <div class="card"><b>Aim</b><span id="r-target"></span></div>
+          <div class="card"><b>Opponents</b><span id="r-form"></span></div>
+          <div class="card"><b>Other option</b><span id="r-backup"></span></div>
+        </div>
+        <div class="jobs">
+          <div class="job you"><b>Then you</b><span id="r-you"></span></div>
+          <div class="job partner"><b>Your partner</b><span id="r-partner"></span></div>
+        </div>
+      </div>
+
+      <div class="controls" id="ctrls">
+        <button class="btn" id="prev" aria-label="Previous step">&#8592; Back</button>
+        <div class="dots" id="dots"></div>
+        <button class="btn" id="next" aria-label="Next step">Next &#8594;</button>
+        <button class="btn primary" id="play">Play all</button>
+        <button class="btn" id="replay">Replay step</button>
+      </div>
+
+      <div class="step" id="stepbox">
+        <div class="step-top">
+          <h3 id="step-title"></h3>
+          <button class="shotchip" id="shotchip" hidden></button>
+        </div>
+        <p class="say" id="say"></p>
+        <div class="options" id="options" hidden><b id="ask"></b><div class="opt-btns" id="opt-btns"></div></div>
+        <div class="jobs" id="jobs">
+          <div class="job you"><b id="you-label">Your job</b><span id="you-text"></span></div>
+          <div class="job partner"><b>Partner</b><span id="partner-text"></span></div>
+        </div>
+        <p class="note" id="note" hidden></p>
+      </div>
+
+      <div class="cards" id="cards" hidden>
+        <div class="card"><b>What it is</b><span id="c-what"></span></div>
+        <div class="card"><b>When to play it</b><span id="c-when"></span></div>
+        <div class="card"><b>Aim</b><span id="c-aim"></span></div>
+        <div class="card avoid"><b>Avoid</b><span id="c-avoid"></span></div>
+      </div>
+    </section>
+  </div>
+</div>
+<script src="app.js"></script>
+</body>
+</html>
