@@ -38,14 +38,14 @@ var NET={A:[9.8,2.7],B:[9.8,5.4]}, DEEP={A:[12.6,2.7],B:[12.6,5.4]};
 /* ---------------- Shot library ---------------- */
 var SHOTS={
 serve:{name:"Serve",cat:"Start",hitter:"R",
-  start:{L:[1.2,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]}, startAlt:{open:{L:[4.4,2.6]}},
+  start:{L:[1.7,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]}, startAlt:{open:{L:[4.4,2.6]}},
   to:[11.6,5.7],mark:true, react:{L:[2.8,2.6],R:[1.6,5.7]}, reactAlt:{open:{L:[5.2,2.6]}},
   after:{L:[4.4,2.7],R:[4.2,5.3],A:[10,2.7],B:[10,5.4]},
   what:"Overhead from behind the baseline. There is no second serve, so pick a target you can hit every time.",
   when:"Every point you serve. Agree the zone (1–5) with a finger signal first.",
-  aim:"Zone 2, at the receiver's body or backhand hip. Mix in zones 4 and 1 so they can't settle.",
+  aim:"Zone 3 down the middle is the most common. Zone 2 at the receiver's body or backhand hip is also safe. Mix in 1, 4 and 5 (signal 5 first) so they can't settle.",
   avoid:"Going for aces with no margin: a fault loses the point. Serving to 5 without telling your partner.",
-  hitDo:"Serve at the receiver's body or backhand (zone 2), then follow it in.",
+  hitDo:"Signal the zone, serve it with spin and dip, then follow it in.",
   partnerDo:"Start moving forward the moment the serve is struck.",
   afterH:"Settle at 4–5 m on your side and split step as they return.",
   afterP:"Settle at 4–5 m, level with your partner, about 3 m apart."},
@@ -241,11 +241,11 @@ guide:{name:"Court guide",cat:"Basics",
    L:"Pick Left or Right at the top and every play shows your job.",R:"Pick Left or Right at the top and every play shows your job."}
   ]},
 serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
-  init:{L:[1.2,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]}, initAlt:{open:{L:[4.4,2.6]}},
+  init:{L:[1.7,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]}, initAlt:{open:{L:[4.4,2.6]}},
   steps:[
   {t:"Set up",zones:true,say:"Server behind the baseline. In men's pro events the partner waits behind the 6 m line until the serve is struck (in women's and social play, behind the 3 m line). The receivers start just behind their 3 m line.",
    L:"You're the partner. Stand left of centre behind the line, weight forward, ready to go on the serve.",
-   R:"You're serving from behind the baseline on the right. Pick your target before the toss: zone 2, at the receiver's body."},
+   R:"You're serving from behind the baseline on the right. Pick your target before the toss: zone 3 down the middle, or zone 2 at the receiver's body."},
   {t:"The serve: spin and dip",ball:{f:[-0.9,6.3],to:[11.7,5.75],shot:"serve"},mark:true,pos:{R:[1.6,5.7],L:[2.8,2.7]},alt:{open:{L:[4.6,2.7]}},
    say:"Hit up and over the ball with topspin so it clears the net with margin, then dips. It should arrive low, around the receiver's hip, so they have to hit up.",
    L:"Watch the contact. Go the moment the ball is struck.",R:"Brush up and over the ball. Low at the body beats fast and flat."},
@@ -463,10 +463,10 @@ var scene=null,timer=null,raf=null,pkTimer=null,preTimer=null;
 var gC=document.getElementById("g-court"),gZ=document.getElementById("g-zones"),gL=document.getElementById("g-lines"),
     gM=document.getElementById("g-moves"),gT=document.getElementById("g-trail"),gP=document.getElementById("g-players"),gB=document.getElementById("g-ball");
 el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"#F3DFAE",rx:4},gC);
-el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"none",stroke:"#FFFFFF","stroke-width":4},gC);
-function lbl(x,y,txt,anchor){var t=el("text",{x:x,y:y,"text-anchor":anchor||"middle",fill:"#FFFFFF",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);t.textContent=txt;return t}
+el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"none",stroke:"#007A74","stroke-width":3},gC);
+function lbl(x,y,txt,anchor){var t=el("text",{x:x,y:y,"text-anchor":anchor||"middle",fill:"currentColor",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);t.textContent=txt;return t}
 function vline(m,lb){var g=el("g",{},gL);el("line",{x1:X(m),y1:Y(0),x2:X(m),y2:Y(8),stroke:C.line,"stroke-width":2,"stroke-dasharray":"7 6"},g);
-  var t=el("text",{x:X(m),y:28,"text-anchor":"middle",fill:"#FFFFFF",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.06em"},g);t.textContent=lb;return g}
+  var t=el("text",{x:X(m),y:28,"text-anchor":"middle",fill:"currentColor",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.06em"},g);t.textContent=lb;return g}
 vline(5,"3 m");vline(11,"3 m");var l6a=vline(2,"6 m"),l6b=vline(14,"6 m");
 el("line",{x1:X(8),y1:Y(0)-10,x2:X(8),y2:Y(8)+10,stroke:C.net,"stroke-width":6,"stroke-linecap":"round"},gL);
 lbl(X(8),28,"NET");lbl(X(4),386,"YOUR SIDE");lbl(X(12),386,"OPPONENTS");
@@ -534,18 +534,18 @@ var INC={
   fakelob:["A","inFloat","A floating ball comes to you. You've lobbed them before, so they're expecting another."],
   fakedrop:["B","inFloat","A soft ball comes to you while they're creeping forward."]};
 var INCP={recoverysmash:"Don't follow your partner back. Step into the middle.",hook:"Don't follow your partner back. Step into the middle.",highlob:"Hold the middle, a step back in case of a lob."};
-var SV0={L:[1.2,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]},SVT={1:[12.6,7.2],2:[11.9,5.75],3:[12.5,4.0],4:[11.9,2.75],5:[12.6,0.75]};
+var SV0={L:[1.7,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]},SVT={1:[12.6,7.2],2:[11.9,5.75],3:[12.5,4.0],4:[11.9,2.75],5:[12.6,0.75]};
 var SVZ={
  1:{rec:"B",rp:[12.3,6.8],L:[3.9,3.5],R:[3.9,6.0],
     say:"Down the line, on the server's own side. It surprises the receiver, but it pulls them wide and opens a return down the server's line.",
     hit:"Serve down your own line, then cover that line yourself as you move in.",partner:"Slide a little towards the middle: your partner is covering their own line.",
     mv:"The server protects their own line, the partner takes more of the middle."},
  2:{rec:"B",rp:[11.7,5.7],L:[3.9,2.8],R:[3.9,5.2],
-    say:"At the receiver on the server's side, aimed at their body or backhand hip. The most common and safest serve.",
+    say:"At the receiver on the server's side, aimed at their body or backhand hip. A safe serve that jams them.",
     hit:"Spin and dip at their body or backhand hip.",partner:"Normal start: go as the serve is struck and cover the middle.",
     mv:"Both move in level, about 3 m apart, and split step as they return."},
  3:{rec:"B",rp:[11.9,4.4],L:[3.9,2.9],R:[3.9,5.1],
-    say:"Down the middle, between the receivers. It can cause confusion over who takes it, and it gives them no angle.",
+    say:"Down the middle, between the receivers. The most common serve: it can cause confusion over who takes it, and it gives them no angle.",
     hit:"Aim at the seam between them.",partner:"Normal start. The return usually comes back through the middle: be ready.",
     mv:"Both move in level and close the middle."},
  4:{rec:"A",rp:[11.7,2.7],L:[3.9,2.8],R:[3.9,5.1],
@@ -559,12 +559,12 @@ var SVZ={
 function serveScene(){var s=SHOTS.serve,trunk=[],br=[];
   trunk.push({t:"Zones 1 to 5",hold:SV0.R,zones:true,
     say:"The receiving side is split into five lanes. Zone 1 is always the lane on the server's side (down the line). 2 is the receiver on that side, 3 the middle, 4 the other receiver, and 5 wide cross-court. Serve from the other side and the numbers flip.",
-    roles:{hit:"You're serving from the right, so zone 1 is the bottom lane here.",partner:"Learn the numbers: they tell you where the return will come from."}});
+    roles:{hit:state.side==="L"?"You're serving from the left, so zone 1 is the top lane here.":"You're serving from the right, so zone 1 is the bottom lane here.",partner:"Learn the numbers: they tell you where the return will come from."}});
   trunk.push({t:"Signal the serve",hold:SV0.R,zones:true,
     say:"Before every serve, the team agrees the zone with a finger signal: one finger for zone 1, up to five for zone 5. Most important is zone 5: the wide serve opens a return straight down the partner's line, so the partner must know it's coming.",
     roles:{hit:"Show your partner the zone with your fingers. Never serve 5 without telling them.",partner:"Check the signal before you set. If it's 5, plan to guard your line."}});
   trunk.push({t:"Set up",hold:SV0.R,zones:true,say:START_SAY.serve,
-    roles:{hit:"Behind the baseline, target picked.",partner:"Weight forward, ready to go the moment the serve is struck."}});
+    roles:{hit:"Behind the baseline, target picked.",partner:state.rules==="men"?"As far forward as the rules allow: just behind the 6 m line, weight forward, ready to go the moment the serve is struck.":"Just behind the 3 m line, weight forward, ready to go the moment the serve is struck."}});
   for(var z=1;z<=5;z++){var c=SVZ[z],rec={};rec[c.rec]=c.rp;
     var steps=[{t:"Serve to zone "+z,hl:z,zones:true,ball:{f:SV0.R,to:SVT[z],shot:"serve"},mark:true,pos:merge({R:[1.6,5.7],L:z===5?[2.8,2.0]:(z===1?[2.8,3.2]:[2.8,2.7])},rec),alt:{open:{L:z===5?[4.6,2.0]:[4.6,2.7]}},
       say:c.say,roles:{hit:c.hit,partner:c.partner}},
@@ -573,8 +573,15 @@ function serveScene(){var s=SHOTS.serve,trunk=[],br=[];
     if(z===5)steps.push({t:"Why: the line return",hl:5,zones:true,ball:{f:c.rp,to:[3.7,1.5],shot:"push"},pos:{L:[3.8,1.5],R:[4.0,4.2]},
       say:"Pulled wide, the receiver drives it straight down the line. Because the partner knew it was a 5, they were already there to block it.",
       roles:{hit:"Cover the middle behind your partner.",partner:"You're on the line already: block it long or straight."}});
-    br.push({label:"Zone "+z+(z===2?" (most common)":""),steps:steps})}
-  return {name:s.name,cat:s.cat,shot:"serve",hitter:"R",zoneSide:"R",init:s.start,initAlt:s.startAlt,steps:trunk,ask:"Where is the serve going? Pick a zone",branches:br}}
+    br.push({label:"Zone "+z+(z===3?" (most common)":""),steps:steps})}
+  var sc={name:s.name,cat:s.cat,shot:"serve",hitter:"R",zoneSide:"R",init:SV0,initAlt:{open:{L:[4.4,2.6]}},steps:trunk,ask:"Where is the serve going? Pick a zone",branches:br};
+  return state.side==="L"?mirrorScene(sc):sc}
+/* Flip the court top to bottom so the left-side player serves */
+function mir(p){if(!p)return p;var o={},sw={L:"R",R:"L",A:"B",B:"A"};for(var k in p){o[sw[k]||k]=[p[k][0],8-p[k][1]]}return o}
+function mirStep(st){var o=merge(st,null);if(st.pos)o.pos=mir(st.pos);if(st.pre)o.pre=mir(st.pre);if(st.alt&&st.alt.open)o.alt={open:mir(st.alt.open)};
+  if(st.ball)o.ball={f:[st.ball.f[0],8-st.ball.f[1]],to:[st.ball.to[0],8-st.ball.to[1]],shot:st.ball.shot};if(st.hold)o.hold=[st.hold[0],8-st.hold[1]];return o}
+function mirrorScene(sc){var o=merge(sc,null);o.hitter="L";o.zoneSide="L";o.init=mir(sc.init);o.initAlt={open:mir(sc.initAlt.open)};o.steps=sc.steps.map(mirStep);
+  o.branches=sc.branches.map(function(b){return {label:b.label,steps:b.steps.map(mirStep)}});return o}
 var START_SAY={serve:"Server behind the baseline. In men's pro the partner starts behind the 6 m line; in women's and social play, behind the 3 m line. The receivers start just behind their 3 m line."};
 function shotScene(id){if(id==="serve")return serveScene();var s=SHOTS[id],h=s.hitter,inc=INC[id],steps=[];
   var rp=merge(s.react,null);["L","R"].forEach(function(k){if(!(k in s.react)&&s.after&&s.after[k]){var a=s.start[k],b=s.after[k];rp[k]=[a[0]+(b[0]-a[0])*0.6,a[1]+(b[1]-a[1])*0.6]}});
@@ -596,7 +603,7 @@ function renderList(){var list=$("list");list.innerHTML="";var shots=state.tab==
   list.className=shots?"list icons":"list";$("sel-title").textContent=shots?"Choose a shot":"Choose a situation";
   var ids=shots?VISIBLE:[].concat.apply([],SCEN_GROUPS.map(function(g){return g[1]}));
   ids.forEach(function(id){var b=document.createElement("button");b.id="item-"+id;
-    if(shots){var ic=ICON[id];b.className="item icon-btn";
+    if(shots){var ic=ICON[id];b.className="item icon-btn";b.style.setProperty("--tile",ic.c);
       b.innerHTML='<span class="ic" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span>';
       var lab=document.createElement("span");lab.textContent=SHOTS[id].name;b.appendChild(lab)}
     else{b.className="item chip";b.textContent=SCENES[id].name}
@@ -666,6 +673,7 @@ $("tab-shots").onclick=function(){setTab("shots")};$("tab-play").onclick=functio
 function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.setAttribute("aria-pressed",String(b.dataset.v===state[key]));
   b.onclick=function(){state[key]=b.dataset.v;save(key,b.dataset.v);[].forEach.call(box.children,function(x){x.setAttribute("aria-pressed",String(x===b))});
     if(state.tab==="pick"){renderPick();return}
+    if(state.tab==="shots"&&state.id==="serve"){select("serve");return}
     if(key==="rules"){var keep=state.step;["A","B","L","R"].forEach(function(k){place(k,posAt(keep)[k],true)})}
     renderStep()}})}
 seg("seg-side","side");seg("seg-rules","rules");

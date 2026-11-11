@@ -46,12 +46,14 @@ h1 span{display:block}
 /* Shot picker: round colour icons with labels */
 .list{display:flex;gap:18px;flex-wrap:wrap}
 .list.icons{justify-content:space-between;gap:12px}
-.icon-btn{display:flex;flex-direction:column;align-items:center;gap:10px;border:0;background:transparent;cursor:pointer;color:var(--muted);font:600 13px var(--font);min-width:76px;padding:0}
+.icon-btn{position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;border:0;background:transparent;cursor:pointer;color:var(--muted);font:600 13px var(--font);min-width:96px;padding:14px 10px 16px;border-radius:22px;transition:background .15s,box-shadow .15s}
 .icon-btn .ic{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;box-shadow:0 6px 16px rgba(13,27,42,.14);transition:transform .15s}
 .icon-btn .ic svg{width:30px;height:30px}
 .icon-btn:hover .ic{transform:translateY(-2px)}
-.icon-btn[aria-current="true"]{color:var(--fg);font-weight:800}
-.icon-btn[aria-current="true"] .ic{outline:3px solid var(--fg);outline-offset:4px}
+.icon-btn:not([aria-current="true"]) .ic{opacity:.5;box-shadow:none}
+.icon-btn:not([aria-current="true"]):hover .ic{opacity:.85}
+.icon-btn[aria-current="true"]{background:var(--surface);box-shadow:var(--shadow);color:var(--fg);font-weight:800}
+.icon-btn[aria-current="true"]::after{content:"";position:absolute;left:28%;right:28%;bottom:7px;height:4px;border-radius:99px;background:var(--tile,var(--coral))}
 .chip{border:0;background:var(--surface);color:var(--fg);font:700 13px var(--font);letter-spacing:.04em;text-transform:uppercase;padding:13px 22px;border-radius:99px;cursor:pointer;box-shadow:var(--shadow-s)}
 .chip:hover{box-shadow:var(--shadow)}
 .chip[aria-current="true"]{background:var(--turq);color:#0D1B2A}
@@ -59,23 +61,25 @@ h1 span{display:block}
 /* Main: court card and coaching panel */
 .main{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:24px;align-items:start}
 .card-w{background:var(--surface);border-radius:24px;box-shadow:var(--shadow);padding:24px;min-width:0}
-.court-card{display:flex;flex-direction:column;gap:16px}
+.court-card{display:flex;flex-direction:column;gap:22px}
 .c-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .c-head h2{margin:0;font-size:30px;font-weight:800;text-transform:uppercase;line-height:1.05;color:var(--head)}
 .cat{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:99px;color:#0D1B2A}
-.court-box{border-radius:18px;background:linear-gradient(135deg,var(--turq),var(--ocean));padding:10px}
-svg#court{display:block;width:100%;height:auto}
+.court-box{border-radius:18px;border:2px solid var(--turq);padding:6px}
+svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;font-weight:500;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:8px}
 .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
 
-.panel{display:flex;flex-direction:column;gap:20px;position:sticky;top:16px}
+.panel{display:flex;flex-direction:column;gap:32px;position:sticky;top:16px;padding:28px}
 .kicker{font-size:12px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--coral)}
-.step{display:flex;flex-direction:column;gap:14px}
+.step{display:flex;flex-direction:column;gap:20px}
+.step .kicker{margin-bottom:-10px}
+.step .say{margin-bottom:8px;line-height:1.7}
 .step h3{font-size:24px;font-weight:800;margin:0;text-transform:uppercase;line-height:1.1;color:var(--head)}
 .say{margin:0;color:var(--fg)}
-.jobs{display:flex;flex-direction:column;gap:12px}
-.job{border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:4px}
+.jobs{display:flex;flex-direction:column;gap:16px}
+.job{border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;line-height:1.6}
 .job b{font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .job.you{background:var(--you-soft);border-left:5px solid var(--you)}
 .job.you b{color:var(--you)}
@@ -83,14 +87,14 @@ svg#court{display:block;width:100%;height:auto}
 .job.partner b{color:var(--muted)}
 .shotchip{align-self:flex-start;border:2px solid var(--turq);background:transparent;color:var(--fg);font:700 12px var(--font);letter-spacing:.04em;text-transform:uppercase;padding:6px 14px;border-radius:99px;cursor:pointer}
 .shotchip:hover{background:var(--turq);color:#0D1B2A}
-.options{display:flex;flex-direction:column;gap:10px}
+.options{display:flex;flex-direction:column;gap:12px;margin:4px 0 8px}
 .options b{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted)}
 .opt-btns{display:flex;flex-wrap:wrap;gap:8px}
 .opt{border:2px solid var(--coral);background:var(--surface);color:var(--fg);font:700 13px var(--font);padding:8px 16px;border-radius:99px;cursor:pointer}
 .opt[aria-pressed="true"]{background:var(--coral);color:#FFFFFF}
 
 /* Controls: pill buttons from the brand sheet */
-.controls{display:flex;flex-direction:column;gap:14px;border-top:1px solid var(--line);padding-top:20px}
+.controls{display:flex;flex-direction:column;gap:18px;border-top:1px solid var(--line);padding-top:26px}
 .nav-row{display:flex;gap:10px}
 .nav-row .btn{flex:1;justify-content:center}
 .btn{border:2px solid var(--turq);background:transparent;color:var(--fg);font:700 13px var(--font);letter-spacing:.06em;text-transform:uppercase;padding:13px 18px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
@@ -107,6 +111,9 @@ svg#court{display:block;width:100%;height:auto}
 .note{font-size:14px;color:var(--muted);margin:0}
 
 /* Info cards */
+.tips{gap:16px;margin-top:6px}
+.tips .card{background:var(--surface-2);box-shadow:none;padding:20px 20px;border-radius:16px;gap:10px}
+.tips .card span{font-size:14px;line-height:1.55}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
 .card{background:var(--surface);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-s)}
 .card b{display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--head)}
@@ -114,13 +121,13 @@ svg#court{display:block;width:100%;height:auto}
 .card span{color:var(--muted)}
 
 /* Which shot? */
-.picker{display:flex;flex-direction:column;gap:18px}
+.picker{display:flex;flex-direction:column;gap:24px}
 .pgroup{display:flex;flex-direction:column;gap:8px}
 .pgroup>span{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:700;color:var(--muted)}
 .picker .seg button{flex:1;padding:9px 4px;font-size:12px}
 .hint{font-size:13px;color:var(--muted);margin:0}
 .hint b{color:var(--fg)}
-.result{display:flex;flex-direction:column;gap:18px}
+.result{display:flex;flex-direction:column;gap:24px}
 .res-top{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .res-top h3{font-size:32px;font-weight:800;margin:4px 0 0;text-transform:uppercase;line-height:1.05;color:var(--head)}
 .result .say{max-width:70ch}
@@ -148,13 +155,16 @@ svg#court{display:block;width:100%;height:auto}
   h1{font-size:30px} .logo{width:64px;height:64px}
   .tabs button{font-size:12px;letter-spacing:.04em;padding:15px 4px 12px}
   .list.icons{flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start;gap:14px;padding:6px 4px 10px;margin:0 -4px}
-  .icon-btn{min-width:68px}
+  .icon-btn{min-width:82px;padding:12px 6px 14px}
   .icon-btn .ic{width:56px;height:56px}
   .list{flex-wrap:nowrap;overflow-x:auto;padding:4px 2px 10px}
   .chip{white-space:nowrap}
   .card-w{padding:16px;border-radius:20px}
+  .panel{padding:22px 18px;gap:28px}
   .c-head h2{font-size:24px}
-  .court-box{padding:6px;border-radius:14px}
+  .court-box{padding:2px;border-radius:14px}
   .settings{width:100%;flex-direction:column;gap:10px}
+  .cards.tips{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-bottom:6px}
+  .tips .card{flex:0 0 78%;scroll-snap-align:start;padding:14px 16px}
   .tg{flex-direction:row;align-items:center;gap:12px}
 }
