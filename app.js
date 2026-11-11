@@ -42,9 +42,9 @@ serve:{name:"Serve",cat:"Start",hitter:"R",
   to:[11.6,5.7],mark:true, react:{L:[2.8,2.6],R:[1.6,5.7]}, reactAlt:{open:{L:[5.2,2.6]}},
   after:{L:[4.4,2.7],R:[4.2,5.3],A:[10,2.7],B:[10,5.4]},
   what:"Overhead from behind the baseline. There is no second serve, so pick a target you can hit every time.",
-  when:"Every point you serve.",
+  when:"Every point you serve. Agree the zone (1–5) with a finger signal first.",
   aim:"Zone 2, at the receiver's body or backhand hip. Mix in zones 4 and 1 so they can't settle.",
-  avoid:"Going for aces with no margin. A fault loses the point.",
+  avoid:"Going for aces with no margin: a fault loses the point. Serving to 5 without telling your partner.",
   hitDo:"Serve at the receiver's body or backhand (zone 2), then follow it in.",
   partnerDo:"Start moving forward the moment the serve is struck.",
   afterH:"Settle at 4–5 m on your side and split step as they return.",
@@ -93,13 +93,13 @@ push:{name:"Push",cat:"Attack",hitter:"R",
   partnerDo:"Hold the middle, racket up.",
   afterH:"If they have to block from low, step in a pace together to 2.5–3 m. If they're balanced, hold.",
   afterP:"Step in with your partner, level, 2–3 m apart."},
-flatsmash:{name:"Flat smash",cat:"Attack",hitter:"L",
+flatsmash:{name:"Smash",cat:"Attack",hitter:"L",
   start:{L:[5.6,2.9],R:[5.8,5.3],A:DEEP.A,B:DEEP.B},
   to:[12.2,4.1],mark:true, react:{A:[12.3,3.5],B:[12.3,4.7]}, after:{L:[6.8,3.0],R:[6.8,5.0]},
-  what:"A hard, flat overhead hit down.",
-  when:"The ball is above your head, you're balanced, and you're within about 5 m of the net.",
-  aim:"Down the middle between them, at their feet, or at a body.",
-  avoid:"Smashing flat from deep. Use a recovery smash there.",
+  what:"An overhead hit down. Close and balanced: hard and flat. Want more control or angle: add brush and spin. From the back of the court: place it deep rather than hit it hard.",
+  when:"The ball is above your head. Within about 5 m of the net you can attack it; further back, smash deep and safe.",
+  aim:"Down the middle between them, at their feet, or at a body. From deep, aim deep into the middle.",
+  avoid:"Going for a winner from the back of the court, or smashing while off balance.",
   hitDo:"Hit down, through the ball, into the middle.",
   partnerDo:"Hold your side and the middle.",
   afterH:"If the reply is weak, step in together. If it's a lob, recover.",
@@ -205,6 +205,18 @@ fakedrop:{name:"Fake drop, real lob",cat:"Disguise",hitter:"R",
   afterP:"Move in level with your partner."}
 };
 var CATCOL={"Start":"var(--sun)","Defence":"var(--turq)","Attack":"var(--coral)","Overheads under pressure":"var(--mango)","Touch and lobs":"var(--palm)","Disguise":"var(--sun)","Basics":"var(--turq)","Tactics":"var(--coral)"};
+var VISIBLE=["serve","push","flatsmash","neutral","lob","drop","dig"];
+var ICON={
+  serve:{c:"#FFD23F",f:"#0D1B2A",d:'<circle cx="7" cy="6" r="3"/><path d="M7 20V12M7 12l9-6M13 6h3v3"/>'},
+  push:{c:"#FF4D6D",f:"#FFFFFF",d:'<path d="M3 12h16M14 7l5 5-5 5"/>'},
+  flatsmash:{c:"#FF9F1C",f:"#FFFFFF",d:'<path d="M14 2L5 13h6l-2 9 10-12h-6z"/>'},
+  neutral:{c:"#00C2B8",f:"#FFFFFF",d:'<path d="M3 18Q12 4 21 18"/><circle cx="21" cy="18" r="1.6"/>'},
+  lob:{c:"#0077B6",f:"#FFFFFF",d:'<path d="M3 21Q12 -6 21 21"/><circle cx="21" cy="21" r="1.6"/>'},
+  drop:{c:"#2ECC71",f:"#FFFFFF",d:'<path d="M3 15Q8 4 13 17"/><path d="M17 4v16" stroke-dasharray="2 2.5"/><circle cx="13" cy="18" r="1.6"/>'},
+  dig:{c:"#0D1B2A",f:"#FFFFFF",d:'<path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/>'}};
+var SIMPLE={brush:"flatsmash",bhsmash:"flatsmash",hook:"flatsmash",recoverysmash:"flatsmash",rainbow:"lob",highlob:"lob",fakelob:"drop",fakedrop:"lob"};
+var BACK2={push:"dig",flatsmash:"neutral",neutral:"lob",lob:"neutral",drop:"lob",dig:"neutral",serve:"serve"};
+function simple(id){return SIMPLE[id]||id}
 var SHOT_GROUPS=[
   ["Start",["serve"]],
   ["Defence",["dig","neutral","highlob"]],
@@ -222,7 +234,7 @@ guide:{name:"Court guide",cat:"Basics",
   {t:"The court",say:"16 m long, 8 m wide, net in the middle. The dashed line 3 m from the net on each side is out of bounds for everyone until the serve is struck. In men's pro events the server's partner must also start behind the 6 m line.",
    L:"You play the left side. Two right-handers: your forehand faces the middle, so the middle ball is usually yours.",
    R:"You play the right side. Your forehand is on the sideline and your backhand faces the middle."},
-  {t:"Target zones",zones:true,say:"Serving from the right side, the opponents' half splits into five lanes: 1 down the line, 2 at the near opponent, 3 the middle, 4 at the other opponent, 5 wide cross-court. Serving from the left flips the numbers.",
+  {t:"Target zones",zones:true,say:"The receiving side splits into five lanes. Zone 1 is always the lane on the server's side of the court (down the line), 2 is the receiver on that side, 3 the middle, 4 the other receiver and 5 wide cross-court. So when the server moves sides, the numbers flip with them. Teams agree the zone with a finger signal before each serve.",
    L:"When you serve from the left, zone 1 is your sideline (the top here).",R:"When you serve from the right, zone 1 is your sideline (the bottom here)."},
   {t:"Reading the pictures",ball:{f:[4.4,5.4],to:[12.6,5.6],shot:"push"},pos:{R:[5.6,5.3],L:[5.6,2.9]},
    say:"Blue is your team and the ring marks you. Coral is the opponents. The ball grows as it rises and the dashed line is its path. Arrows show where each player moves next.",
@@ -461,10 +473,10 @@ lbl(X(8),28,"NET");lbl(X(4),386,"YOUR SIDE");lbl(X(12),386,"OPPONENTS");
 var s1=el("text",{x:X(0.2),y:Y(0.45),fill:C.sandText,style:"font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);s1.textContent="LEFT SIDE";
 var s2=el("text",{x:X(0.2),y:Y(7.75),fill:C.sandText,style:"font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);s2.textContent="RIGHT SIDE";
 
-function drawZones(show,side,half){gZ.innerHTML="";if(!show)return;var own=half==="own";
-  for(var b=0;b<5;b++){var y0=b*1.6;
-    el("rect",{x:X(own?0:8),y:Y(y0),width:320,height:64,fill:C.opp,"fill-opacity":b%2?0.2:0.08},gZ);
-    var n=side==="L"?b+1:5-b;var t=el("text",{x:X(own?7.3:15.4),y:Y(y0+0.8)+7,"text-anchor":"middle",fill:"#B01E42",style:"font:800 20px Montserrat,sans-serif"},gZ);t.textContent=n}}
+function drawZones(show,side,half,hl){gZ.innerHTML="";if(!show)return;var own=half==="own";
+  for(var b=0;b<5;b++){var y0=b*1.6,n=side==="L"?b+1:5-b,on=hl===n;
+    el("rect",{x:X(own?0:8),y:Y(y0),width:320,height:64,fill:on?"#FFD23F":C.opp,"fill-opacity":on?0.55:(b%2?0.2:0.08)},gZ);
+    if(on)el("rect",{x:X(own?0:8)+2,y:Y(y0)+2,width:316,height:60,fill:"none",stroke:"#E08A00","stroke-width":3,rx:3},gZ);var t=el("text",{x:X(own?7.3:15.4),y:Y(y0+0.8)+7,"text-anchor":"middle",fill:"#B01E42",style:"font:800 20px Montserrat,sans-serif"},gZ);t.textContent=n}}
 
 /* Players */
 var COL={L:C.you,R:C.you,A:C.opp,B:C.opp},PL={};
@@ -522,15 +534,57 @@ var INC={
   fakelob:["A","inFloat","A floating ball comes to you. You've lobbed them before, so they're expecting another."],
   fakedrop:["B","inFloat","A soft ball comes to you while they're creeping forward."]};
 var INCP={recoverysmash:"Don't follow your partner back. Step into the middle.",hook:"Don't follow your partner back. Step into the middle.",highlob:"Hold the middle, a step back in case of a lob."};
-function shotScene(id){var s=SHOTS[id],h=s.hitter,inc=INC[id],steps=[],init=s.start,initAlt=s.startAlt;
-  var pre=null;
-  if(inc){init=merge(s.start,{L:[4.4,2.7],R:[4.4,5.3]});initAlt=null;var p1=merge(s.start,null);delete p1[h];pre={};pre[h]=s.start[h];
-    steps.push({t:"The ball comes in",ball:{f:s.start[inc[0]],to:s.start[h],shot:inc[1]},pos:p1,say:inc[2],
-      roles:{hit:"Read where it's going and get ready to move.",partner:INCP[id]||"Adjust to cover the middle."}})}
+var SV0={L:[1.2,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]},SVT={1:[12.6,7.2],2:[11.9,5.75],3:[12.5,4.0],4:[11.9,2.75],5:[12.6,0.75]};
+var SVZ={
+ 1:{rec:"B",rp:[12.3,6.8],L:[3.9,3.5],R:[3.9,6.0],
+    say:"Down the line, on the server's own side. It surprises the receiver, but it pulls them wide and opens a return down the server's line.",
+    hit:"Serve down your own line, then cover that line yourself as you move in.",partner:"Slide a little towards the middle: your partner is covering their own line.",
+    mv:"The server protects their own line, the partner takes more of the middle."},
+ 2:{rec:"B",rp:[11.7,5.7],L:[3.9,2.8],R:[3.9,5.2],
+    say:"At the receiver on the server's side, aimed at their body or backhand hip. The most common and safest serve.",
+    hit:"Spin and dip at their body or backhand hip.",partner:"Normal start: go as the serve is struck and cover the middle.",
+    mv:"Both move in level, about 3 m apart, and split step as they return."},
+ 3:{rec:"B",rp:[11.9,4.4],L:[3.9,2.9],R:[3.9,5.1],
+    say:"Down the middle, between the receivers. It can cause confusion over who takes it, and it gives them no angle.",
+    hit:"Aim at the seam between them.",partner:"Normal start. The return usually comes back through the middle: be ready.",
+    mv:"Both move in level and close the middle."},
+ 4:{rec:"A",rp:[11.7,2.7],L:[3.9,2.8],R:[3.9,5.1],
+    say:"At the other receiver, cross-court. Jams them if it's at the body.",
+    hit:"Cross-court at their body.",partner:"The return comes from the receiver opposite you. Hold your side.",
+    mv:"Both move in level. The partner watches their line."},
+ 5:{rec:"A",rp:[12.3,1.2],L:[3.9,1.7],R:[3.9,4.4],
+    say:"Wide cross-court. A good surprise, but it pulls the receiver wide, and from there the easy return is straight down the partner's line. The server must signal 5 so the partner is ready.",
+    hit:"Signal 5 to your partner first. Serve wide, then move in towards the middle.",partner:"You know it's going to 5: shade towards your line before the return, don't drift to the middle.",
+    mv:"The partner guards the line, the server takes the middle."}};
+function serveScene(){var s=SHOTS.serve,trunk=[],br=[];
+  trunk.push({t:"Zones 1 to 5",hold:SV0.R,zones:true,
+    say:"The receiving side is split into five lanes. Zone 1 is always the lane on the server's side (down the line). 2 is the receiver on that side, 3 the middle, 4 the other receiver, and 5 wide cross-court. Serve from the other side and the numbers flip.",
+    roles:{hit:"You're serving from the right, so zone 1 is the bottom lane here.",partner:"Learn the numbers: they tell you where the return will come from."}});
+  trunk.push({t:"Signal the serve",hold:SV0.R,zones:true,
+    say:"Before every serve, the team agrees the zone with a finger signal: one finger for zone 1, up to five for zone 5. Most important is zone 5: the wide serve opens a return straight down the partner's line, so the partner must know it's coming.",
+    roles:{hit:"Show your partner the zone with your fingers. Never serve 5 without telling them.",partner:"Check the signal before you set. If it's 5, plan to guard your line."}});
+  trunk.push({t:"Set up",hold:SV0.R,zones:true,say:START_SAY.serve,
+    roles:{hit:"Behind the baseline, target picked.",partner:"Weight forward, ready to go the moment the serve is struck."}});
+  for(var z=1;z<=5;z++){var c=SVZ[z],rec={};rec[c.rec]=c.rp;
+    var steps=[{t:"Serve to zone "+z,hl:z,zones:true,ball:{f:SV0.R,to:SVT[z],shot:"serve"},mark:true,pos:merge({R:[1.6,5.7],L:z===5?[2.8,2.0]:(z===1?[2.8,3.2]:[2.8,2.7])},rec),alt:{open:{L:z===5?[4.6,2.0]:[4.6,2.7]}},
+      say:c.say,roles:{hit:c.hit,partner:c.partner}},
+      {t:"Move in",hl:z,zones:true,pos:{L:c.L,R:c.R},alt:{open:{L:[Math.max(4.6,c.L[0]),c.L[1]]}},say:c.mv,
+      roles:{hit:z===1?"Cover your own line as you come in.":"Move in and split step as they hit.",partner:z===5?"Guard your line first.":(z===1?"Take more of the middle.":"Move in level, middle covered.")}}];
+    if(z===5)steps.push({t:"Why: the line return",hl:5,zones:true,ball:{f:c.rp,to:[3.7,1.5],shot:"push"},pos:{L:[3.8,1.5],R:[4.0,4.2]},
+      say:"Pulled wide, the receiver drives it straight down the line. Because the partner knew it was a 5, they were already there to block it.",
+      roles:{hit:"Cover the middle behind your partner.",partner:"You're on the line already: block it long or straight."}});
+    br.push({label:"Zone "+z+(z===2?" (most common)":""),steps:steps})}
+  return {name:s.name,cat:s.cat,shot:"serve",hitter:"R",zoneSide:"R",init:s.start,initAlt:s.startAlt,steps:trunk,ask:"Where is the serve going? Pick a zone",branches:br}}
+var START_SAY={serve:"Server behind the baseline. In men's pro the partner starts behind the 6 m line; in women's and social play, behind the 3 m line. The receivers start just behind their 3 m line."};
+function shotScene(id){if(id==="serve")return serveScene();var s=SHOTS[id],h=s.hitter,inc=INC[id],steps=[];
   var rp=merge(s.react,null);["L","R"].forEach(function(k){if(!(k in s.react)&&s.after&&s.after[k]){var a=s.start[k],b=s.after[k];rp[k]=[a[0]+(b[0]-a[0])*0.6,a[1]+(b[1]-a[1])*0.6]}});
-  steps.push({t:inc?"Move to it and play the shot":"Play the shot",pre:pre,ball:{f:s.start[h],to:s.to,shot:id},mark:s.mark,pos:rp,alt:s.reactAlt,say:s.what,roles:{hit:s.hitDo,partner:s.partnerDo}});
-  steps.push({t:"After the shot",pos:s.after,say:"Where both players go next.",roles:{hit:s.afterH,partner:s.afterP}});
-  return {name:s.name,cat:s.cat,shot:id,hitter:h,zoneSide:"R",init:init,initAlt:initAlt,steps:steps}}
+  var sv=id==="serve";
+  steps.push({t:"Starting position",hold:s.start[h],zones:sv,say:START_SAY[id]||(inc?inc[2]:""),
+    roles:{hit:sv?"Pick your target before the toss: zone 2, at the receiver's body or backhand.":"Get to the ball early and set your feet.",
+      partner:sv?"Weight forward, ready to go the moment the serve is struck.":(INCP[id]||"Hold your side, ready for the reply.")}});
+  steps.push({t:"The shot",ball:{f:s.start[h],to:s.to,shot:id},mark:s.mark,pos:rp,alt:s.reactAlt,say:s.what,roles:{hit:s.hitDo,partner:s.partnerDo}});
+  steps.push({t:"Where to move",pos:s.after,say:"Where both of you go next, and how the opponents react.",roles:{hit:s.afterH,partner:s.afterP}});
+  return {name:s.name,cat:s.cat,shot:id,hitter:h,zoneSide:"R",init:s.start,initAlt:s.startAlt,steps:steps}}
 function stepsOf(){return scene.branches&&state.branch!=null?scene.steps.concat(scene.branches[state.branch].steps):scene.steps}
 function posAt(i){var p=merge(scene.init,scene.initAlt&&scene.initAlt[state.rules]),all=stepsOf();
   for(var n=0;n<=i;n++){var st=all[n];p=merge(p,st.pre);p=merge(p,st.pos);if(st.alt&&st.alt[state.rules])p=merge(p,st.alt[state.rules])}return p}
@@ -538,23 +592,26 @@ function initPos(){return merge(scene.init,scene.initAlt&&scene.initAlt[state.ru
 
 /* ---------------- Rendering ---------------- */
 var $=function(id){return document.getElementById(id)};
-function renderList(){var list=$("list");list.innerHTML="";
-  var groups=state.tab==="shots"?SHOT_GROUPS:SCEN_GROUPS,src=state.tab==="shots"?SHOTS:SCENES;
-  groups.forEach(function(g){var h=document.createElement("div");h.className="glabel";var dot=document.createElement("i");dot.style.background=CATCOL[g[0]]||"var(--turq)";h.appendChild(dot);h.appendChild(document.createTextNode(g[0]));list.appendChild(h);
-    g[1].forEach(function(id){var b=document.createElement("button");b.className="item";b.id="item-"+id;b.textContent=src[id].name;
-      if(state.tab==="play"){var sm=document.createElement("small");var sc=SCENES[id];sm.textContent=sc.branches?sc.steps.length+" steps + options":sc.steps.length+" steps";b.appendChild(sm)}
-      b.setAttribute("aria-current",String(id===state.id));b.onclick=function(){select(id)};list.appendChild(b)})})}
+function renderList(){var list=$("list");list.innerHTML="";var shots=state.tab==="shots";
+  list.className=shots?"list icons":"list";$("sel-title").textContent=shots?"Choose a shot":"Choose a situation";
+  var ids=shots?VISIBLE:[].concat.apply([],SCEN_GROUPS.map(function(g){return g[1]}));
+  ids.forEach(function(id){var b=document.createElement("button");b.id="item-"+id;
+    if(shots){var ic=ICON[id];b.className="item icon-btn";
+      b.innerHTML='<span class="ic" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span>';
+      var lab=document.createElement("span");lab.textContent=SHOTS[id].name;b.appendChild(lab)}
+    else{b.className="item chip";b.textContent=SCENES[id].name}
+    b.setAttribute("aria-current",String(id===state.id));b.onclick=function(){select(id)};list.appendChild(b)})}
 function select(id){stop();state.id=id;save("id-"+state.tab,id);
   scene=state.tab==="shots"?shotScene(id):SCENES[id];state.step=0;state.branch=null;
   [].forEach.call(document.querySelectorAll(".item"),function(b){b.setAttribute("aria-current",String(b.id==="item-"+id))});
   $("title").textContent=scene.name;var cat=$("cat");cat.textContent=scene.cat;cat.style.background=CATCOL[scene.cat]||"var(--turq)";
   renderOptions();
   var isShot=state.tab==="shots";$("cards").hidden=!isShot;
-  if(isShot){var s=SHOTS[id];$("c-what").textContent=s.what;$("c-when").textContent=s.when;$("c-aim").textContent=s.aim;$("c-avoid").textContent=s.avoid}
+  if(isShot){var s=SHOTS[id];$("c-when").textContent=s.when;$("c-aim").textContent=s.aim;$("c-avoid").textContent=s.avoid}
   if(scene.note){$("note").hidden=false;$("note").textContent=scene.note}else{$("note").hidden=true}
   var ip=initPos();["A","B","L","R"].forEach(function(k){place(k,ip[k],true)});
   renderStep()}
-function renderDots(){var dots=$("dots");dots.innerHTML="";stepsOf().forEach(function(s,i){var b=document.createElement("button");b.textContent=i+1;b.setAttribute("aria-label","Step "+(i+1)+": "+s.t);b.onclick=function(){stop();state.step=i;renderStep()};dots.appendChild(b)})}
+function renderDots(){var dots=$("dots");dots.innerHTML="";stepsOf().forEach(function(s,i){var b=document.createElement("button");b.setAttribute("aria-label","Step "+(i+1)+": "+s.t);b.onclick=function(){stop();state.step=i;renderStep()};dots.appendChild(b)})}
 function renderOptions(){var box=$("opt-btns");box.innerHTML="";if(!scene.branches){$("options").hidden=true;return}
   $("ask").textContent=scene.ask||"What happens next?";
   scene.branches.forEach(function(br,j){var b=document.createElement("button");b.className="opt";b.id="opt-"+j;b.textContent=br.label;
@@ -572,18 +629,20 @@ function renderStep(){var all=stepsOf(),i=state.step,st=all[i];renderDots();
   if(delay)setPos(pp,delay);else setPos(cur,mv);
   drawMoves(prev,cur);
   var sv=st.ball&&st.ball.shot==="serve";
-  if(sv)drawZones(true,st.ball.f[1]<4?"L":"R",st.ball.to[0]<8?"own":"opp");
-  else drawZones(state.zones||!!st.zones,scene.zoneSide||"R","opp");
+  if(sv)drawZones(true,st.ball.f[1]<4?"L":"R",st.ball.to[0]<8?"own":"opp",st.hl);
+  else drawZones(state.zones||!!st.zones,scene.zoneSide||"R","opp",st.hl);
   var showSix=state.rules==="men";l6a.style.display=showSix?"":"none";l6b.style.display=showSix?"":"none";
   var d;
   if(delay){if(raf)cancelAnimationFrame(raf);trail.setAttribute("opacity",0);tgt.setAttribute("opacity",0);land.setAttribute("opacity",0);
     if(st.ball){ball.setAttribute("cx",X(st.ball.f[0]));ball.setAttribute("cy",Y(st.ball.f[1]));ball.setAttribute("r",7);ball.setAttribute("opacity",1);shadow.setAttribute("cx",X(st.ball.f[0]));shadow.setAttribute("cy",Y(st.ball.f[1])+2);shadow.setAttribute("opacity",1)}
     preTimer=setTimeout(function(){setPos(cur,mv);runBall(st.ball,st.mark)},delay+120);d=bp?bp.d*1.3:0}
   else d=runBall(st.ball,st.mark);
+  if(!st.ball&&st.hold){var hx=X(st.hold[0]+(st.hold[0]<8?0.5:-0.5)),hy=Y(st.hold[1]);ball.setAttribute("cx",hx);ball.setAttribute("cy",hy);ball.setAttribute("r",6);ball.setAttribute("opacity",1);shadow.setAttribute("cx",hx);shadow.setAttribute("cy",hy+2);shadow.setAttribute("opacity",1)}
+  $("step-k").textContent="Step "+(i+1)+" of "+all.length;
   $("step-title").textContent=st.t;$("say").textContent=st.say||"";
-  var chip=$("shotchip");if(st.ball&&SHOTS[st.ball.shot]){chip.hidden=false;chip.textContent=SHOTS[st.ball.shot].name;chip.dataset.shot=st.ball.shot}else{chip.hidden=true}
+  var chip=$("shotchip"),sid=st.ball&&simple(st.ball.shot);if(state.tab!=="shots"&&sid&&VISIBLE.indexOf(sid)>=0){chip.hidden=false;chip.textContent="Shot: "+SHOTS[sid].name;chip.dataset.shot=sid}else{chip.hidden=true}
   var you,partner,label="Your job";
-  if(st.roles){var hit=scene.hitter===state.side;you=hit?st.roles.hit:st.roles.partner;partner=hit?st.roles.partner:st.roles.hit;label=hit?"Your job (you hit it)":"Your job (partner hits it)"}
+  if(st.roles){var hit=scene.hitter===state.side;you=hit?st.roles.hit:st.roles.partner;partner=hit?st.roles.partner:st.roles.hit;label=hit?"You (hitting)":"You (partner hits)"}
   else{you=st[state.side];partner=st[state.side==="L"?"R":"L"]}
   $("you-label").textContent=label+" · "+(state.side==="L"?"left side":"right side");
   $("you-text").textContent=you||"";$("partner-text").textContent=partner||"";$("jobs").hidden=!you&&!partner;
@@ -598,10 +657,10 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
 /* ---------------- Controls ---------------- */
 function setTab(t){stop();clearTimeout(pkTimer);state.tab=t;save("tab",t);
   ["shots","play","pick"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
-  var pick=t==="pick";$("list").hidden=pick;$("picker").hidden=!pick;$("ctrls").hidden=pick;$("stepbox").hidden=pick;$("result").hidden=!pick;
+  var pick=t==="pick";$("selector").hidden=pick;$("picker").hidden=!pick;$("ctrls").hidden=pick;$("stepbox").hidden=pick;$("result").hidden=!pick;
   if(pick){$("cards").hidden=true;$("title").textContent="Which shot?";var ct=$("cat");ct.textContent="Decision tool";ct.style.background="var(--sun)";renderPickInputs();renderPick();return}
   gG.innerHTML="";
-  var def=t==="shots"?"serve":"guide",saved=load("id-"+t,def),src=t==="shots"?SHOTS:SCENES;state.id=src[saved]?saved:def;
+  var def=t==="shots"?"serve":"guide",saved=load("id-"+t,def),ok=t==="shots"?VISIBLE.indexOf(saved)>=0:!!SCENES[saved];state.id=ok?saved:def;
   renderList();select(state.id)}
 $("tab-shots").onclick=function(){setTab("shots")};$("tab-play").onclick=function(){setTab("play")};$("tab-pick").onclick=function(){setTab("pick")};
 function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.setAttribute("aria-pressed",String(b.dataset.v===state[key]));
@@ -610,12 +669,12 @@ function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.se
     if(key==="rules"){var keep=state.step;["A","B","L","R"].forEach(function(k){place(k,posAt(keep)[k],true)})}
     renderStep()}})}
 seg("seg-side","side");seg("seg-rules","rules");
-$("zones").checked=state.zones;$("zones").onchange=function(e){state.zones=e.target.checked;save("zones",state.zones?"1":"0");if(state.tab==="pick")renderPick();else renderStep()};
+state.zones=false;
 $("prev").onclick=function(){stop();if(state.step>0){state.step--;renderStep()}};
 $("next").onclick=function(){stop();if(state.step<stepsOf().length-1){state.step++;renderStep()}};
 $("play").onclick=play;
 $("replay").onclick=function(){stop();var i=state.step,prev=i>0?posAt(i-1):initPos();["A","B","L","R"].forEach(function(k){place(k,prev[k],true)});requestAnimationFrame(function(){renderStep()})};
-function openShot(s){save("id-shots",s);setTab("shots")}
+function openShot(s){save("id-shots",simple(s));setTab("shots")}
 $("shotchip").onclick=function(){openShot(this.dataset.shot)};
 $("r-open").onclick=function(){openShot(this.dataset.shot)};
 
@@ -696,7 +755,7 @@ function drawGrid(){gG.innerHTML="";
 function pkSeg(key){var box=$("pk-"+key);[].forEach.call(box.children,function(b){b.setAttribute("aria-pressed",String(b.dataset.v===PK[key]));
   b.onclick=function(){PK[key]=b.dataset.v;save("pk-"+key,b.dataset.v);[].forEach.call(box.children,function(x){x.setAttribute("aria-pressed",String(x===b))});renderPick()}})}
 function renderPickInputs(){["side","depth","speed","height"].forEach(pkSeg)}
-function renderPick(){var c=choose(),t=target(c.shot),s=SHOTS[c.shot],D=DI[PK.depth];
+function renderPick(){var c=choose(),t=target(c.shot),mid=simple(c.shot),s=SHOTS[mid],D=DI[PK.depth];
   var youX=[6.4,3.6,1.0][D],youY=state.side==="L"?2.6:5.4,partner=state.side==="L"?"R":"L";
   var pos={A:oppPos(PK.A),B:oppPos(PK.B)};pos[state.side]=[youX,youY];pos[partner]=[D===0?5.4:3.8,state.side==="L"?5.4:2.6];
   ["A","B","L","R"].forEach(function(k){place(k,pos[k],false);PL[k].ring.setAttribute("opacity",k===state.side?1:0)});
@@ -708,9 +767,9 @@ function renderPick(){var c=choose(),t=target(c.shot),s=SHOTS[c.shot],D=DI[PK.de
   clearTimeout(pkTimer);
   var d1=runBall({f:src,to:[cx,cy],shot:"_in"},false);
   pkTimer=setTimeout(function(){runBall({f:[cx,cy],to:t.p,shot:c.shot},true)},d1+450);
-  $("r-shot").textContent=s.name;$("r-open").dataset.shot=c.shot;$("r-why").textContent=c.why;
+  $("r-shot").textContent=s.name;$("r-open").dataset.shot=mid;$("r-why").textContent=c.why;
   $("r-target").textContent=t.txt;$("r-form").textContent=formationText();
-  var b=SHOTS[BACKUP[c.shot]];$("r-backup").textContent=b?b.name+". "+b.when:"";
+  var b=SHOTS[BACK2[mid]];$("r-backup").textContent=b?b.name+". "+b.when:"";
   $("r-you").textContent=s.afterH;$("r-partner").textContent=s.afterP;
   $("pk-next").textContent="Next tap moves "+PK.next+"."}
 
