@@ -51,6 +51,12 @@
           <button id="side-R" data-v="R" aria-pressed="false">Right</button>
         </div>
       </div>
+      <div class="tg">Layout (preview)
+        <div class="seg" id="seg-layout">
+          <button data-v="a" aria-pressed="true">Steps beside</button>
+          <button data-v="b" aria-pressed="false">Tips beside</button>
+        </div>
+      </div>
       <div class="tg">Rules
         <div class="seg" id="seg-rules">
           <button id="rules-men" data-v="men" aria-pressed="true">Men's pro</button>
@@ -81,7 +87,7 @@
         <svg id="court" viewBox="0 0 760 400" role="img" aria-labelledby="court-t">
           <title id="court-t">Top-down beach tennis court showing player positions and the ball</title>
           <defs>
-            <marker id="ar-you" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#0077B6"/></marker>
+            <marker id="ar-you" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#00A79E"/></marker>
             <marker id="ar-opp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#E2365A"/></marker>
           </defs>
           <g id="g-court"></g>
@@ -94,16 +100,28 @@
           <g id="g-ball"></g>
         </svg>
       </div>
+      <div class="controls" id="ctrls">
+        <button class="btn" id="prev" aria-label="Previous step">&#8592; Back</button>
+        <div class="mid">
+          <div class="dots" id="dots"></div>
+          <div class="mini" hidden>
+            <button class="btn soft" id="replay">Replay</button>
+            <button class="btn soft" id="play">Play all</button>
+          </div>
+        </div>
+        <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
+      </div>
       <div class="legend">
-        <span><i class="dot" style="background:#0077B6"></i>Your team (ring = you)</span>
+        <span><i class="dot" style="background:#00C2B8;width:14px;height:14px;box-shadow:0 0 0 4px rgba(0,194,184,.3)"></i>You</span>
+        <span><i class="dot" style="background:#00C2B8"></i>Partner</span>
         <span><i class="dot" style="background:#FF4D6D"></i>Opponents</span>
         <span><i class="dot" style="background:#FFD23F;border:1px solid #8A6A00"></i>Ball</span>
-        <span>Arrows show where players move</span>
       </div>
   <div class="cards tips" id="cards" hidden>
-    <div class="card"><b><i style="background:var(--turq)"></i>When to play it</b><span id="c-when"></span></div>
-    <div class="card"><b><i style="background:var(--ocean)"></i>Aim</b><span id="c-aim"></span></div>
-    <div class="card"><b><i style="background:var(--coral)"></i>Avoid</b><span id="c-avoid"></span></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>When to play it</b><ul class="bl" id="c-when"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><ul class="bl" id="c-aim"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Avoid</b><ul class="bl" id="c-avoid"></ul></div>
+    <div class="card" id="c-windc"><b><i style="background:var(--shotc,var(--fg))"></i>In the wind</b><ul class="bl" id="c-wind"></ul></div>
   </div>
     </section>
 
@@ -112,6 +130,9 @@
         <span class="kicker" id="step-k"></span>
         <h3 id="step-title"></h3>
         <p class="say" id="say"></p>
+        <ol class="zlist" id="say-list" hidden></ol>
+        <figure class="illus" id="say-img" hidden></figure>
+        <p class="say" id="say-after" hidden></p>
         <button class="shotchip" id="shotchip" hidden></button>
         <div class="options" id="options" hidden><b id="ask"></b><div class="opt-btns" id="opt-btns"></div></div>
         <div class="jobs" id="jobs">
@@ -119,20 +140,6 @@
           <div class="job partner"><b>Partner</b><span id="partner-text"></span></div>
         </div>
         <p class="note" id="note" hidden></p>
-      </div>
-
-      <div class="controls" id="ctrls">
-        <div class="nav-row">
-          <button class="btn" id="prev" aria-label="Previous step">&#8592; Back</button>
-          <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
-        </div>
-        <div class="sub-row">
-          <div class="dots" id="dots"></div>
-          <div style="display:flex;gap:8px">
-            <button class="btn soft" id="replay">Replay</button>
-            <button class="btn soft" id="play">Play all</button>
-          </div>
-        </div>
       </div>
 
       <div class="picker" id="picker" hidden>
@@ -146,13 +153,20 @@
     </aside>
   </div>
 
+  <div class="cards tips m-only" id="cards-m" hidden>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>When to play it</b><ul class="bl" id="m-when"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><ul class="bl" id="m-aim"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Avoid</b><ul class="bl" id="m-avoid"></ul></div>
+    <div class="card" id="m-windc"><b><i style="background:var(--shotc,var(--fg))"></i>In the wind</b><ul class="bl" id="m-wind"></ul></div>
+  </div>
+
   <section class="card-w result" id="result" hidden>
     <div class="res-top"><div><span class="kicker">Play</span><h3 id="r-shot"></h3></div><button class="shotchip" id="r-open">See the shot</button></div>
     <p class="say" id="r-why"></p>
     <div class="cards">
-      <div class="card"><b><i style="background:var(--ocean)"></i>Aim</b><span id="r-target"></span></div>
-      <div class="card"><b><i style="background:var(--coral)"></i>Opponents</b><span id="r-form"></span></div>
-      <div class="card"><b><i style="background:var(--turq)"></i>Other option</b><span id="r-backup"></span></div>
+      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><span id="r-target"></span></div>
+      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Opponents</b><span id="r-form"></span></div>
+      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Other option</b><span id="r-backup"></span></div>
     </div>
     <div class="jobs">
       <div class="job you"><b>Then you</b><span id="r-you"></span></div>

@@ -2,17 +2,17 @@
 :root{
   --coral:#FF4D6D; --mango:#FF9F1C; --sun:#FFD23F; --turq:#00C2B8; --ocean:#0077B6; --sand:#F7F4E9; --navy:#0D1B2A; --palm:#2ECC71;
   --bg:#F7F4E9; --surface:#FFFFFF; --surface-2:#F3EEE0; --fg:#0D1B2A; --muted:#5E6875; --line:#ECE5D3;
-  --you:#0077B6; --you-soft:#E6F3FB; --head:#0D1B2A; --accent:#00A79E; --warn:#D9304F;
+  --you:#00A79E; --you-soft:#E2F6F4; --head:#0D1B2A; --accent:#00A79E; --warn:#D9304F;
   --shadow:0 6px 24px rgba(13,27,42,.07); --shadow-s:0 2px 10px rgba(13,27,42,.06);
   --font:"Montserrat",system-ui,-apple-system,"Segoe UI",sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#0D1B2A; --surface:#14273A; --surface-2:#1B3248; --fg:#F7F4E9; --muted:#A9B6C4; --line:#28405A;
-  --you:#4FB3EA; --you-soft:#12314A; --head:#F7F4E9; --accent:#2FD8CE; --warn:#FF7D93;
+  --you:#2FD8CE; --you-soft:#103A3E; --head:#F7F4E9; --accent:#2FD8CE; --warn:#FF7D93;
   --shadow:0 6px 24px rgba(0,0,0,.25); --shadow-s:0 2px 10px rgba(0,0,0,.2); color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0D1B2A; --surface:#14273A; --surface-2:#1B3248; --fg:#F7F4E9; --muted:#A9B6C4; --line:#28405A;
-  --you:#4FB3EA; --you-soft:#12314A; --head:#F7F4E9; --accent:#2FD8CE; --warn:#FF7D93;
+  --you:#2FD8CE; --you-soft:#103A3E; --head:#F7F4E9; --accent:#2FD8CE; --warn:#FF7D93;
   --shadow:0 6px 24px rgba(0,0,0,.25); --shadow-s:0 2px 10px rgba(0,0,0,.2); color-scheme:dark}
 *{box-sizing:border-box}
 html,body{margin:0}
@@ -64,10 +64,10 @@ h1 span{display:block}
 .court-card{display:flex;flex-direction:column;gap:22px}
 .c-head{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
 .c-head h2{margin:0;font-size:30px;font-weight:800;text-transform:uppercase;line-height:1.05;color:var(--head)}
-.cat{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:99px;color:#0D1B2A}
-.court-box{border-radius:18px;border:2px solid var(--turq);padding:6px}
+.cat{display:none;font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:700;padding:6px 14px;border-radius:99px;color:#0D1B2A}
+.court-box{border-radius:18px;padding:0}
 svg#court{display:block;width:100%;height:auto;color:var(--muted)}
-.legend{display:flex;flex-wrap:wrap;gap:8px 20px;font-size:13px;font-weight:500;color:var(--muted)}
+.legend{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 28px;font-size:13px;font-weight:500;color:var(--muted)}
 .legend span{display:inline-flex;align-items:center;gap:8px}
 .dot{width:12px;height:12px;border-radius:50%;display:inline-block}
 
@@ -79,6 +79,12 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .step h3{font-size:24px;font-weight:800;margin:0;text-transform:uppercase;line-height:1.1;color:var(--head)}
 .say{margin:0;color:var(--fg)}
 .jobs{display:flex;flex-direction:column;gap:16px}
+.illus{margin:0;background:var(--surface-2);border-radius:18px;padding:18px 16px 16px;display:flex;flex-direction:column;align-items:center;gap:10px}
+.illus svg,.illus img{width:100%;max-width:260px;height:auto;border-radius:14px;display:block}
+.illus figcaption{font-size:14px;color:var(--muted);text-align:center;line-height:1.5}
+.zlist{list-style:none;margin:-6px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}
+.zlist li{display:flex;align-items:center;gap:14px}
+.zlist b{flex:none;width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:#FFE0E6;color:#B01E42;font-weight:800;font-size:14px}
 .job{border-radius:16px;padding:18px 20px;display:flex;flex-direction:column;gap:8px;line-height:1.6}
 .job b{font-size:11px;letter-spacing:.1em;text-transform:uppercase}
 .job.you{background:var(--you-soft);border-left:5px solid var(--you)}
@@ -94,7 +100,10 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .opt[aria-pressed="true"]{background:var(--coral);color:#FFFFFF}
 
 /* Controls: pill buttons from the brand sheet */
-.controls{display:flex;flex-direction:column;gap:18px;border-top:1px solid var(--line);padding-top:26px}
+.controls{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:16px}
+.controls>.btn{min-width:140px;justify-content:center}
+.controls .mid{display:flex;flex-direction:column;align-items:center;gap:10px}
+.mini{display:flex;gap:8px}
 .nav-row{display:flex;gap:10px}
 .nav-row .btn{flex:1;justify-content:center}
 .btn{border:2px solid var(--turq);background:transparent;color:var(--fg);font:700 13px var(--font);letter-spacing:.06em;text-transform:uppercase;padding:13px 18px;border-radius:99px;cursor:pointer;display:inline-flex;align-items:center;gap:6px}
@@ -111,10 +120,16 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .note{font-size:14px;color:var(--muted);margin:0}
 
 /* Info cards */
-.tips{gap:16px;margin-top:6px}
+.tips{gap:16px;margin-top:6px;align-items:stretch}
+.cards.m-only{display:none}
 .tips .card{background:var(--surface-2);box-shadow:none;padding:20px 20px;border-radius:16px;gap:10px}
 .tips .card span{font-size:14px;line-height:1.55}
+.bl{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:8px;font-size:14px;line-height:1.5;color:var(--muted)}
+.bl li::marker{color:var(--fg)}
 .cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}
+.cards.four{grid-template-columns:repeat(2,minmax(0,1fr))}
+.lay-b .panel .cards,.lay-b .panel .cards.four{grid-template-columns:1fr;margin-top:0}
+.lay-b .court-card .step{border-top:1px solid var(--line);padding-top:24px;margin-top:4px}
 .card{background:var(--surface);border-radius:20px;padding:22px;display:flex;flex-direction:column;gap:8px;box-shadow:var(--shadow-s)}
 .card b{display:flex;align-items:center;gap:10px;font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--head)}
 .card b i{width:12px;height:12px;border-radius:50%;display:inline-block}
@@ -161,6 +176,11 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
   .chip{white-space:nowrap}
   .card-w{padding:16px;border-radius:20px}
   .panel{padding:22px 18px;gap:28px}
+  .controls{gap:10px}
+  .controls>.btn{min-width:0;padding:12px 14px;white-space:nowrap}
+  .mini .btn{padding:7px 10px;font-size:11px;white-space:nowrap}
+  .court-card .cards.tips{display:none}
+  .cards.tips.m-only:not([hidden]){display:flex}
   .c-head h2{font-size:24px}
   .court-box{padding:2px;border-radius:14px}
   .settings{width:100%;flex-direction:column;gap:10px}

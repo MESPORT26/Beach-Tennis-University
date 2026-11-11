@@ -44,7 +44,7 @@ serve:{name:"Serve",cat:"Start",hitter:"R",
   what:"Overhead from behind the baseline. There is no second serve, so pick a target you can hit every time.",
   when:"Every point you serve. Agree the zone (1–5) with a finger signal first.",
   aim:"Zone 3 down the middle is the most common. Zone 2 at the receiver's body or backhand hip is also safe. Mix in 1, 4 and 5 (signal 5 first) so they can't settle.",
-  avoid:"Going for aces with no margin: a fault loses the point. Serving to 5 without telling your partner.",
+  avoid:"Going for aces with no margin, as a fault loses the point. Serving to 5 without telling your partner.",
   hitDo:"Signal the zone, serve it with spin and dip, then follow it in.",
   partnerDo:"Start moving forward the moment the serve is struck.",
   afterH:"Settle at 4–5 m on your side and split step as they return.",
@@ -55,7 +55,7 @@ dig:{name:"Block",cat:"Defence",hitter:"R",
   what:"A short, firm swing with a stable racket face. You block a hard ball back rather than swing at it. It appeared in almost every pro rally.",
   when:"An opponent pushes or smashes hard at your feet or body.",
   aim:"Long over them, deep. Or straight down the line at medium height. Either way they don't get an easy smash.",
-  avoid:"Blocking short: they're waiting at the net, so leave that to very advanced players. Popping it up mid-court. Trying to lob a hard smash, which is very difficult.",
+  avoid:"Blocking short. They're waiting at the net, so leave that to very advanced players. Popping it up mid-court. Trying to lob a hard smash, which is very difficult.",
   hitDo:"Firm wrist, short swing. Send it long over them, or straight at medium height.",
   partnerDo:"Shade towards the middle, racket up, ready for the next ball.",
   afterH:"If your block goes deep and they turn, step in a pace together. If it sits up, hold and get ready.",
@@ -70,7 +70,7 @@ neutral:{name:"Neutral ball",cat:"Defence",hitter:"R",
   hitDo:"Lift it deep onto a backhand, high enough that they can't attack it.",
   partnerDo:"Get back level with your partner.",
   afterH:"Recover to 4–5 m and split step.",
-  afterP:"Same: 4–5 m, level, middle covered."},
+  afterP:"Get to 4–5 m, level, with the middle covered."},
 highlob:{name:"High recovery lob",cat:"Defence",hitter:"L",
   start:{L:[7.4,1.4],R:[3.4,5.9],A:[9.8,3.0],B:[9.8,5.3]},
   to:[14.9,4.0], react:{A:[13.0,3.0],B:[13.0,5.0]}, after:{L:[4.4,2.7],R:[4.4,5.3]},
@@ -96,8 +96,8 @@ push:{name:"Push",cat:"Attack",hitter:"R",
 flatsmash:{name:"Smash",cat:"Attack",hitter:"L",
   start:{L:[5.6,2.9],R:[5.8,5.3],A:DEEP.A,B:DEEP.B},
   to:[12.2,4.1],mark:true, react:{A:[12.3,3.5],B:[12.3,4.7]}, after:{L:[6.8,3.0],R:[6.8,5.0]},
-  what:"An overhead hit down. Close and balanced: hard and flat. Want more control or angle: add brush and spin. From the back of the court: place it deep rather than hit it hard.",
-  when:"The ball is above your head. Within about 5 m of the net you can attack it; further back, smash deep and safe.",
+  what:"An overhead hit down. Hit it hard and flat when you're close and balanced, add brush and spin for more control or angle, and place it deep rather than hard from the back of the court.",
+  when:"The ball is above your head. Within about 5 m of the net you can attack it. Further back, smash deep and safe.",
   aim:"Down the middle between them, at their feet, or at a body. From deep, aim deep into the middle.",
   avoid:"Going for a winner from the back of the court, or smashing while off balance.",
   hitDo:"Hit down, through the ball, into the middle.",
@@ -112,7 +112,7 @@ brush:{name:"Brush smash",cat:"Attack",hitter:"R",
   aim:"Wide (zone 5) or short at the feet.",
   avoid:"Hitting it long and flat. The spin is what keeps it in.",
   hitDo:"Brush up the back of the ball and angle it wide.",
-  partnerDo:"Shift towards the middle: the reply comes back through the middle.",
+  partnerDo:"Shift towards the middle. The reply comes back through the middle.",
   afterH:"Recover to your side.",
   afterP:"Cover the middle while your partner recovers."},
 rainbow:{name:"Backhand rainbow",cat:"Attack",hitter:"L",
@@ -165,18 +165,18 @@ drop:{name:"Drop shot",cat:"Touch and lobs",hitter:"R",
   what:"A soft ball that lands inside the opponents' 3 m line.",
   when:"The player you drop to is mid-court or deep (often after your lob), off balance, or tired. Never drop to a player at their 3 m line or closer, but you can drop to their partner if the partner is back.",
   aim:"Straight and short, towards the deeper player.",
-  avoid:"Dropping to a player at their 3 m line or closer: they get to it early and put it away. A cross-court drop opens the line on your partner.",
+  avoid:"Dropping to a player at their 3 m line or closer. They get to it early and put it away. A cross-court drop opens the line on your partner.",
   hitDo:"Soft hands, land it close to the net.",
   partnerDo:"Hold your lane and step in a little. Watch for the lift.",
   afterH:"Follow in one step to about 4 m, not all the way, and split step.",
-  afterP:"Stay level a step in. The lift usually comes straight or high cross-court: smash it."},
+  afterP:"Stay level a step in. The lift usually comes straight or high cross-court. Smash it."},
 lob:{name:"Lob",cat:"Touch and lobs",hitter:"L",
   start:{L:[4.4,2.6],R:[4.4,5.4],A:NET.A,B:NET.B},
   to:[14.8,7.0], react:{A:[11.0,4.0],B:[14.0,6.4]}, after:{L:[6.4,2.9],R:[6.4,5.1]},
   what:"A high ball over the net player, aimed over their left shoulder (the backhand side of a right-hander).",
   when:"Opponents are close to the net, or you need time.",
   aim:"Deep, over the left shoulder of the net player.",
-  avoid:"Short or flat lobs: they become easy smashes. Lobbing straight off a hard smash is very difficult, so block that instead.",
+  avoid:"Short or flat lobs. They become easy smashes. Lobbing straight off a hard smash is very difficult, so block that instead.",
   hitDo:"High and deep over their backhand shoulder.",
   partnerDo:"Watch them turn and get ready to move in.",
   afterH:"If they're running back, move in together to 3–4 m.",
@@ -205,6 +205,49 @@ fakedrop:{name:"Fake drop, real lob",cat:"Disguise",hitter:"R",
   afterP:"Move in level with your partner."}
 };
 var CATCOL={"Start":"var(--sun)","Defence":"var(--turq)","Attack":"var(--coral)","Overheads under pressure":"var(--mango)","Touch and lobs":"var(--palm)","Disguise":"var(--sun)","Basics":"var(--turq)","Tactics":"var(--coral)"};
+var ILLUS={signal:'<img src="signal.jpg" alt="A hand showing two fingers next to a beach tennis racket" width="560" height="609">'};
+function fillTips(tp){var w=tp.wind||(state.id==="serve"?WIND:null);
+  ["when","aim","avoid","wind"].forEach(function(k){["c-","m-"].forEach(function(pf){var ul=$(pf+k);ul.innerHTML="";((k==="wind"?w:tp[k])||[]).forEach(function(t){var li=document.createElement("li");li.textContent=t;ul.appendChild(li)})})});
+  ["c","m"].forEach(function(pf){$(pf+"-windc").hidden=!w;$(pf==="c"?"cards":"cards-m").classList.toggle("four",!!w)})}
+var WIND=["Into the wind, hit it harder and flatter","Downwind, add more spin so it dips in","In a crosswind, use side spin so it curves back into the court"];
+var ZTIPS={
+ 1:{when:["When the receiver leaves the line open by standing towards the middle","When a crosswind is blowing into the court from that sideline","To mix it up and catch them off guard"],
+  aim:["Low and close to the sideline","More spin so it dips and stays in"],
+  avoid:["Forgetting to cover your own line, because the straight return comes back down it","Zone 1 when a crosswind is blowing towards that sideline, as it can carry the ball out"]},
+ 2:{when:["Your safe, everyday serve","When the receiver struggles with balls at the body"],
+  aim:["At the body or backhand hip","Topspin and dip so it arrives low"],
+  avoid:["Floating it high, because they can attack it"]},
+ 3:{when:["Most serves, as it's the most common choice","When the receivers aren't sure who takes the middle"],
+  aim:["The seam between the two receivers","Topspin and dip so it lands low and gives them no angle"],
+  avoid:["Drifting onto a receiver's forehand, which gives them a clean swing"]},
+ 4:{when:["To change the target and keep them guessing","At a receiver with a weaker backhand or body"],
+  aim:["Cross-court at the body","Flatter and a little quicker, as it has more court to travel"],
+  avoid:["Going too wide, which turns it into a 5 without the signal"]},
+ 5:{when:["When the receiver leaves the wide side open","When a crosswind is blowing into the court from that sideline","To mix it up and catch them off guard","Only after you've signalled 5 to your partner"],
+  aim:["Wide cross-court, flatter and quicker","Make the receiver stretch"],
+  avoid:["Serving it without the signal, because the return comes straight down your partner's line","Floating it, because a slow wide serve gives them time to drive the line","Zone 5 when a crosswind is blowing towards that sideline, as it can carry the ball out"]}};
+var TIPS={
+ serve:{when:["Every point you serve","After you agree the zone (1–5) with a finger signal"],
+  aim:["Zone 3 down the middle is the most common","Zone 2 at the receiver's body or backhand hip","Mix in 1, 4 and 5 so they can't settle","Vary the speed, spin and dip so the receiver can't time their return","A serve that dips low makes them hit up, so your team gets the first attacking ball"],
+  avoid:["Going for aces with no margin, as there's no second serve","Serving to the same zone too often, so the receiver gets used to it","Serving to 5 without telling your partner, because the wide serve opens a return straight down their line"]},
+ push:{when:["The ball reaches you at or above net height","You're 2–4 m from the net"],
+  aim:["At a backhand","At the body, feet or hip","Down the middle between them"],
+  avoid:["Pushing a ball from below net height, because it goes up and gets smashed"]},
+ flatsmash:{when:["The ball is above your head","Within about 5 m of the net, attack it","Further back, smash deep and safe"],
+  aim:["Down the middle between them","At their feet or a body","Deep into the middle when you're at the back"],
+  avoid:["Going for a winner from the back of the court","Smashing while off balance"]},
+ neutral:{when:["You're under pressure or off balance","You're hitting from below net height"],
+  aim:["Deep, to a backhand","Against two right-handers, the outside of B or the middle side of A"],
+  avoid:["Playing it when the ball is high near the net and you could attack"]},
+ lob:{when:["The opponents are close to the net","You need time to recover"],
+  aim:["Always deep","Over the left shoulder of the net player (a right-hander's backhand)"],
+  avoid:["Short or flat lobs, because they get smashed","Lobbing straight off a hard smash, so block it instead"]},
+ drop:{when:["The player you drop to is mid-court or deep","Often after your lob has pushed them back","They're off balance or tired"],
+  aim:["Short, just over the net","Straight, in front of the deeper player"],
+  avoid:["Dropping to a player at their 3 m line or closer","Cross-court drops, because they open the line on your partner"]},
+ dig:{when:["An opponent pushes or smashes hard at your feet or body"],
+  aim:["Long over them, deep","Or straight down the line at medium height","Either way, no easy smash for them"],
+  avoid:["Blocking short, which is only for very advanced players","Popping it up mid-court","Trying to lob a hard smash"]}};
 var VISIBLE=["serve","push","flatsmash","neutral","lob","drop","dig"];
 var ICON={
   serve:{c:"#FFD23F",f:"#0D1B2A",d:'<circle cx="7" cy="6" r="3"/><path d="M7 20V12M7 12l9-6M13 6h3v3"/>'},
@@ -232,7 +275,7 @@ guide:{name:"Court guide",cat:"Basics",
   init:{L:[4.4,2.6],R:[4.4,5.4],A:DEEP.A,B:DEEP.B},
   steps:[
   {t:"The court",say:"16 m long, 8 m wide, net in the middle. The dashed line 3 m from the net on each side is out of bounds for everyone until the serve is struck. In men's pro events the server's partner must also start behind the 6 m line.",
-   L:"You play the left side. Two right-handers: your forehand faces the middle, so the middle ball is usually yours.",
+   L:"You play the left side. With two right-handers, your forehand faces the middle, so the middle ball is usually yours.",
    R:"You play the right side. Your forehand is on the sideline and your backhand faces the middle."},
   {t:"Target zones",zones:true,say:"The receiving side splits into five lanes. Zone 1 is always the lane on the server's side of the court (down the line), 2 is the receiver on that side, 3 the middle, 4 the other receiver and 5 wide cross-court. So when the server moves sides, the numbers flip with them. Teams agree the zone with a finger signal before each serve.",
    L:"When you serve from the left, zone 1 is your sideline (the top here).",R:"When you serve from the right, zone 1 is your sideline (the bottom here)."},
@@ -245,8 +288,8 @@ serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
   steps:[
   {t:"Set up",zones:true,say:"Server behind the baseline. In men's pro events the partner waits behind the 6 m line until the serve is struck (in women's and social play, behind the 3 m line). The receivers start just behind their 3 m line.",
    L:"You're the partner. Stand left of centre behind the line, weight forward, ready to go on the serve.",
-   R:"You're serving from behind the baseline on the right. Pick your target before the toss: zone 3 down the middle, or zone 2 at the receiver's body."},
-  {t:"The serve: spin and dip",ball:{f:[-0.9,6.3],to:[11.7,5.75],shot:"serve"},mark:true,pos:{R:[1.6,5.7],L:[2.8,2.7]},alt:{open:{L:[4.6,2.7]}},
+   R:"You're serving from behind the baseline on the right. Pick your target before the toss. Zone 3 down the middle, or zone 2 at the receiver's body."},
+  {t:"The serve with spin and dip",ball:{f:[-0.9,6.3],to:[11.7,5.75],shot:"serve"},mark:true,pos:{R:[1.6,5.7],L:[2.8,2.7]},alt:{open:{L:[4.6,2.7]}},
    say:"Hit up and over the ball with topspin so it clears the net with margin, then dips. It should arrive low, around the receiver's hip, so they have to hit up.",
    L:"Watch the contact. Go the moment the ball is struck.",R:"Brush up and over the ball. Low at the body beats fast and flat."},
   {t:"Move in together",pos:{L:[3.9,2.8],R:[3.9,5.2]},alt:{open:{L:[4.6,2.8]}},
@@ -257,10 +300,10 @@ serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
   branches:[
   {label:"Hard at the server's feet",steps:[
    {t:"Hard return at the server's feet",ball:{f:[11.6,5.6],to:[4.0,5.4],shot:"push"},pos:{R:[3.9,5.3],L:[4.0,3.4],A:[10.0,2.8],B:[10.1,5.3]},
-    say:"The most common return: low and hard at the server's feet as they come in. The receivers follow it to the net.",
+    say:"The most common return. Low and hard at the server's feet as they come in. The receivers follow it to the net.",
     R:"Stop, get low, racket head down.",L:"Shade towards the middle, racket up."},
    {t:"Block it long over them",ball:{f:[3.9,5.3],to:[14.2,6.2],shot:"dig"},mark:true,pos:{A:[11.2,3.0],B:[12.8,5.8]},
-    say:"Don't swing and don't block it short: they're waiting at the net. Block it long over them, onto B's backhand, or straight at medium height so they don't get an easy smash.",
+    say:"Don't swing and don't block it short. They're waiting at the net. Block it long over them, onto B's backhand, or straight at medium height so they don't get an easy smash.",
     R:"Firm block, long over them.",L:"Ready for their next ball."},
    {t:"Settle and wait for a high ball",pos:{L:[4.4,2.8],R:[4.4,5.2]},
     say:"They've had to turn and go back. Settle level at 4–5 m. Attack only when you get a ball above the net.",
@@ -274,23 +317,23 @@ serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
     R:"Sprint in, lob over A's backhand shoulder, then backpedal straight away to level.",L:"Slide back to your side as the lob goes up, level with your partner."},
    {t:"Their reply floats up",ball:{f:[13.9,2.5],to:[4.8,3.6],shot:"highlob"},pos:{L:[4.6,3.3],R:[4.8,5.0],A:[13.0,2.8],B:[11.8,4.6]},
     say:"Chasing back on the backhand, A can usually only float it back high. You're level at 4–5 m and ready. Whoever has it on the forehand calls it and smashes.",
-    R:"Hold your side, ready to cover.",L:"Middle ball on your forehand: call it and smash."}]},
+    R:"Hold your side, ready to cover.",L:"Middle ball on your forehand. Call it and smash."}]},
   {label:"Drop shot to the partner",steps:[
    {t:"Drop in front of the partner",ball:{f:[11.6,5.6],to:[6.9,2.7],shot:"drop"},pos:{R:[4.4,4.2],A:[10.6,2.8],B:[10.4,5.2]},
-    say:"Short in front of the partner, and both receivers follow it in. Same rule, mirrored: the server slides to the middle, a step back.",
+    say:"Short in front of the partner, and both receivers follow it in. Same rule, mirrored. The server slides to the middle, a step back.",
     R:"Slide to the middle, a step back for the lob.",L:"Read it early. It's yours."},
    {t:"Run in and lob over A's backhand",pre:{L:[6.9,2.7]},ball:{f:[6.9,2.7],to:[14.6,2.4],shot:"lob"},pos:{L:[4.6,2.9],R:[4.4,5.2],A:[13.9,2.5],B:[11.6,4.4]},
-    say:"The partner sprints in from behind the 3 m line and lifts the lob just over A's left shoulder, onto their backhand. Don't float it to the middle: that gives B time to come across and smash. A has to turn and chase it on the backhand. Early and above the net: push at their feet instead.",
+    say:"The partner sprints in from behind the 3 m line and lifts the lob just over A's left shoulder, onto their backhand. Don't float it to the middle. That gives B time to come across and smash. A has to turn and chase it on the backhand. If you're early and the ball is above the net, push at their feet instead.",
     R:"Slide back to your side as the lob goes up.",L:"Sprint in, lob over A's backhand shoulder, then backpedal straight away to level."},
    {t:"Their reply floats up",ball:{f:[13.9,2.5],to:[4.8,3.6],shot:"highlob"},pos:{L:[4.6,3.3],R:[4.8,5.0],A:[13.0,2.8],B:[11.8,4.6]},
     say:"Chasing back on the backhand, A can usually only float it back high. You're level at 4–5 m and ready. Whoever has it on the forehand calls it and smashes.",
-    R:"Hold your side, ready to cover.",L:"Middle ball on your forehand: call it and smash."}]},
+    R:"Hold your side, ready to cover.",L:"Middle ball on your forehand. Call it and smash."}]},
   {label:"Down the partner's line",steps:[
    {t:"Return down the partner's line",ball:{f:[11.6,5.6],to:[3.6,0.8],shot:"push"},pos:{L:[3.8,1.0],R:[4.0,4.1],A:[10.0,2.7],B:[10.2,5.3]},
     say:"The returner aims down the line on the partner's side while they're still moving in. This is why the partner protects their line first.",
     R:"Slide to the middle as your partner goes wide.",L:"Line first. Don't drift to the middle until the return is struck. Get low and block."},
    {t:"Block it straight",ball:{f:[3.8,1.0],to:[14.0,1.3],shot:"dig"},mark:true,pos:{A:[11.4,1.9],B:[10.8,4.6]},
-    say:"Block it straight back down the line at medium height, past A and deep. Don't try to block it short: that's for very advanced players and usually gets put away.",
+    say:"Block it straight back down the line at medium height, past A and deep. Don't try to block it short. That's for very advanced players and usually gets put away.",
     R:"Hold the middle, racket up.",L:"Firm block, straight, medium height."},
    {t:"Reset",pos:{L:[4.4,2.8],R:[4.4,5.2]},
     say:"Back to level at 4–5 m, ready for their next push.",
@@ -298,9 +341,9 @@ serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
   {label:"Neutral ball",steps:[
    {t:"A floating return",ball:{f:[11.6,5.6],to:[4.3,3.8],shot:"neutral"},pos:{L:[4.2,3.6],R:[4.3,5.2],A:[10.0,2.8],B:[10.2,5.3]},
     say:"A floating return with no pace. This is your team's best chance to take over the point.",
-    R:"Hold your side, racket up.",L:"It's coming to the middle on your forehand: call it."},
+    R:"Hold your side, racket up.",L:"It's coming to the middle on your forehand. Call it."},
    {t:"Hit down at them",ball:{f:[4.2,3.6],to:[10.0,4.1],shot:"flatsmash"},pos:{A:[10.0,3.5],B:[10.0,4.7]},
-    say:"Above your head and within about 5 m: smash down into the middle or at their feet. Lower than that: push it at their feet.",
+    say:"If it's above your head and within about 5 m, smash down into the middle or at their feet. If it's lower, push it at their feet.",
     R:"Watch the reply.",L:"Hit down into the middle."},
    {t:"Step in together",pos:{L:[5.4,3.0],R:[5.4,5.0]},
     say:"Your attack made them block from low, so step in a pace together and split step as they hit.",
@@ -310,13 +353,13 @@ serving:{name:"Serve and the third ball",cat:"Basics",zoneSide:"R",
     say:"The returner lobs over the partner's left shoulder while you're both moving in. The receivers follow it to the net.",
     R:"Don't follow. Step into the middle and slightly forward.",L:"Turn and chase. Call 'mine' early."},
    {t:"Chase it, recovery smash deep",pre:{L:[1.4,1.6]},ball:{f:[1.4,1.6],to:[13.6,4.0],shot:"recoverysmash"},pos:{L:[4.0,2.8],R:[4.4,5.2],A:[11.4,2.9],B:[11.4,5.1]},
-    say:"Under it and balanced: recovery smash deep into the middle. Not balanced: a high recovery lob instead.",
+    say:"If you're under it and balanced, play a recovery smash deep into the middle. If not, play a high recovery lob instead.",
     R:"Slide back to your side as the smash goes.",L:"Deep and safe into the middle, then run forward to level straight away."},
    {t:"Step in as they defend",pos:{L:[5.0,2.9],R:[5.0,5.1]},
     say:"Your deep smash makes them defend from the back, so you are level again at 4–5 m. Step in a pace together and split step as they hit.",
     R:"Step in, level.",L:"Step in, level."}]}
   ]},
-receiving:{name:"Receiving: take the net",cat:"Basics",
+receiving:{name:"Receiving and taking the net",cat:"Basics",
   init:{L:[4.4,2.6],R:[4.4,5.5],A:[16.9,1.8],B:[14.7,5.4]}, initAlt:{open:{B:[11.6,5.4]}},
   steps:[
   {t:"Starting positions",say:"Both of you stand just behind your 3 m line, level. The serving team starts further back, so you have the head start to the net.",
@@ -329,7 +372,7 @@ receiving:{name:"Receiving: take the net",cat:"Basics",
    L:"Low return at the server's feet, then step in.",R:"Move in level with your partner as the return is hit."},
   {t:"Their block pops up",ball:{f:[13.6,2.3],to:[7.0,3.8],shot:"dig"},pos:{L:[7.0,2.9],R:[7.0,5.1],A:[12.8,2.6],B:[11.6,5.0]},
    say:"The server has to block your low return up. You're at the net and they're still deep.",
-   L:"It's coming to the middle on your forehand: yours.",R:"Hold your side, racket up."},
+   L:"It's coming to the middle on your forehand. Yours.",R:"Hold your side, racket up."},
   {t:"Push it down the middle",ball:{f:[7.0,3.8],to:[12.2,4.0],shot:"push",land:true},pos:{A:[12.5,3.2],B:[11.8,4.6]},
    say:"Push down into the middle between them. Point won.",
    L:"Push down the middle.",R:"Watch the reply in case it comes back."}
@@ -343,16 +386,16 @@ pair:{name:"Moving as a pair",cat:"Basics",
   {t:"Block it straight",ball:{f:[4.6,0.9],to:[14.0,1.3],shot:"dig"},pos:{A:[11.2,2.4]},
    say:"Block it straight down the line at medium height, or long over them. Not short.",L:"Firm block, straight.",R:"Hold the middle."},
   {t:"Ball goes wide right",ball:{f:[9.8,5.4],to:[4.6,7.4],shot:"push"},pos:{R:[4.7,7.0],L:[4.7,4.2]},
-   say:"Now the other way. Same rule: hitter out, partner to the middle.",L:"Slide to the middle.",R:"Go out to the ball."},
+   say:"Now the other way. Same rule. Hitter out, partner to the middle.",L:"Slide to the middle.",R:"Go out to the ball."},
   {t:"Reset",ball:{f:[4.7,7.1],to:[14.0,6.8],shot:"dig"},pos:{L:[4.5,2.7],R:[4.5,5.3],B:[11.4,5.8]},
    say:"Once the ball is back over, both return to level and centred on your own halves.",L:"Back to your side.",R:"Back to your side."}
   ],
-  note:"Seen in almost every rally of the pro matches: the player away from the ball moves to the middle, and the pair keeps roughly 3 m between them."},
+  note:"Seen in almost every rally of the pro matches. The player away from the ball moves to the middle, and the pair keeps roughly 3 m between them."},
 middle:{name:"Calling the middle ball",cat:"Basics",
   init:{L:[4.5,2.6],R:[4.5,5.4],A:NET.A,B:NET.B},
   steps:[
   {t:"The wrong way",ball:{f:[9.8,2.7],to:[4.6,4.0],shot:"push",land:true},pos:{L:[4.5,3.5],R:[4.5,4.5]},
-   say:"A push down the middle. Both go for it: rackets clash, or both leave it. When this happened in the pro matches the defending team lost 3 points out of 4.",
+   say:"A push down the middle. Both go for it. Rackets clash, or both leave it. When this happened in the pro matches the defending team lost 3 points out of 4.",
    L:"Two players on one ball means nobody covers the sides.",R:"Two players on one ball means nobody covers the sides."},
   {t:"Reset and decide",pos:{L:[4.5,2.6],R:[4.5,5.4]},
    say:"Agree before the point who takes the middle. For two right-handers, the left-side player usually takes it, because their forehand faces the middle.",
@@ -372,7 +415,7 @@ pushdig:{name:"Push vs block",cat:"Tactics",
    L:"Hold the middle, racket up.",R:"Push at the feet, hip or backhand of the player in front of you."},
   {t:"Their block comes up",ball:{f:[12.7,5.6],to:[7.1,4.0],shot:"dig"},pos:{L:[7.2,3.0],R:[7.2,5.0]},
    say:"They had to block from low and the ball is coming up above the net. Step in together a pace, level.",
-   L:"Step in with your partner. It's coming to the middle: yours.",R:"Step in level and cover your side."},
+   L:"Step in with your partner. It's coming to the middle. Yours.",R:"Step in level and cover your side."},
   {t:"Smash the pop-up",ball:{f:[7.2,3.4],to:[12.3,4.2],shot:"flatsmash",land:true},pos:{A:[12.3,3.6],B:[12.3,4.7]},
    say:"Hit down into the middle. Both defenders lunge for the same ball.",
    L:"Smash down the middle.",R:"Hold your side in case it comes back."}
@@ -389,7 +432,7 @@ defend:{name:"Defending from deep",cat:"Tactics",
    L:"Hold the middle.",R:"Firm, short swing, long over them."},
   {t:"Their reply comes up",ball:{f:[12.9,5.9],to:[5.5,3.4],shot:"neutral"},pos:{L:[5.4,3.1],R:[5.4,5.0],B:[12.4,5.4]},
    say:"Turning back on the backhand, they can only float it back. Step in together.",
-   L:"It's coming to the middle on your forehand: take it.",R:"Step in level."},
+   L:"It's coming to the middle on your forehand. Take it.",R:"Step in level."},
   {t:"Attack",ball:{f:[5.5,3.4],to:[12.0,4.3],shot:"flatsmash",land:true},
    say:"Hit down at their feet. Your defence just became attack.",L:"Hit down at their feet.",R:"Hold your side."}
   ],
@@ -401,7 +444,7 @@ lobcover:{name:"Covering the lob",cat:"Tactics",
    say:"You pressed in, and they lob over the left shoulder of the left-side player. The opponents move in behind it.",
    L:"Turn and chase. Call 'mine' or 'switch' early.",R:"Don't follow. Step into the middle, slightly forward, to cover their likely reply."},
   {t:"Recovery smash, deep",ball:{f:[1.5,1.4],to:[13.4,4.0],shot:"recoverysmash"},pos:{A:[11.6,3.0],B:[11.6,5.0]},
-   say:"Under it but deep: play a recovery smash deep into the middle. Placement, not power.",
+   say:"Under it but deep. Play a recovery smash deep into the middle. Placement, not power.",
    L:"Deep into the middle, then move forward.",R:"Hold the middle."},
   {t:"Reset",pos:{L:[4.4,2.7],R:[4.4,5.3]},
    say:"The hitter recovers forward, the partner slides back to their side, and you're level at 4–5 m again. If you can't get balanced under the lob, play a high recovery lob instead.",
@@ -421,28 +464,28 @@ droppattern:{name:"Drop shot when they're deep",cat:"Tactics",
   {t:"Smash into the space",ball:{f:[5.7,4.9],to:[13.6,6.0],shot:"flatsmash",land:true},
    say:"Smash into the space behind the player who ran forward.",L:"Hold your side.",R:"Into the space behind them."}
   ],
-  note:"Avoid the cross-court drop: the reply down the line goes straight at your partner's open side."},
-fake:{name:"Disguise: fake lob, real drop",cat:"Tactics",
+  note:"Avoid the cross-court drop. The reply down the line goes straight at your partner's open side."},
+fake:{name:"Fake lob, real drop",cat:"Tactics",
   init:{L:[5.0,2.7],R:[5.0,5.3],A:[11.6,2.7],B:[11.6,5.4]},
   steps:[
   {t:"Shape up for the lob",pos:{A:[12.8,2.8],B:[12.8,5.3]},
    say:"Same backswing as your lob. They read lob and drift back.",L:"Open the racket as if lobbing.",R:"Hold your lane."},
   {t:"Real drop",ball:{f:[5.0,2.7],to:[9.3,2.4],shot:"fakelob"},mark:true,pos:{A:[10.1,2.5],L:[5.7,2.9],R:[5.6,5.0]},
-   say:"Soften at the last moment: a drop straight in front of you.",L:"Soft drop, then one step in.",R:"Step in level."},
+   say:"Soften at the last moment. A drop straight in front of you.",L:"Soft drop, then one step in.",R:"Step in level."},
   {t:"They lift it",ball:{f:[10.1,2.5],to:[6.0,3.4],shot:"dig"},
    say:"Just like the drop pattern, the lift comes up.",L:"It's yours, middle-left.",R:"Split step."},
   {t:"Finish",ball:{f:[6.0,3.3],to:[14.0,1.6],shot:"flatsmash",land:true},
    say:"Smash into the deep corner the drop pulled them out of.",L:"Into the deep corner.",R:"Hold your side."}
   ]},
-stepin:{name:"After an attack: step in or hold?",cat:"Tactics",
+stepin:{name:"After an attack, step in or hold?",cat:"Tactics",
   init:{L:[5.8,2.8],R:[6.0,5.2],A:[12.4,2.7],B:[12.5,5.4]},
   steps:[
   {t:"You attack",ball:{f:[6.0,5.2],to:[12.6,5.6],shot:"push"},pos:{B:[12.7,5.6]},
    say:"You push at their feet.",L:"Hold the middle.",R:"Push at their feet."},
-  {t:"Weak reply: step in",ball:{f:[12.7,5.6],to:[7.0,4.3],shot:"dig"},pos:{L:[6.8,3.0],R:[6.8,5.0]},
+  {t:"Weak reply, so step in",ball:{f:[12.7,5.6],to:[7.0,4.3],shot:"dig"},pos:{L:[6.8,3.0],R:[6.8,5.0]},
    say:"They blocked from low and the ball is coming up. Step in together to 2.5–3 m and split step as it arrives.",
    L:"Step in level with your partner.",R:"Recover from the swing, then step in."},
-  {t:"The other case: balanced defender",pos:{L:[5.8,2.8],R:[6.0,5.2],A:[12.0,2.9],B:[12.4,5.2]},
+  {t:"The other case, a balanced defender",pos:{L:[5.8,2.8],R:[6.0,5.2],A:[12.0,2.9],B:[12.4,5.2]},
    say:"Same attack, but this time the defender is balanced and under the ball with time. A lob is coming.",
    L:"Don't step in. Hold your ground.",R:"Hold. Watch their racket face open."},
   {t:"The lob",ball:{f:[12.0,2.9],to:[1.6,1.3],shot:"lob"},pos:{L:[2.4,1.6],R:[5.8,4.0]},
@@ -462,14 +505,17 @@ var scene=null,timer=null,raf=null,pkTimer=null,preTimer=null;
 /* ---------------- Static court ---------------- */
 var gC=document.getElementById("g-court"),gZ=document.getElementById("g-zones"),gL=document.getElementById("g-lines"),
     gM=document.getElementById("g-moves"),gT=document.getElementById("g-trail"),gP=document.getElementById("g-players"),gB=document.getElementById("g-ball");
-el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"#F3DFAE",rx:4},gC);
-el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"none",stroke:"#007A74","stroke-width":3},gC);
+var courtFill=el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"#F3DFAE",rx:4},gC);
+var noGo=el("rect",{x:X(5),y:Y(0),width:240,height:320,fill:"#FF9F1C","fill-opacity":0},gC);
+var DASH=[];
+el("rect",{x:X(0),y:Y(0),width:640,height:320,fill:"none",stroke:"#0077B6","stroke-width":3},gC);
+[0,8].forEach(function(m){el("line",{x1:X(5),y1:Y(m),x2:X(11),y2:Y(m),stroke:"#FF9F1C","stroke-width":4},gC)});
 function lbl(x,y,txt,anchor){var t=el("text",{x:x,y:y,"text-anchor":anchor||"middle",fill:"currentColor",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);t.textContent=txt;return t}
-function vline(m,lb){var g=el("g",{},gL);el("line",{x1:X(m),y1:Y(0),x2:X(m),y2:Y(8),stroke:C.line,"stroke-width":2,"stroke-dasharray":"7 6"},g);
-  var t=el("text",{x:X(m),y:28,"text-anchor":"middle",fill:"currentColor",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.06em"},g);t.textContent=lb;return g}
+function vline(m,lb){var g=el("g",{},gL);var dl=el("line",{x1:X(m),y1:Y(0),x2:X(m),y2:Y(8),stroke:C.line,"stroke-width":2,"stroke-dasharray":"7 6"},g);DASH.push(dl);
+  var t=el("text",{x:X(m),y:17,"text-anchor":"middle",fill:"currentColor",style:"font:700 12px Montserrat,system-ui,sans-serif;letter-spacing:.06em"},g);t.textContent=lb;return g}
 vline(5,"3 m");vline(11,"3 m");var l6a=vline(2,"6 m"),l6b=vline(14,"6 m");
 el("line",{x1:X(8),y1:Y(0)-10,x2:X(8),y2:Y(8)+10,stroke:C.net,"stroke-width":6,"stroke-linecap":"round"},gL);
-lbl(X(8),28,"NET");lbl(X(4),386,"YOUR SIDE");lbl(X(12),386,"OPPONENTS");
+lbl(X(8),17,"NET");lbl(X(4),386,"YOUR SIDE");lbl(X(12),386,"OPPONENTS");
 var s1=el("text",{x:X(0.2),y:Y(0.45),fill:C.sandText,style:"font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);s1.textContent="LEFT SIDE";
 var s2=el("text",{x:X(0.2),y:Y(7.75),fill:C.sandText,style:"font:700 11px Montserrat,system-ui,sans-serif;letter-spacing:.08em"},gL);s2.textContent="RIGHT SIDE";
 
@@ -481,11 +527,13 @@ function drawZones(show,side,half,hl){gZ.innerHTML="";if(!show)return;var own=ha
 /* Players */
 var COL={L:C.you,R:C.you,A:C.opp,B:C.opp},PL={};
 ["A","B","L","R"].forEach(function(id){var g=el("g",{"class":"pl"},gP);
-  var ring=el("circle",{r:20,fill:"none",stroke:"#0D1B2A","stroke-width":3,opacity:0},g);
-  el("circle",{r:14,fill:COL[id],stroke:"#FFFFFF","stroke-width":2.5},g);
+  var ring=el("circle",{r:25,fill:"#00C2B8","fill-opacity":0.3,opacity:0},g);
+  var c=el("circle",{r:14,fill:COL[id],stroke:"#FFFFFF","stroke-width":2.5},g);
   var t=el("text",{"text-anchor":"middle","dominant-baseline":"central",y:1,fill:"#FFFFFF",style:"font:800 12px Montserrat,system-ui,sans-serif"},g);t.textContent=id;
-  PL[id]={g:g,ring:ring}});
-function place(id,p,instant){var g=PL[id].g;if(instant){g.style.transition="none";}g.style.transform="translate("+X(p[0])+"px,"+Y(p[1])+"px)";
+  PL[id]={g:g,ring:ring,c:c,t:t}});
+var ME="#00C2B8";
+function place(id,p,instant){var g=PL[id].g;
+  if(id==="L"||id==="R"){var me=id===state.side;PL[id].c.setAttribute("fill",ME);PL[id].c.setAttribute("r",me?17:14);PL[id].t.setAttribute("fill","#0D1B2A");PL[id].t.textContent=me?"Y":"P"}if(instant){g.style.transition="none";}g.style.transform="translate("+X(p[0])+"px,"+Y(p[1])+"px)";
   if(instant){g.getBoundingClientRect();g.style.transition="";}}
 
 /* Ball */
@@ -513,7 +561,7 @@ function drawMoves(prev,cur){gM.innerHTML="";
   ["A","B","L","R"].forEach(function(id){var a=prev[id],b=cur[id];if(!a||!b)return;
     var dx=X(b[0])-X(a[0]),dy=Y(b[1])-Y(a[1]),len=Math.hypot(dx,dy);if(len<12)return;
     var ux=dx/len,uy=dy/len,opp=(id==="A"||id==="B");
-    if(len>26)el("line",{x1:X(a[0])+ux*4,y1:Y(a[1])+uy*4,x2:X(b[0])-ux*18,y2:Y(b[1])-uy*18,stroke:opp?C.oppDark:C.you,"stroke-width":2.5,"marker-end":opp?"url(#ar-opp)":"url(#ar-you)"},gM)})}
+    if(len>26)el("line",{x1:X(a[0])+ux*4,y1:Y(a[1])+uy*4,x2:X(b[0])-ux*18,y2:Y(b[1])-uy*18,stroke:opp?C.oppDark:"#00A79E","stroke-width":2.5,"marker-end":opp?"url(#ar-opp)":"url(#ar-you)"},gM)})}
 
 /* ---------------- Scene building ---------------- */
 function merge(a,b){var o={};for(var k in a)o[k]=a[k];if(b)for(var j in b)o[j]=b[j];return o}
@@ -536,44 +584,44 @@ var INC={
 var INCP={recoverysmash:"Don't follow your partner back. Step into the middle.",hook:"Don't follow your partner back. Step into the middle.",highlob:"Hold the middle, a step back in case of a lob."};
 var SV0={L:[1.7,2.6],R:[-0.9,6.3],A:[11.6,2.6],B:[11.6,5.6]},SVT={1:[12.6,7.2],2:[11.9,5.75],3:[12.5,4.0],4:[11.9,2.75],5:[12.6,0.75]};
 var SVZ={
- 1:{rec:"B",rp:[12.3,6.8],L:[3.9,3.5],R:[3.9,6.0],
-    say:"Down the line, on the server's own side. It surprises the receiver, but it pulls them wide and opens a return down the server's line.",
-    hit:"Serve down your own line, then cover that line yourself as you move in.",partner:"Slide a little towards the middle: your partner is covering their own line.",
+ 1:{rec:"B",rp:[12.3,6.8],op:[11.6,3.3],L:[4.6,3.3],R:[4.6,6.0],
+    say:"Down the line, on the server's own side. It surprises the receiver, but the straight return comes back down the server's line, so the server covers it.",
+    hit:"Serve down your own line, then cover that line yourself as you move in.",partner:"Slide a little towards the middle. Your partner is covering their own line.",
     mv:"The server protects their own line, the partner takes more of the middle."},
- 2:{rec:"B",rp:[11.7,5.7],L:[3.9,2.8],R:[3.9,5.2],
+ 2:{rec:"B",rp:[11.7,5.7],op:[11.6,3.3],L:[4.6,2.7],R:[4.6,5.3],
     say:"At the receiver on the server's side, aimed at their body or backhand hip. A safe serve that jams them.",
-    hit:"Spin and dip at their body or backhand hip.",partner:"Normal start: go as the serve is struck and cover the middle.",
-    mv:"Both move in level, about 3 m apart, and split step as they return."},
- 3:{rec:"B",rp:[11.9,4.4],L:[3.9,2.9],R:[3.9,5.1],
-    say:"Down the middle, between the receivers. The most common serve: it can cause confusion over who takes it, and it gives them no angle.",
-    hit:"Aim at the seam between them.",partner:"Normal start. The return usually comes back through the middle: be ready.",
+    hit:"Spin and dip at their body or backhand hip.",partner:"Normal start. Go as the serve is struck and cover the middle.",
+    mv:"Both move in level to about 4 m from the net, just behind the 3 m line, and split step as they return."},
+ 3:{rec:"B",rp:[11.9,4.6],op:[11.6,3.2],L:[4.6,2.9],R:[4.6,5.1],
+    say:"Down the middle, between the receivers. The most common serve. It can cause confusion over who takes it, and it gives them no angle.",
+    hit:"Aim at the seam between them.",partner:"Normal start. The return usually comes back through the middle. Be ready.",
     mv:"Both move in level and close the middle."},
- 4:{rec:"A",rp:[11.7,2.7],L:[3.9,2.8],R:[3.9,5.1],
+ 4:{rec:"A",rp:[11.7,2.7],op:[11.6,4.8],L:[4.6,2.7],R:[4.6,5.2],
     say:"At the other receiver, cross-court. Jams them if it's at the body.",
     hit:"Cross-court at their body.",partner:"The return comes from the receiver opposite you. Hold your side.",
     mv:"Both move in level. The partner watches their line."},
- 5:{rec:"A",rp:[12.3,1.2],L:[3.9,1.7],R:[3.9,4.4],
+ 5:{rec:"A",rp:[12.3,1.2],op:[11.6,4.4],L:[4.6,1.9],R:[4.6,4.6],
     say:"Wide cross-court. A good surprise, but it pulls the receiver wide, and from there the easy return is straight down the partner's line. The server must signal 5 so the partner is ready.",
-    hit:"Signal 5 to your partner first. Serve wide, then move in towards the middle.",partner:"You know it's going to 5: shade towards your line before the return, don't drift to the middle.",
+    hit:"Signal 5 to your partner first. Serve wide, then move in towards the middle.",partner:"You know it's going to 5, so shade towards your line before the return and don't drift to the middle.",
     mv:"The partner guards the line, the server takes the middle."}};
 function serveScene(){var s=SHOTS.serve,trunk=[],br=[];
   trunk.push({t:"Zones 1 to 5",hold:SV0.R,zones:true,
-    say:"The receiving side is split into five lanes. Zone 1 is always the lane on the server's side (down the line). 2 is the receiver on that side, 3 the middle, 4 the other receiver, and 5 wide cross-court. Serve from the other side and the numbers flip.",
-    roles:{hit:state.side==="L"?"You're serving from the left, so zone 1 is the top lane here.":"You're serving from the right, so zone 1 is the bottom lane here.",partner:"Learn the numbers: they tell you where the return will come from."}});
-  trunk.push({t:"Signal the serve",hold:SV0.R,zones:true,
-    say:"Before every serve, the team agrees the zone with a finger signal: one finger for zone 1, up to five for zone 5. Most important is zone 5: the wide serve opens a return straight down the partner's line, so the partner must know it's coming.",
+    say:"The receiving side is split into five lanes, always counted from the server's side:",
+    list:["Down the line, on the server's side","At the receiver on the server's side","Down the middle","At the other receiver","Wide cross-court"],
+    after:"Zone 1 always follows the server. When your partner serves, zone 1 is on their side.",
+    roles:{hit:state.side==="L"?"You're serving from the left, so zone 1 is the top lane here.":"You're serving from the right, so zone 1 is the bottom lane here.",partner:"Learn the numbers. They tell you where the return will come from."}});
+  trunk.push({t:"Signal the serve",hold:SV0.R,zones:true,img:"signal",cap:"Two fingers means zone 2. Hold the signal behind your racket so the receivers can't see it.",
+    say:"Before every serve, the team agrees the zone with a finger signal. One finger for zone 1, up to five for zone 5. Most important is zone 5. The wide serve opens a return straight down the partner's line, so the partner must know it's coming.",
     roles:{hit:"Show your partner the zone with your fingers. Never serve 5 without telling them.",partner:"Check the signal before you set. If it's 5, plan to guard your line."}});
   trunk.push({t:"Set up",hold:SV0.R,zones:true,say:START_SAY.serve,
-    roles:{hit:"Behind the baseline, target picked.",partner:state.rules==="men"?"As far forward as the rules allow: just behind the 6 m line, weight forward, ready to go the moment the serve is struck.":"Just behind the 3 m line, weight forward, ready to go the moment the serve is struck."}});
-  for(var z=1;z<=5;z++){var c=SVZ[z],rec={};rec[c.rec]=c.rp;
-    var steps=[{t:"Serve to zone "+z,hl:z,zones:true,ball:{f:SV0.R,to:SVT[z],shot:"serve"},mark:true,pos:merge({R:[1.6,5.7],L:z===5?[2.8,2.0]:(z===1?[2.8,3.2]:[2.8,2.7])},rec),alt:{open:{L:z===5?[4.6,2.0]:[4.6,2.7]}},
-      say:c.say,roles:{hit:c.hit,partner:c.partner}},
-      {t:"Move in",hl:z,zones:true,pos:{L:c.L,R:c.R},alt:{open:{L:[Math.max(4.6,c.L[0]),c.L[1]]}},say:c.mv,
-      roles:{hit:z===1?"Cover your own line as you come in.":"Move in and split step as they hit.",partner:z===5?"Guard your line first.":(z===1?"Take more of the middle.":"Move in level, middle covered.")}}];
-    if(z===5)steps.push({t:"Why: the line return",hl:5,zones:true,ball:{f:c.rp,to:[3.7,1.5],shot:"push"},pos:{L:[3.8,1.5],R:[4.0,4.2]},
+    roles:{hit:"Behind the baseline, target picked. Change your speed, spin and dip from serve to serve so the receiver never settles.",partner:state.rules==="men"?"As far forward as the rules allow. Just behind the 6 m line, weight forward, ready to go the moment the serve is struck.":"Just behind the 3 m line, weight forward, ready to go the moment the serve is struck."}});
+  for(var z=1;z<=5;z++){var c=SVZ[z],rec={};rec[c.rec]=c.rp;rec[c.rec==="A"?"B":"A"]=c.op;
+    var steps=[{t:"Serve to zone "+z,tz:z,hl:z,zones:true,ball:{f:SV0.R,to:SVT[z],shot:"serve"},mark:true,pos:merge({R:c.R,L:c.L},rec),alt:{open:{L:[Math.max(4.6,c.L[0]),c.L[1]]}},
+      say:c.say+" "+c.mv,roles:{hit:c.hit+" Get to about 4 m and split step as they hit.",partner:c.partner}}];
+    if(z===5)steps.push({t:"Why it matters, the line return",tz:5,hl:5,zones:true,ball:{f:c.rp,to:[4.5,1.5],shot:"push"},pos:{L:[4.5,1.5],R:[4.7,4.4]},
       say:"Pulled wide, the receiver drives it straight down the line. Because the partner knew it was a 5, they were already there to block it.",
-      roles:{hit:"Cover the middle behind your partner.",partner:"You're on the line already: block it long or straight."}});
-    br.push({label:"Zone "+z+(z===3?" (most common)":""),steps:steps})}
+      roles:{hit:"Cover the middle behind your partner.",partner:"You're on the line already. Block it long or straight."}});
+    br.push({label:"Zone "+z,steps:steps})}
   var sc={name:s.name,cat:s.cat,shot:"serve",hitter:"R",zoneSide:"R",init:SV0,initAlt:{open:{L:[4.4,2.6]}},steps:trunk,ask:"Where is the serve going? Pick a zone",branches:br};
   return state.side==="L"?mirrorScene(sc):sc}
 /* Flip the court top to bottom so the left-side player serves */
@@ -582,12 +630,12 @@ function mirStep(st){var o=merge(st,null);if(st.pos)o.pos=mir(st.pos);if(st.pre)
   if(st.ball)o.ball={f:[st.ball.f[0],8-st.ball.f[1]],to:[st.ball.to[0],8-st.ball.to[1]],shot:st.ball.shot};if(st.hold)o.hold=[st.hold[0],8-st.hold[1]];return o}
 function mirrorScene(sc){var o=merge(sc,null);o.hitter="L";o.zoneSide="L";o.init=mir(sc.init);o.initAlt={open:mir(sc.initAlt.open)};o.steps=sc.steps.map(mirStep);
   o.branches=sc.branches.map(function(b){return {label:b.label,steps:b.steps.map(mirStep)}});return o}
-var START_SAY={serve:"Server behind the baseline. In men's pro the partner starts behind the 6 m line; in women's and social play, behind the 3 m line. The receivers start just behind their 3 m line."};
+var START_SAY={serve:"Server behind the baseline. In men's pro the partner starts behind the 6 m line. In women's and social play, it's the 3 m line. The receivers start just behind their 3 m line."};
 function shotScene(id){if(id==="serve")return serveScene();var s=SHOTS[id],h=s.hitter,inc=INC[id],steps=[];
   var rp=merge(s.react,null);["L","R"].forEach(function(k){if(!(k in s.react)&&s.after&&s.after[k]){var a=s.start[k],b=s.after[k];rp[k]=[a[0]+(b[0]-a[0])*0.6,a[1]+(b[1]-a[1])*0.6]}});
   var sv=id==="serve";
   steps.push({t:"Starting position",hold:s.start[h],zones:sv,say:START_SAY[id]||(inc?inc[2]:""),
-    roles:{hit:sv?"Pick your target before the toss: zone 2, at the receiver's body or backhand.":"Get to the ball early and set your feet.",
+    roles:{hit:sv?"Pick your target before the toss. Zone 2, at the receiver's body or backhand.":"Get to the ball early and set your feet.",
       partner:sv?"Weight forward, ready to go the moment the serve is struck.":(INCP[id]||"Hold your side, ready for the reply.")}});
   steps.push({t:"The shot",ball:{f:s.start[h],to:s.to,shot:id},mark:s.mark,pos:rp,alt:s.reactAlt,say:s.what,roles:{hit:s.hitDo,partner:s.partnerDo}});
   steps.push({t:"Where to move",pos:s.after,say:"Where both of you go next, and how the opponents react.",roles:{hit:s.afterH,partner:s.afterP}});
@@ -613,8 +661,8 @@ function select(id){stop();state.id=id;save("id-"+state.tab,id);
   [].forEach.call(document.querySelectorAll(".item"),function(b){b.setAttribute("aria-current",String(b.id==="item-"+id))});
   $("title").textContent=scene.name;var cat=$("cat");cat.textContent=scene.cat;cat.style.background=CATCOL[scene.cat]||"var(--turq)";
   renderOptions();
-  var isShot=state.tab==="shots";$("cards").hidden=!isShot;
-  if(isShot){var s=SHOTS[id];$("c-when").textContent=s.when;$("c-aim").textContent=s.aim;$("c-avoid").textContent=s.avoid}
+  var isShot=state.tab==="shots";if(isShot&&ICON[id])document.documentElement.style.setProperty("--shotc",ICON[id].c);$("cards").hidden=!isShot;$("cards-m").hidden=!isShot;
+  if(isShot){var s=SHOTS[id];fillTips(TIPS[id]||{when:[s.when],aim:[s.aim],avoid:[s.avoid]})}
   if(scene.note){$("note").hidden=false;$("note").textContent=scene.note}else{$("note").hidden=true}
   var ip=initPos();["A","B","L","R"].forEach(function(k){place(k,ip[k],true)});
   renderStep()}
@@ -645,9 +693,13 @@ function renderStep(){var all=stepsOf(),i=state.step,st=all[i];renderDots();
     preTimer=setTimeout(function(){setPos(cur,mv);runBall(st.ball,st.mark)},delay+120);d=bp?bp.d*1.3:0}
   else d=runBall(st.ball,st.mark);
   if(!st.ball&&st.hold){var hx=X(st.hold[0]+(st.hold[0]<8?0.5:-0.5)),hy=Y(st.hold[1]);ball.setAttribute("cx",hx);ball.setAttribute("cy",hy);ball.setAttribute("r",6);ball.setAttribute("opacity",1);shadow.setAttribute("cx",hx);shadow.setAttribute("cy",hy+2);shadow.setAttribute("opacity",1)}
+  if(state.tab==="shots"&&state.id==="serve"){fillTips(st.tz?ZTIPS[st.tz]:TIPS.serve)}
   $("step-k").textContent="Step "+(i+1)+" of "+all.length;
   $("step-title").textContent=st.t;$("say").textContent=st.say||"";
-  var chip=$("shotchip"),sid=st.ball&&simple(st.ball.shot);if(state.tab!=="shots"&&sid&&VISIBLE.indexOf(sid)>=0){chip.hidden=false;chip.textContent="Shot: "+SHOTS[sid].name;chip.dataset.shot=sid}else{chip.hidden=true}
+  var ol=$("say-list");ol.innerHTML="";(st.list||[]).forEach(function(t,j){var li=document.createElement("li");var n=document.createElement("b");n.textContent=j+1;li.appendChild(n);li.appendChild(document.createTextNode(t));ol.appendChild(li)});ol.hidden=!st.list;
+  var im=$("say-img");im.innerHTML=st.img?ILLUS[st.img]+(st.cap?"<figcaption>"+st.cap+"</figcaption>":""):"";im.hidden=!st.img;
+  $("say-after").textContent=st.after||"";$("say-after").hidden=!st.after;
+  var chip=$("shotchip"),sid=st.ball&&simple(st.ball.shot);if(state.tab!=="shots"&&sid&&VISIBLE.indexOf(sid)>=0){chip.hidden=false;chip.textContent="See the "+SHOTS[sid].name.toLowerCase();chip.dataset.shot=sid}else{chip.hidden=true}
   var you,partner,label="Your job";
   if(st.roles){var hit=scene.hitter===state.side;you=hit?st.roles.hit:st.roles.partner;partner=hit?st.roles.partner:st.roles.hit;label=hit?"You (hitting)":"You (partner hits)"}
   else{you=st[state.side];partner=st[state.side==="L"?"R":"L"]}
@@ -665,7 +717,7 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
 function setTab(t){stop();clearTimeout(pkTimer);state.tab=t;save("tab",t);
   ["shots","play","pick"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
   var pick=t==="pick";$("selector").hidden=pick;$("picker").hidden=!pick;$("ctrls").hidden=pick;$("stepbox").hidden=pick;$("result").hidden=!pick;
-  if(pick){$("cards").hidden=true;$("title").textContent="Which shot?";var ct=$("cat");ct.textContent="Decision tool";ct.style.background="var(--sun)";renderPickInputs();renderPick();return}
+  if(pick){$("cards").hidden=true;$("cards-m").hidden=true;$("title").textContent="Which shot?";var ct=$("cat");ct.textContent="Decision tool";ct.style.background="var(--sun)";renderPickInputs();renderPick();return}
   gG.innerHTML="";
   var def=t==="shots"?"serve":"guide",saved=load("id-"+t,def),ok=t==="shots"?VISIBLE.indexOf(saved)>=0:!!SCENES[saved];state.id=ok?saved:def;
   renderList();select(state.id)}
@@ -677,6 +729,16 @@ function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.se
     if(key==="rules"){var keep=state.step;["A","B","L","R"].forEach(function(k){place(k,posAt(keep)[k],true)})}
     renderStep()}})}
 seg("seg-side","side");seg("seg-rules","rules");
+/* Layout preview: A = step text beside the court, B = step text under the court and tips beside it */
+var stepHome=$("stepbox").parentNode,stepNext=$("stepbox").nextSibling,cardsHome=$("cards").parentNode;
+function applyLayout(v){var b=v==="b"&&window.matchMedia("(min-width:901px)").matches,panel=document.querySelector(".panel"),cc=document.querySelector(".court-card");
+  if(b){cc.appendChild($("stepbox"));panel.insertBefore($("cards"),panel.firstChild);document.body.classList.add("lay-b")}
+  else{stepHome.insertBefore($("stepbox"),stepNext);cardsHome.appendChild($("cards"));document.body.classList.remove("lay-b")}
+  [].forEach.call($("seg-layout").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))})}
+[].forEach.call($("seg-layout").children,function(x){x.onclick=function(){save("layout",x.dataset.v);applyLayout(x.dataset.v)}});
+applyLayout(load("layout","a"));
+/* Light sand court with soft blue 3 m and 6 m lines */
+courtFill.setAttribute("fill","#FBF3DF");DASH.forEach(function(d){d.setAttribute("stroke","#0077B6");d.setAttribute("stroke-opacity",0.55)});
 state.zones=false;
 $("prev").onclick=function(){stop();if(state.step>0){state.step--;renderStep()}};
 $("next").onclick=function(){stop();if(state.step<stepsOf().length-1){state.step++;renderStep()}};
@@ -701,7 +763,7 @@ function formationText(){var a=PK.A,b=PK.B,d,l;
   if(dl===0)l=a[1]===1?"bunched in the middle, so the sidelines are open":"both on your "+(a[1]===0?"left":"right")+", so your "+(a[1]===0?"right":"left")+" side is open";
   else if(dl===2)l="spread wide, so the middle is open";
   else l="close together, so your "+(a[1]+b[1]===1?"right":"left")+" side is open";
-  return d+"; "+l+"."}
+  return d+". "+cap(l)+"."}
 /* Drop only to a player who is mid-court or deep, and not into the lane of a partner who is at the net */
 function dropTarget(){var a=PK.A,b=PK.B,c=[[a,b],[b,a]].sort(function(x,y){return y[0][0]-x[0][0]});
   for(var i=0;i<2;i++){var t=c[i][0],o=c[i][1];if(t[0]<1)continue;if(o[0]===0&&o[1]===t[1])continue;return t}return null}
@@ -710,27 +772,27 @@ function choose(){var H=PK.height,D=DI[PK.depth],Sp=PK.speed,Sd=PK.side;
   var minD=Math.min(PK.A[0],PK.B[0]),bothBack=minD===2,anyFront=minD===0,bunched=PK.A[1]===1&&PK.B[1]===1,r;
   if(H==="high"){
     if(D<=1){
-      if(Sd==="bh")r=["bhsmash","High on your backhand and close enough to attack: a short, firm overhead."];
-      else if(bunched)r=["brush","High ball close to the net and they're bunched in the middle: spin it wide."];
-      else r=["flatsmash","High ball within about 5 m of the net: hit down."];
-    }else r=(Sp==="fast"||Sd==="bh")?["hook","High but deep, and rushed or on your backhand: windmill it back deep."]:["recoverysmash","High but you're deep. A smash from here won't win the point, so place it deep."];
+      if(Sd==="bh")r=["bhsmash","High on your backhand and close enough to attack. A short, firm overhead."];
+      else if(bunched)r=["brush","High ball close to the net and they're bunched in the middle. Spin it wide."];
+      else r=["flatsmash","High ball within about 5 m of the net. Hit down."];
+    }else r=(Sp==="fast"||Sd==="bh")?["hook","High but deep, and rushed or on your backhand. Windmill it back deep."]:["recoverysmash","High but you're deep. A smash from here won't win the point, so place it deep."];
   }else if(H==="med"){
-    if(Sp==="fast")r=D===0?["push","Fast at net height and you're close: punch it back down with a compact swing."]:["dig","Fast and you're further back: no time to swing, so block it long over them or straight at medium height."];
-    else if(D===0)r=(dropOK()&&Sp==="slow")?["drop","Slow ball near the net and the player you'd drop to is behind their 3 m line: play it short in front of them."]:["push","At net height and close to the net: push it down."];
+    if(Sp==="fast")r=D===0?["push","Fast at net height and you're close. Punch it back down with a compact swing."]:["dig","Fast and you're further back. No time to swing, so block it long over them or straight at medium height."];
+    else if(D===0)r=(dropOK()&&Sp==="slow")?["drop","Slow ball near the net and the player you'd drop to is behind their 3 m line. Play it short in front of them."]:["push","At net height and close to the net. Push it down."];
     else if(D===1){
-      if(Sp==="slow"&&anyFront)r=Sd==="bh"?["rainbow","Time on your backhand and an opponent at the net: spin it up over them."]:["lob","Time to swing and an opponent at the net: go over them."];
-      else if(Sp==="slow"&&dropOK())r=["drop","Time to swing and the player you'd drop to is behind their 3 m line: play it short in front of them."];
-      else r=["push","At net height in the middle of the court: push it down at them."];
-    }else r=(Sp==="slow"&&minD<=1)?(Sd==="bh"?["rainbow","Time on your backhand and they're forward: spin it over them."]:["lob","You're deep with time and they're forward: lob over them."]):["neutral","You're deep and can't attack from here: reset deep onto a backhand."];
+      if(Sp==="slow"&&anyFront)r=Sd==="bh"?["rainbow","Time on your backhand and an opponent at the net. Spin it up over them."]:["lob","Time to swing and an opponent at the net. Go over them."];
+      else if(Sp==="slow"&&dropOK())r=["drop","Time to swing and the player you'd drop to is behind their 3 m line. Play it short in front of them."];
+      else r=["push","At net height in the middle of the court. Push it down at them."];
+    }else r=(Sp==="slow"&&minD<=1)?(Sd==="bh"?["rainbow","Time on your backhand and they're forward. Spin it over them."]:["lob","You're deep with time and they're forward. Lob over them."]):["neutral","You're deep and can't attack from here. Reset deep onto a backhand."];
   }else{
-    if(Sp==="fast")r=["dig","Fast and below the net: don't swing and don't try to lob it, that's very difficult. Block it long over them or straight at medium height."];
-    else if(D===0)r=(Sp==="slow"&&dropOK())?["drop","Low but slow near the net, and the player you'd drop to is behind their 3 m line: drop it short in front of them."]:["dig","Below the net you can't hit down: block it long over them or straight at medium height."];
+    if(Sp==="fast")r=["dig","Fast and below the net. Don't swing, and don't try to lob it because that's very difficult. Block it long over them or straight at medium height."];
+    else if(D===0)r=(Sp==="slow"&&dropOK())?["drop","Low but slow near the net, and the player you'd drop to is behind their 3 m line. Drop it short in front of them."]:["dig","Below the net you can't hit down. Block it long over them or straight at medium height."];
     else if(D===1){
-      if(Sp==="slow")r=anyFront?(Sd==="bh"?["rainbow","Low on your backhand with time and an opponent at the net: spin it up over them."]:["lob","Below the net with time and an opponent at the net: go over them."]):(dropOK()?["drop","Below the net with time, and the player you'd drop to is behind their 3 m line: play short in front of them."]:["neutral","Below the net with time: reset deep onto a backhand."]);
-      else r=["dig","Below the net with some pace: block it long over them or straight at medium height."];
-    }else r=(Sp==="slow"&&anyFront)?["lob","Deep with time and they're at the net: lob over them."]:["neutral","Low and deep: reset with a deep neutral ball onto a backhand."];
+      if(Sp==="slow")r=anyFront?(Sd==="bh"?["rainbow","Low on your backhand with time and an opponent at the net. Spin it up over them."]:["lob","Below the net with time and an opponent at the net. Go over them."]):(dropOK()?["drop","Below the net with time, and the player you'd drop to is behind their 3 m line. Play short in front of them."]:["neutral","Below the net with time. Reset deep onto a backhand."]);
+      else r=["dig","Below the net with some pace. Block it long over them or straight at medium height."];
+    }else r=(Sp==="slow"&&anyFront)?["lob","Deep with time and they're at the net. Lob over them."]:["neutral","Low and deep. Reset with a deep neutral ball onto a backhand."];
   }
-  if(Sd==="body"&&Sp==="fast"&&H!=="high")r=["dig","Fast at your body: get the racket in front and block it long or straight, not short."];
+  if(Sd==="body"&&Sp==="fast"&&H!=="high")r=["dig","Fast at your body. Get the racket in front and block it long or straight, not short."];
   return {shot:r[0],why:r[1]}}
 var BACKUP={flatsmash:"brush",brush:"flatsmash",bhsmash:"hook",hook:"highlob",recoverysmash:"highlob",push:"dig",dig:"neutral",neutral:"highlob",lob:"neutral",rainbow:"lob",drop:"fakedrop",highlob:"neutral",fakelob:"lob",fakedrop:"drop"};
 function target(shot){var o=[oppPos(PK.A),oppPos(PK.B)],minD=Math.min(PK.A[0],PK.B[0]);
@@ -775,7 +837,7 @@ function renderPick(){var c=choose(),t=target(c.shot),mid=simple(c.shot),s=SHOTS
   clearTimeout(pkTimer);
   var d1=runBall({f:src,to:[cx,cy],shot:"_in"},false);
   pkTimer=setTimeout(function(){runBall({f:[cx,cy],to:t.p,shot:c.shot},true)},d1+450);
-  $("r-shot").textContent=s.name;$("r-open").dataset.shot=mid;$("r-why").textContent=c.why;
+  $("r-shot").textContent=s.name;if(ICON[mid])document.documentElement.style.setProperty("--shotc",ICON[mid].c);$("r-open").dataset.shot=mid;$("r-why").textContent=c.why;
   $("r-target").textContent=t.txt;$("r-form").textContent=formationText();
   var b=SHOTS[BACK2[mid]];$("r-backup").textContent=b?b.name+". "+b.when:"";
   $("r-you").textContent=s.afterH;$("r-partner").textContent=s.afterP;
