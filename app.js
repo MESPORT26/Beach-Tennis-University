@@ -521,7 +521,7 @@ var s2=el("text",{x:X(0.2),y:Y(7.75),fill:C.sandText,style:"font:700 11px Montse
 
 function drawZones(show,side,half,hl){gZ.innerHTML="";if(!show)return;var own=half==="own";
   for(var b=0;b<5;b++){var y0=b*1.6,n=side==="L"?b+1:5-b,on=hl===n;
-    el("rect",{x:X(own?0:8),y:Y(y0),width:320,height:64,fill:on?"#FFD23F":C.opp,"fill-opacity":on?0.55:(b%2?0.2:0.08)},gZ);
+    el("rect",{x:X(own?0:8),y:Y(y0),width:320,height:64,fill:on?"#FFD23F":C.opp,"fill-opacity":on?0.55:(b%2?0.2:0)},gZ);
     if(on)el("rect",{x:X(own?0:8)+2,y:Y(y0)+2,width:316,height:60,fill:"none",stroke:"#E08A00","stroke-width":3,rx:3},gZ);var t=el("text",{x:X(own?7.3:15.4),y:Y(y0+0.8)+7,"text-anchor":"middle",fill:"#B01E42",style:"font:800 20px Montserrat,sans-serif"},gZ);t.textContent=n}}
 
 /* Players */
