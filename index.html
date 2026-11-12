@@ -44,7 +44,8 @@
         <div class="tag">Learn. Play. Win.</div>
       </div>
     </div>
-    <div class="settings">
+    <button class="set-btn" id="set-btn" aria-expanded="false" aria-controls="settings"></button>
+    <div class="settings" id="settings">
       <div class="tg">I play
         <div class="seg" id="seg-side">
           <button id="side-L" data-v="L" aria-pressed="true">Left</button>
@@ -62,20 +63,24 @@
 
   <nav class="tabs" role="tablist">
     <button id="tab-shots" role="tab" aria-selected="true" data-tab="shots">Shots</button>
-    <button id="tab-play" role="tab" aria-selected="false" data-tab="play">When to play</button>
-    <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Which shot?</button>
+    <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Train</button>
+    <button id="tab-compete" role="tab" aria-selected="false" data-tab="compete">Compete</button>
   </nav>
 
   <section id="selector">
     <h2 class="sec" id="sel-title">Choose a shot</h2>
     <nav class="list" id="list" aria-label="Choose"></nav>
+    <h2 class="sec sec2" id="sel2-title" hidden></h2>
+    <nav class="list" id="list2" aria-label="More" hidden></nav>
   </section>
 
   <div class="main">
     <section class="card-w court-card" aria-live="polite">
+      <div class="score" id="score" hidden></div>
       <div class="c-head">
         <h2 id="title">Serve</h2>
         <span class="cat" id="cat"></span>
+        <div class="wind" id="wind-ctl"><span>Wind</span><svg id="wdial" viewBox="0 0 64 64" tabindex="0" role="slider" aria-label="Wind direction. Drag or use the arrow keys" aria-valuemin="0" aria-valuemax="359"></svg><div class="seg" id="seg-wind"><button data-v="calm" aria-pressed="true">Calm</button><button data-v="breezy" aria-pressed="false">Breezy</button><button data-v="gusty" aria-pressed="false">Gusty</button></div></div>
       </div>
       <div class="court-box">
         <svg id="court" viewBox="0 0 760 400" role="img" aria-labelledby="court-t">
@@ -84,6 +89,7 @@
             <marker id="ar-you" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#00A79E"/></marker>
             <marker id="ar-opp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#E2365A"/></marker>
           </defs>
+          <g id="world">
           <g id="g-court"></g>
           <g id="g-zones"></g>
           <g id="g-grid"></g>
@@ -91,7 +97,9 @@
           <g id="g-moves"></g>
           <g id="g-trail"></g>
           <g id="g-players"></g>
+          <g id="g-wind"></g>
           <g id="g-ball"></g>
+          </g>
         </svg>
       </div>
       <div class="controls" id="ctrls">
@@ -105,12 +113,38 @@
         </div>
         <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
       </div>
+      <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
+      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><a href="#stepbox">Details below &#8595;</a></div>
       <div class="legend">
         <span><i class="dot" style="background:#00C2B8;width:14px;height:14px;box-shadow:0 0 0 4px rgba(0,194,184,.3)"></i>You</span>
         <span><i class="dot" style="background:#00C2B8"></i>Partner</span>
         <span><i class="dot" style="background:#FF4D6D"></i>Opponents</span>
         <span><i class="dot" style="background:#FFD23F;border:1px solid #8A6A00"></i>Ball</span>
       </div>
+      <section class="result" id="result" hidden>
+        <div class="call" id="call">
+          <span class="kicker">Your call</span>
+          <h3>What would you play?</h3>
+          <p class="hint" id="call-hint">Tap a shot in the row above, then pick where you'd aim it.</p>
+          <div class="call-btns" id="call-btns" hidden></div>
+          <div class="step2" id="aim-step" hidden><b>Now pick where you'd aim it</b>
+            <div class="aim-grid" id="aim-grid" role="group" aria-label="Where to aim on the opponents' side"></div></div>
+        </div>
+        <div id="reveal" hidden>
+          <div class="verdict" id="verdict"></div>
+          <div class="res-top"><div><span class="kicker">Iara plays</span><h3 id="r-shot"></h3></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="shotchip" id="r-watch" hidden>Watch the point</button><button class="shotchip" id="r-open">See the shot</button></div></div>
+          <p class="say" id="r-why"></p>
+          <div class="cards">
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><span id="r-target"></span></div>
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Opponents</b><span id="r-form"></span></div>
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Other option</b><span id="r-backup"></span></div>
+          </div>
+          <div class="jobs">
+            <div class="job you"><b>Then you</b><span id="r-you"></span></div>
+            <div class="job partner"><b>Your partner</b><span id="r-partner"></span></div>
+          </div>
+        </div>
+      </section>
   <div class="cards tips" id="cards" hidden>
     <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>When to play it</b><ul class="bl" id="c-when"></ul></div>
     <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><ul class="bl" id="c-aim"></ul></div>
@@ -120,10 +154,13 @@
     </section>
 
     <aside class="card-w panel">
+      <div class="cpanel" id="cpanel" hidden></div>
       <div class="step" id="stepbox">
         <span class="kicker" id="step-k"></span>
         <h3 id="step-title"></h3>
-        <p class="say" id="say"></p>
+        <div class="iara"><span class="av" aria-hidden="true">I</span><div class="iara-b"><b>Coach Iara</b><p class="say" id="say"></p></div></div>
+        <p class="windtip" id="windtip" hidden></p>
+        <div class="outro" id="outro" hidden><b>Point.</b> <span id="outro-t"></span></div>
         <ol class="zlist" id="say-list" hidden></ol>
         <figure class="illus" id="say-img" hidden></figure>
         <p class="say" id="say-after" hidden></p>
@@ -154,20 +191,17 @@
     <div class="card" id="m-windc"><b><i style="background:var(--shotc,var(--fg))"></i>In the wind</b><ul class="bl" id="m-wind"></ul></div>
   </div>
 
-  <section class="card-w result" id="result" hidden>
-    <div class="res-top"><div><span class="kicker">Play</span><h3 id="r-shot"></h3></div><button class="shotchip" id="r-open">See the shot</button></div>
-    <p class="say" id="r-why"></p>
-    <div class="cards">
-      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><span id="r-target"></span></div>
-      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Opponents</b><span id="r-form"></span></div>
-      <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Other option</b><span id="r-backup"></span></div>
-    </div>
-    <div class="jobs">
-      <div class="job you"><b>Then you</b><span id="r-you"></span></div>
-      <div class="job partner"><b>Your partner</b><span id="r-partner"></span></div>
-    </div>
-  </section>
 
+</div>
+<div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="w-title">
+  <div class="welcome-card">
+    <span class="kicker">Welcome</span>
+    <h2 id="w-title">Let's set up your court</h2>
+    <div class="pgroup"><span>Which side do you play?</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
+    <div class="pgroup"><span>How do you play?</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">Social</button><button data-v="men" aria-pressed="false">Men's pro rules</button></div></div>
+    <button class="btn primary" id="w-go">Start with the court guide &#8594;</button>
+    <button class="btn soft" id="w-skip">Skip</button>
+  </div>
 </div>
 <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <script src="app.js"></script>
