@@ -956,8 +956,8 @@ function buildCall(){var g=$("aim-grid");if(g.children.length)return;g.appendChi
       b.onclick=function(){[].forEach.call(g.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",String(x===b))});judge([dI,lI])};g.appendChild(b)})})}
 function judge(cell){var ok=PK.pickShot===PK.answer,ic=PK.ideal,off=Math.abs(cell[0]-ic[0])+Math.abs(cell[1]-ic[1]),sq=off===0?"right":off===1?"close":"wrong";
   PK.streak=(ok&&sq==="right")?PK.streak+1:0;save("pk-streak",String(PK.streak));PK.revealed=true;PK.chosen=cell;
-  var v=$("verdict"),shotTxt=ok?"Right shot":"Iara would play "+SHOTS[PK.answer].name.toLowerCase()+", not "+SHOTS[PK.pickShot].name.toLowerCase(),
-    sqTxt=sq==="right"?"right square":sq==="close"?"your square was one off. Iara aims "+cellName(ic).toLowerCase():"aim "+cellName(ic).toLowerCase()+" instead";
+  var v=$("verdict"),shotTxt=ok?"Right shot":"Guto would play "+SHOTS[PK.answer].name.toLowerCase()+", not "+SHOTS[PK.pickShot].name.toLowerCase(),
+    sqTxt=sq==="right"?"right square":sq==="close"?"your square was one off. Guto aims "+cellName(ic).toLowerCase():"aim "+cellName(ic).toLowerCase()+" instead";
   v.className="verdict "+(ok&&sq==="right"?"ok":ok||sq!=="wrong"?"mid":"no");
   v.textContent=shotTxt+(ok&&sq==="right"?", right square.":", and "+sqTxt+".")+(ok&&sq==="right"?" Streak "+PK.streak+".":"");
   track("shot_picker_resolved",{side:PK.side,depth:PK.depth,speed:PK.speed,height:PK.height,picked:PK.pickShot,answer:PK.answer,correct:ok,square:sq});
