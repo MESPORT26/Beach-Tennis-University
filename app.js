@@ -96,11 +96,13 @@ push:{name:"Push",cat:"Attack",hitter:"R",
 flatsmash:{name:"Smash",cat:"Attack",hitter:"L",
   start:{L:[4.8,2.9],R:[4.8,5.2],A:DEEP.A,B:DEEP.B},
   to:[12.2,4.1],mark:true, react:{A:[12.3,3.5],B:[12.3,4.7]}, after:{L:[5.5,3.0],R:[5.5,5.0]},
-  what:"An overhead hit down. Hit it hard and flat when you're close and balanced, add brush and spin for more control or angle, and place it deep rather than hard from the back of the court.",
+  what:"An overhead hit down. Set it up in six steps.",
+  tech:["Turn side on","Point your free hand at the ball","Take the racket back over your shoulder","Get under the ball, as if it would land on your head","Swing a little earlier than feels natural","High ball or more than 4 m from the net, add more brush. Inside about 3 m, hit it flatter"],
+  techAfter:"Aim down the middle and hit down, or go at an opponent's body or backhand.",
   when:"The ball is above your head. Within about 5 m of the net you can attack it. Further back, smash deep and safe.",
   aim:"Down the middle between them, at their feet, or at a body. From deep, aim deep into the middle.",
   avoid:"Going for a winner from the back of the court, or smashing while off balance.",
-  hitDo:"Hit down, through the ball, into the middle.",
+  hitDo:"Side on, point, racket back, get under it, swing early. Hit down into the middle or at a body or backhand.",
   partnerDo:"Hold your side and the middle.",
   afterH:"If the reply is weak, step in together to about 2.5 m. If it's a lob, recover.",
   afterP:"Step in level with your partner and split step as they hit."},
@@ -233,8 +235,8 @@ var TIPS={
  push:{when:["The ball reaches you at or above net height","You're 2–4 m from the net"],
   aim:["At a backhand","At the body, feet or hip","Down the middle between them"],
   avoid:["Pushing a ball from below net height, because it goes up and gets smashed"]},
- flatsmash:{when:["The ball is above your head","Within about 5 m of the net, attack it","Further back, smash deep and safe"],
-  aim:["Down the middle between them","At their feet or a body","Deep into the middle when you're at the back"],
+ flatsmash:{when:["The ball is above your head","Inside about 3 m, hit it flatter and harder","High ball, or more than 4 m from the net, add more brush"],
+  aim:["Down the middle, hitting down","At an opponent's body or backhand","Deep into the middle when you're at the back"],
   avoid:["Going for a winner from the back of the court","Smashing while off balance"]},
  neutral:{when:["You're under pressure or off balance","You're hitting from below net height"],
   aim:["Deep, to a backhand","Against two right-handers, the outside of B or the middle side of A"],
@@ -708,7 +710,7 @@ function shotScene(id){if(id==="serve")return serveScene();var s=SHOTS[id],h=s.h
   steps.push({t:"Starting position",hold:s.start[h],zones:sv,say:START_SAY[id]||(inc?inc[2]:""),
     roles:{hit:sv?"Pick your target before the toss. Zone 2, at the receiver's body or backhand.":"Get to the ball early and set your feet.",
       partner:sv?"Weight forward, ready to go the moment the serve is struck.":(INCP[id]||"Hold your side, ready for the reply.")}});
-  steps.push({t:"The shot",ball:{f:s.start[h],to:s.to,shot:id},mark:s.mark,pos:rp,alt:s.reactAlt,say:s.what,roles:{hit:s.hitDo,partner:s.partnerDo}});
+  steps.push({t:"The shot",ball:{f:s.start[h],to:s.to,shot:id},mark:s.mark,pos:rp,alt:s.reactAlt,say:s.what,list:s.tech,after:s.techAfter,roles:{hit:s.hitDo,partner:s.partnerDo}});
   var mv=MOVE[id];
   steps.push({t:"Where to move",pos:merge(s.after,mv&&mv.opp),say:mv?mv.say:"Where both of you go next, and how the opponents react.",roles:{hit:s.afterH,partner:s.afterP}});
   var sc={name:s.name,cat:s.cat,shot:id,hitter:h,zoneSide:"R",init:s.start,initAlt:s.startAlt,steps:steps};
