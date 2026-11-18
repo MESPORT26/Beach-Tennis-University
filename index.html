@@ -62,7 +62,7 @@
 
   <div class="main">
     <section class="card-w court-card" aria-live="polite">
-      <div class="score" id="score" hidden></div>
+      <div class="score" id="score" hidden></div><div class="banter" id="banter" aria-live="polite"></div>
       <div class="csit" id="csit" hidden></div>
       <p class="vh" id="c-sr" aria-live="polite"></p>
       <div class="c-head">
@@ -131,7 +131,7 @@
         <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
       </div>
       <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
-      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><a href="#stepbox">More detail &#8595;</a></div>
+      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><button class="whybtn" id="whybtn" type="button">Why?</button></div>
       <div class="legend" id="legend"></div>
       <section class="result" id="result" hidden>
         <div class="call" id="call">
@@ -165,7 +165,7 @@
   </div>
     </section>
 
-    <aside class="card-w panel">
+    <aside class="card-w panel"><div class="trtray" id="trtray" hidden></div>
       <div class="cpanel" id="cpanel" hidden></div>
       <div class="step" id="stepbox">
         <span class="kicker" id="step-k"></span>
@@ -232,6 +232,7 @@
       <div class="pgroup"><span>Your player</span><div class="emojis" id="p-emo" role="radiogroup" aria-label="Your player"></div></div>
       <div class="pgroup"><span>Your partner</span><div class="emojis" id="p-emo2" role="radiogroup" aria-label="Your partner"></div></div>
       <div class="pgroup"><span>Level</span><div class="seg lv4" id="seg-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div><p class="hint" id="lvl-hint"></p></div>
+      <div class="pgroup"><span>Match clock</span><div class="seg" id="seg-clock"><button data-v="match">Timed</button><button data-v="practice">No clock</button></div></div>
       <div class="pgroup"><span>I play</span><div class="seg" id="seg-side"><button id="side-L" data-v="L" aria-pressed="true">Left</button><button id="side-R" data-v="R" aria-pressed="false">Right</button></div></div>
       <div class="pgroup"><span>Playing hand</span><div class="seg" id="seg-hand"><button data-v="R" aria-pressed="true">Right</button><button data-v="L" aria-pressed="false">Left</button></div></div>
       <div class="pgroup"><span>Rules</span><div class="seg" id="seg-rules"><button id="rules-men" data-v="men" aria-pressed="true">Men's open &amp; ITF</button><button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; mixed</button></div></div>
