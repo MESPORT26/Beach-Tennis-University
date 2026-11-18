@@ -909,7 +909,7 @@ function setTab(t){stop();document.body.classList.remove("lobby-on");clearTimeou
   if(typeof drawWind==="function"){state.wind=pick?load("wind","calm"):"calm";[].forEach.call($("seg-wind").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===state.wind))});drawWind();drawDial()}
   renderLegend();
   hideTrainUI();gauge(null);
-  $("trtray").hidden=!pick;if(!pick)document.body.classList.remove("sheet-open");
+  $("trtray").hidden=!pick;if(!pick)document.body.classList.remove("sheet-open","trsu");
   if(pick){$("cards").hidden=true;$("cards-m").hidden=true;$("title").textContent="Train";trainOpen();return}
   if(comp){gG.innerHTML="";gM.innerHTML="";drawZones(false);runBall(null);$("title").textContent="Sand Series";renderList();lobbyPanel();return}
   gG.innerHTML="";
@@ -1928,7 +1928,10 @@ drawWind();
 /* ---------------- Train: five real moments. What would you do next? ---------------- */
 var TR=null;
 function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
-function trainOpen(){document.body.classList.add("sheet-open");if(!TR||TR.done)trainStart();else trainScene(true)}
+var TRMODE=load("tr-mode","quiz");
+function trainOpen(){document.body.classList.add("sheet-open");if(TRMODE==="setup"){setupOpen();return}if(!TR||TR.done)trainStart();else trainScene(true)}
+function modeSeg(){return '<div class="seg trmode" id="tr-mode"><button data-v="quiz" aria-pressed="'+(TRMODE==="quiz")+'">What next?</button><button data-v="setup" aria-pressed="'+(TRMODE==="setup")+'">Set up</button></div>'}
+function wireMode(t){[].forEach.call(t.querySelectorAll("#tr-mode button"),function(b){b.onclick=function(){if(TRMODE===b.dataset.v)return;TRMODE=b.dataset.v;save("tr-mode",TRMODE);track("train_mode",{mode:TRMODE});trainOpen()}})}
 function trainStart(){TR={set:shuf(PRESETS.map(function(_,i){return i})).slice(0,5),i:0,res:[],done:false};trainScene()}
 function rr(a,b){return a+Math.random()*(b-a)}
 function trainSit(i){var s;
@@ -1946,7 +1949,7 @@ function trainSit(i){var s;
   if(!s.label){var hw={high:"High ball",med:"Chest-high ball",low:"Low ball"}[s.height],sw={fast:"fast",med:"",slow:"slow"}[s.speed],side={fh:"on your forehand",bh:"on your backhand",body:"at your body"}[s.side],
     op=s.A[0]===s.B[0]?["Both at the net","Both mid-court","Both deep"][s.A[0]]:"One up, one back";s.label=(sw?sw[0].toUpperCase()+sw.slice(1)+" "+hw.toLowerCase():hw)+" "+side+" · "+op}
   return s}
-function trainScene(redraw){var sit=redraw&&TR.sit?TR.sit:trainSit(TR.set[TR.i]);state.wind="calm";drawWind();
+function trainScene(redraw){var sit=redraw&&TR.sit?TR.sit:trainSit(TR.set[TR.i]);drawWind();
   if(!redraw){TR.sit=sit;TR.ans=solveSit(sit);TR.pick={speed:"neutral",spin:"flat"};TR.step="shot"}
   gG.innerHTML="";gM.innerHTML="";clearAim();drawZones(false);runBall(null);
   var sp=sitPos(sit);["A","B","L","R"].forEach(function(k){place(k,sp.pos[k],true)});TR.sp=sp;
@@ -1957,11 +1960,11 @@ function trainScene(redraw){var sit=redraw&&TR.sit?TR.sit:trainSit(TR.set[TR.i])
     if(TR.step==="target")trainAimOn();if(TR.step==="move")trainMoveOn()}
   trainTray()}
 function trProg(){return '<div class="trprog">'+TR.set.map(function(_,i){var r=TR.res[i];return '<i class="'+(r||(i===TR.i?"cur":""))+'"></i>'}).join("")+'</div>'}
-function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;
+function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;document.body.classList.remove("trsu");var _w=function(){wireMode(t)};setTimeout(_w,0);
   if(TR.done){var sc=TR.res.filter(function(r){return r==="good"}).length,best=Math.max(sc,+load("tr-best","0")||0);save("tr-best",String(best));
-    t.innerHTML=trProg()+'<div class="trend"><b>'+sc+'/5</b><small>Best '+best+'/5</small></div><div class="trbtns"><button class="btn primary big" id="tr-again">Again</button><button class="btn soft" id="tr-comp">Compete</button></div>';
+    t.innerHTML=modeSeg()+trProg()+'<div class="trend"><b>'+sc+'/5</b><small>Best '+best+'/5</small></div><div class="trbtns"><button class="btn primary big" id="tr-again">Again</button><button class="btn soft" id="tr-comp">Compete</button></div>';
     $("tr-again").onclick=trainStart;$("tr-comp").onclick=function(){setTab("compete")};return}
-  var h=trProg()+'<p class="trk">'+(TR.sit.label||pr.name)+'</p>';
+  var h=modeSeg()+trProg()+'<p class="trk">'+(TR.sit.label||pr.name)+(state.wind!=="calm"?' · '+windWords():'')+'</p>';
   if(TR.step==="shot"||TR.step==="target")h+='<h3 class="trq">'+(TR.pick.shot?"Tap where to hit":"What next?")+'</h3><div class="trchips t7">'+VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(TR.pick.shot===id)+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span></button>'}).join("")+'</div>'+
     '<div class="trss"><div class="seg" id="tr-spd">'+["slow","neutral","fast"].map(function(v){return '<button data-v="'+v+'" aria-pressed="'+(TR.pick.speed===v)+'">'+SPD_L[v]+'</button>'}).join("")+'</div><div class="trball">'+BALLSVG.replace(/id="sv-seam"/,'class="tr-seam"').replace(/id="sv-arrow"/,'class="tr-arrow"').replace(/svclip/g,"trclip")+'<span class="trspin">'+SPIN_LBL[TR.pick.spin]+'</span></div></div>';
   else if(TR.step==="move")h+='<h3 class="trq">Then where do you go?</h3><div class="trmoves">'+MOVES.map(function(m){return '<button data-v="'+m[0]+'">'+m[1]+'</button>'}).join("")+'</div>';
@@ -2000,8 +2003,53 @@ function trainVerdictDraw(){var p=TR.pick,a=TR.ans;drawAim(function(){},null);he
   var bc=svTarget(a.cell5);el("circle",{cx:X(bc[0]),cy:Y(bc[1]),r:22,fill:"none",stroke:"#00C2B8","stroke-width":4,"pointer-events":"none"},gM);
   var mk=MOVE_OK[shotTiers(TR.sit,a.shot)[p.shot]===2?p.shot:a.shot];if(mk!==p.move){var gp=trMovePos(mk),gs=52*PS,gh=el("g",{transform:"translate("+X(gp[0])+" "+Y(gp[1])+")"+(PORT?" rotate(90)":""),opacity:0.35,"pointer-events":"none"},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh)}
   if(p.move)place(state.side,trMovePos(p.move),true)}
-function trainRedraw(){if(state.tab==="pick"&&TR)trainScene(true)}
+function trainRedraw(){if(state.tab!=="pick")return;if(TRMODE==="setup"){setupDraw();return}if(TR)trainScene(true)}
 renderPick=trainRedraw;
+
+/* ---------------- Train, Set up: build any situation, the coach gives the best shot ---------------- */
+var THEIR={push:{height:"med",speed:"fast"},flatsmash:{height:"low",speed:"fast"},hook:{height:"med",speed:"fast"},neutral:{height:"med",speed:"med"},lob:{height:"high",speed:"slow"},drop:{height:"low",speed:"slow"},dig:{height:"med",speed:"med"}};
+var SU=null;
+function setupInit(){var mL=state.side==="L";SU={their:"neutral",side:"fh",speed:"med",height:"med",A:[11.4,2.2],B:[11.4,5.8],me:[3.8,mL?2.6:5.4],mate:[3.8,mL?5.4:2.6]};
+  try{var sv=JSON.parse(load("tr-setup","null"));if(sv&&sv.A)SU=sv}catch(e){}}
+function setupSit(){var x=SU.me[0],hs=state.hand==="L"?-1:1,off=SU.side==="fh"?hs*0.8:SU.side==="bh"?-hs*0.8:0,
+    sit={side:SU.side,speed:SU.speed,height:SU.height,depth:x>5.2?"front":x>2.3?"mid":"back",oA:SU.A.slice(),oB:SU.B.slice(),me0:SU.me.slice(),mate0:SU.mate.slice(),
+      cxy:[Math.max(.4,Math.min(7.5,x+0.2)),Math.max(.3,Math.min(7.7,SU.me[1]+off))],shot:SU.their};
+  sit.A=toGrid(sit.oA);sit.B=toGrid(sit.oB);return sit}
+function setupOpen(){if(!SU)setupInit();setupDraw(true)}
+var suT=null;function setupSoon(){clearTimeout(suT);suT=setTimeout(function(){save("tr-setup",JSON.stringify(SU));setupDraw(true)},120)}
+function setupDraw(anim){if(!SU)setupInit();var sit=setupSit(),sp=sitPos(sit),a=solveSit(sit),I=idealSS(a.shot,sit),bs=ssVerdict(a.shot,I.sp[0],I.sn[0],sit).best,mv=MOVE_OK[a.shot];
+  gG.innerHTML="";gM.innerHTML="";clearAim();drawZones(false);drawWind();
+  ["A","B","L","R"].forEach(function(k){place(k,sp.pos[k],true)});
+  var hk=sp.pos.A[0]<=sp.pos.B[0]?"A":"B",pm={};pm[hk]=SU.their;pm[state.side]=a.shot;setPoses(pm);
+  drawAim(function(){},null);heatAim(null,{shot:a.shot,sit:sit},I.sp[0]);[].forEach.call(gA.querySelectorAll("*"),function(e){e.style.pointerEvents="none"});
+  var bc=svTarget(a.cell5);el("circle",{cx:X(bc[0]),cy:Y(bc[1]),r:22,fill:"none",stroke:"#00C2B8","stroke-width":4,"pointer-events":"none"},gM);
+  var c=sp.contact,mp=[Math.max(0.6,Math.min(7.4,c[0]-0.3+{in:1.4,hold:0,back:-1.2}[mv])),sp.pos[state.side][1]],gs=52*PS,gh=el("g",{transform:"translate("+X(mp[0])+" "+Y(mp[1])+")"+(PORT?" rotate(90)":""),opacity:0.3,"pointer-events":"none"},gM);
+  el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);
+  el("line",{x1:X(sp.pos[state.side][0]),y1:Y(sp.pos[state.side][1]),x2:X(mp[0]),y2:Y(mp[1]),stroke:"#0D1B2A","stroke-opacity":.4,"stroke-width":2.5,"stroke-dasharray":"2 6","stroke-linecap":"round","pointer-events":"none"},gM);
+  if(anim){var endH={low:0.4,med:1.4,high:3.0}[sit.height],arc={fast:0.4,med:1.2,slow:2.2}[sit.speed];PROF._in={d:{fast:380,med:850,slow:1800}[sit.speed],h:function(k){return 1.2*(1-k)+endH*k+arc*S(PI*k)}};
+    var d=runBall({f:sp.pos[hk],to:c,shot:"_in",spin:{fast:2.4,med:1.0,slow:0.35}[sit.speed],trail:sit.speed},false);
+    clearTimeout(SU.t2);SU.t2=setTimeout(function(){if(state.tab!=="pick"||TRMODE!=="setup")return;var pr=PROF[a.shot]||PROF.neutral;PROF._me={d:pr.d,h:pr.h};runBall({f:c,to:bc,shot:"_me",spin:SV_ROT[I.sp[0]]*(I.sn[0]==="flat"?0.6:1.5)*(I.sn[0]==="slice"?-1:1),curve:I.sn[0]==="left"?-24:I.sn[0]==="right"?24:0,land:true},true)},(RM?150:d)+500)}
+  setupTray(a,bs,mv,sit)}
+function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.classList.add("trsu");var tiers=shotTiers(sit,a.shot),also=Object.keys(tiers).filter(function(k){return tiers[k]===2&&k!==a.shot});
+  var chips=function(id,opts,cur){return '<div class="seg sus" data-k="'+id+'">'+opts.map(function(o){return '<button data-v="'+o[0]+'" aria-pressed="'+(cur===o[0])+'">'+o[1]+'</button>'}).join("")+'</div>'};
+  t.innerHTML=modeSeg()+
+    '<div class="suans"><span class="trk">Best shot</span><h3 class="trq">'+SHOTS[a.shot].name+'</h3><p class="trline">'+bs+' to the '+cellName5(a.cell5).toLowerCase()+', then '+(mv==="in"?"step in.":mv==="back"?"move back.":"hold level.")+'</p>'+
+      '<p class="trsub">'+firstSentence(a.why)+'</p>'+(also.length?'<p class="trk">Also good: '+also.map(function(k){return SHOTS[k].name}).join(", ")+'</p>':'')+'</div>'+
+    '<div class="sugrp"><span class="trk">Their shot</span><div class="trchips t7 sut">'+VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(SU.their===id)+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span></button>'}).join("")+'</div></div>'+
+    '<div class="sugrp"><span class="trk">Comes to your</span>'+chips("side",[["bh","Backhand"],["body","Body"],["fh","Forehand"]],SU.side)+'</div>'+
+    '<div class="sugrp two"><div><span class="trk">Speed</span>'+chips("speed",[["slow","Slow"],["med","Neutral"],["fast","Fast"]],SU.speed)+'</div><div><span class="trk">Height</span>'+chips("height",[["low","Low"],["med","Mid"],["high","High"]],SU.height)+'</div></div>'+
+    '<p class="trk suhint">Drag anyone on the court to move them.</p>';
+  wireMode(t);
+  [].forEach.call(t.querySelectorAll(".sut button"),function(b){b.onclick=function(){SU.their=b.dataset.v;var d=THEIR[SU.their];SU.speed=d.speed;SU.height=d.height;buzz(10);setupSoon()}});
+  [].forEach.call(t.querySelectorAll(".sus"),function(g){var k=g.dataset.k;[].forEach.call(g.children,function(b){b.onclick=function(){SU[k]=b.dataset.v;setupSoon()}})})}
+/* Drag anyone in Set up */
+["A","B","L","R"].forEach(function(k){var g=PL[k].g,drag=false;
+  function on(){return state.tab==="pick"&&TRMODE==="setup"&&SU}
+  function toM(e){var pt=SVGC.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var q=pt.matrixTransform(WORLD.getScreenCTM().inverse()),x=(q.x-60)/40,y=(q.y-40)/40,opp=k==="A"||k==="B";
+    return [opp?Math.max(8.4,Math.min(15.8,x)):Math.max(0.3,Math.min(7.6,x)),Math.max(0.3,Math.min(7.7,y))]}
+  g.addEventListener("pointerdown",function(e){if(!on())return;drag=true;g.setPointerCapture(e.pointerId);e.preventDefault();e.stopPropagation()});
+  g.addEventListener("pointermove",function(e){if(!drag||!on())return;var p=toM(e);place(k,p,true);var key=k==="A"||k==="B"?k:(k===state.side?"me":"mate");SU[key]=p});
+  g.addEventListener("pointerup",function(){if(!drag)return;drag=false;if(on())setupSoon()})});
 /* Analytics: session start */
 (function(){var last=+load("last-visit","0"),now=Date.now();track("session_start",{returning:!!last,days_since_last:last?Math.round((now-last)/864e5):null});save("last-visit",String(now))})();
 /* Deep links: #/shots/lob/2, #/play/lobcover/1, #/pick */

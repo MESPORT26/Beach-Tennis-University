@@ -631,7 +631,7 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .banter{display:none;align-items:center;gap:8px;height:28px;padding:0 4px;opacity:0;transition:opacity .3s}.banter img{width:24px;height:24px;object-fit:contain}
 .banter p{margin:0;font-size:13px;font-style:italic;color:var(--fg);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .competing.c-live .banter{display:flex}.banter.go{opacity:1}
-.picking #selector,.picking #result,.picking #picker,.picking #pk-home,.picking .c-head,.picking #side,.picking #trsit,.picking #trball,.picking #trsit-tab,.picking #trball-tab,.picking #fbpop,.picking #fbtab{display:none!important}
+.picking #selector,.picking #result,.picking #picker,.picking #pk-home,.picking #side,.picking #trsit,.picking #trball,.picking #trsit-tab,.picking #trball-tab,.picking #fbpop,.picking #fbtab{display:none!important}
 .trtray{display:grid;gap:10px}
 .trprog{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.trprog i{height:6px;border-radius:99px;background:var(--line)}.trprog i.cur{background:#0D1B2A}.trprog i.good{background:#00C2B8}.trprog i.ok{background:#FF9F1C}.trprog i.bad{background:#FF4D6D}
 .trk{margin:4px 0 0;font:600 12px var(--font);color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
@@ -650,7 +650,7 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
   .why-open .whyx{display:block;position:sticky;top:0;margin-left:auto;all:unset;cursor:pointer;float:right;font-size:20px;width:44px;height:44px;text-align:center;line-height:44px}
   .picking #side{display:none}
   .picking .panel{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:60;background:var(--surface);border-radius:22px 22px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(13,27,42,.18);max-height:52dvh;overflow:auto}
-  .picking .court-box svg#court{height:calc(52dvh - 60px)!important}
+  .picking .court-box svg#court{height:calc(52dvh - 112px)!important}
   .picking .court-card{padding-bottom:0}
   #side{display:none}
 }
@@ -669,3 +669,18 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .trss{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:center}.trball{display:grid;justify-items:center;gap:0}.trball svg{width:64px;height:64px;cursor:grab;touch-action:none}
 .trball .swipecap{font:800 10px var(--font);letter-spacing:.08em;text-transform:uppercase}.trball .swipehint{display:none}.trspin{font:700 12px var(--font);color:var(--muted)}
 .tr-seam{transition:transform .25s}
+
+.picking .c-head{display:flex;justify-content:center;margin-bottom:4px}.picking .c-head #title,.picking .c-head .cat,.picking .c-head #lvl-chip{display:none!important}
+.picking #wind-ctl{display:flex!important}
+
+@media (max-width:900px){body.sheet-open.picking .court-box svg#court{height:calc(100dvh - 330px - 52dvh)!important;min-height:220px}.picking .court-card{padding-top:10px}}
+
+.trmode{margin-bottom:2px}.trmode button{flex:1}
+.suans{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
+.sugrp{display:grid;gap:6px}.sugrp.two{grid-template-columns:1fr 1fr;gap:10px}.sus{width:100%}.sus button{flex:1;padding-left:4px;padding-right:4px;font-size:13px}
+.trchips.sut{grid-template-columns:repeat(7,1fr);gap:4px}.trchips.sut button{min-height:58px;font-size:10.5px;padding:4px 2px}.trchips.sut .si{width:26px;height:26px}
+.suhint{text-transform:none;letter-spacing:0;font-weight:500}
+.picking g.pl{cursor:grab}
+@media (max-width:420px){.sugrp.two{grid-template-columns:1fr}}
+
+@media (max-width:900px){body.trsu.picking .panel{max-height:44dvh}body.trsu.sheet-open.picking .court-box svg#court{height:calc(56dvh - 240px)!important;min-height:230px}}
