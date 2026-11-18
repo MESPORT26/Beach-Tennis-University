@@ -1149,7 +1149,7 @@ function renderPick(){var c=choose(),t=target(c.shot),mid=simple(c.shot),s=SHOTS
   function toM(e){var pt=SVGC.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var q=pt.matrixTransform(WORLD.getScreenCTM().inverse());return [Math.max(0.3,Math.min(7.6,(q.x-60)/40)),Math.max(0.3,Math.min(7.7,(q.y-40)/40))]}
   function live(){return state.tab==="compete"&&k===state.side&&MATCH&&MATCH.cur&&!MATCH.cur.done&&MATCH.cur.from}
   g.addEventListener("pointerdown",function(e){if(!live())return;drag=true;last=null;g.setPointerCapture(e.pointerId);e.preventDefault()});
-  g.addEventListener("pointermove",function(e){if(!drag||!live())return;last=toM(e);place(k,last,true);var t=MATCH.cur.trail;if(t){t.setAttribute("x2",X(last[0]));t.setAttribute("y2",Y(last[1]))}});
+  g.addEventListener("pointermove",function(e){if(!drag||!live())return;if(MATCH.cur.ghost){MATCH.cur.ghost.remove();MATCH.cur.ghost=null}last=toM(e);place(k,last,true);var t=MATCH.cur.trail;if(t){t.setAttribute("x2",X(last[0]));t.setAttribute("y2",Y(last[1]))}});
   g.addEventListener("pointerup",function(e){if(!drag)return;drag=false;if(!live())return;var cur=MATCH.cur,pos=last||cur.from,dx=pos[0]-cur.from[0];
     if(!cur.mate&&!cur.atBall&&cur.runTo){cur.runTo(pos);return}cur.pick.move=dx>0.6?"in":dx<-0.6?"back":"hold";cur.pick.pos=pos;var h=$("cs-movehint");if(h)h.textContent={in:"Stepping in",hold:"Holding level",back:"Moving back"}[cur.pick.move];maybeResolve()})});
 
@@ -1163,19 +1163,19 @@ function avatar(p){var hair={short:'<path d="M14 26c0-11 8-17 18-17s18 6 18 17c-
     '<circle cx="32" cy="30" r="15" fill="'+p.skin+'"/><g fill="'+p.hc+'">'+hair+'</g>'+(p.visor?'<path d="M15 23h34v5H15z" fill="'+p.visor+'"/>':'')+
     '<circle cx="26" cy="31" r="1.8" fill="#0D1B2A"/><circle cx="38" cy="31" r="1.8" fill="#0D1B2A"/><path d="M27 37q5 4 10 0" stroke="#0D1B2A" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>'}
 var RIVALS=[
- {id:"baloes",R:{react:.32,run:4.0,back:.55,reach:1.3,ue:.08,fe:.15,shortLob:.35,blunder:.25,hes:.2,bh:.12,attack:.25},pair:"Os Balões",from:"Rio de Janeiro",style:"Patient lobbers who push you back and wait for a short ball.",level:1,time:15,mod:0,
+ {id:"baloes",R:{aim:0.3,react:.32,run:4.0,back:.55,reach:1.3,ue:.08,fe:.15,shortLob:.35,blunder:.25,hes:.2,bh:.12,attack:.25},pair:"Os Balões",from:"Rio de Janeiro",style:"Patient lobbers who push you back and wait for a short ball.",level:1,time:15,mod:0,
   p:[{n:"Duda",e:"a06",skin:"#C68A5E",hair:"pony",hc:"#2B1B12",shirt:"#FFD23F",bg:"#FFE9A8",visor:"#FF9F1C"},{n:"Leo",e:"a02",skin:"#8D5A3B",hair:"curly",hc:"#1A120D",shirt:"#2ECC71",bg:"#C9F2DA"}],
   gen:{height:[["high",5],["med",3],["low",1]],depth:[["back",3],["mid",4],["front",2]],speed:[["slow",4],["med",4],["fast",1]],opp:[[[2,0],[2,2]],[[1,0],[2,2]],[[2,1],[1,2]]]}},
- {id:"wall",R:{react:.26,run:4.4,back:.5,reach:1.6,ue:.06,fe:.10,shortLob:.25,blunder:.18,hes:.15,bh:.12,attack:.4},pair:"The Wall",from:"Gold Coast",style:"Net blockers who get everything back. Beat them with height or the middle.",level:2,time:14,mod:.05,
+ {id:"wall",R:{aim:0.45,react:.26,run:4.4,back:.5,reach:1.6,ue:.06,fe:.10,shortLob:.25,blunder:.18,hes:.15,bh:.12,attack:.4},pair:"The Wall",from:"Gold Coast",style:"Net blockers who get everything back. Beat them with height or the middle.",level:2,time:14,mod:.05,
   p:[{n:"Kiri",e:"a10",skin:"#B07850",hair:"bun",hc:"#3A2414",shirt:"#00C2B8",bg:"#BFEDEA"},{n:"Sam",e:"a03",skin:"#F1C7A1",hair:"cap",hc:"#0077B6",shirt:"#0077B6",bg:"#CFE6F5"}],
   gen:{height:[["low",4],["med",4],["high",1]],depth:[["mid",4],["front",3],["back",1]],speed:[["fast",4],["med",3],["slow",2]],opp:[[[0,0],[0,2]],[[0,0],[0,1]],[[0,1],[0,2]],[[0,0],[1,2]]]}},
- {id:"breeze",R:{react:.24,run:4.8,back:.6,reach:1.5,ue:.05,fe:.08,shortLob:.18,blunder:.12,hes:.08,bh:.1,attack:.55},pair:"Breeze & Bolt",from:"Rimini",style:"A big server and a smasher who poaches the middle.",level:3,time:13,mod:.08,
+ {id:"breeze",R:{aim:0.6,react:.24,run:4.8,back:.6,reach:1.5,ue:.05,fe:.08,shortLob:.18,blunder:.12,hes:.08,bh:.1,attack:.55},pair:"Breeze & Bolt",from:"Rimini",style:"A big server and a smasher who poaches the middle.",level:3,time:13,mod:.08,
   p:[{n:"Marco",e:"a01",skin:"#E3B08A",hair:"short",hc:"#4A2E1A",shirt:"#FF4D6D",bg:"#FFD1DA"},{n:"Inês",e:"a09",skin:"#D9A27A",hair:"pony",hc:"#1E1E1E",shirt:"#0D1B2A",bg:"#D6DCE4",visor:"#FF4D6D"}],
   gen:{height:[["med",4],["high",3],["low",3]],depth:[["mid",4],["front",3],["back",2]],speed:[["fast",4],["med",4],["slow",1]],opp:[[[0,1],[1,2]],[[0,0],[1,2]],[[1,0],[0,2]],[[0,0],[0,2]]]}},
- {id:"feather",R:{react:.2,run:5.2,back:.65,reach:1.55,ue:.04,fe:.06,shortLob:.1,blunder:.08,hes:.1,bh:.08,attack:.7},pair:"Feather & Fox",from:"Florianópolis",style:"Drop-shot artists who pull you forward, then lob.",level:4,time:12,mod:.1,
+ {id:"feather",R:{aim:0.7,react:.2,run:5.2,back:.65,reach:1.55,ue:.04,fe:.06,shortLob:.1,blunder:.08,hes:.1,bh:.08,attack:.7},pair:"Feather & Fox",from:"Florianópolis",style:"Drop-shot artists who pull you forward, then lob.",level:4,time:12,mod:.1,
   p:[{n:"Ana",e:"a12",skin:"#A86B45",hair:"curly",hc:"#2A160C",shirt:"#FF9F1C",bg:"#FFDDB3"},{n:"Teo",e:"a11",skin:"#E8BE98",hair:"short",hc:"#C77A2E",shirt:"#2ECC71",bg:"#CDEFD9"}],
   gen:{height:[["low",4],["med",4],["high",2]],depth:[["front",3],["mid",4],["back",2]],speed:[["slow",5],["med",3],["fast",1]],opp:[[[1,0],[2,2]],[[2,0],[2,2]],[[0,0],[2,2]],[[1,1],[2,0]]]}},
- {id:"champs",R:{react:.16,run:5.8,back:.75,reach:1.7,ue:.02,fe:.04,shortLob:.05,blunder:.03,hes:.03,bh:.05,attack:.85},pair:"The Champions",from:"World No. 1",style:"The best pair on the tour. They mix every style and punish slow decisions.",level:5,time:10,mod:.14,
+ {id:"champs",R:{aim:0.85,react:.16,run:5.8,back:.75,reach:1.7,ue:.02,fe:.04,shortLob:.05,blunder:.03,hes:.03,bh:.05,attack:.85},pair:"The Champions",from:"World No. 1",style:"The best pair on the tour. They mix every style and punish slow decisions.",level:5,time:10,mod:.14,
   p:[{n:"Rafa",e:"a05",skin:"#9C6644",hair:"cap",hc:"#FFD23F",shirt:"#0D1B2A",bg:"#FFE9A8"},{n:"Lia",e:"a07",skin:"#F0C9A6",hair:"bun",hc:"#1A1A1A",shirt:"#FFD23F",bg:"#0D1B2A"}],
   gen:{height:[["high",3],["med",4],["low",3]],depth:[["front",3],["mid",4],["back",3]],speed:[["fast",3],["med",4],["slow",3]],opp:[[[0,0],[0,2]],[[2,0],[2,2]],[[0,0],[2,2]],[[1,0],[1,2]],[[0,1],[2,2]]]}}];
 var MOVES=[["in","Step in"],["hold","Hold level"],["back","Move back"]],MOVE_OK={hook:"hold",push:"in",flatsmash:"in",lob:"in",drop:"in",neutral:"hold",dig:"hold"};
@@ -1298,7 +1298,7 @@ function replyRows(c){var r=[],add=function(k,w,why,to){r.push({k:k,w:w,why:why,
 /* Turn the chosen reply into the ball that comes to you */
 var REPLY_BALL={drop:{depth:"front",height:"low",speed:"slow"},neutral:{depth:"mid",height:"med",speed:"med"},push:{depth:"mid",height:"med",speed:"fast"},
   lob:{depth:"back",height:"high",speed:"slow"},hook:{depth:"back",height:"med",speed:"fast"},flatsmash:{depth:"mid",height:"low",speed:"fast"},dig:{depth:"mid",height:"med",speed:"med"}};
-function applyReply(cur,c,hitter){var rows=replyRows(c),pick=wpick(rows.map(function(x){return [x,x.w]})),b=REPLY_BALL[pick.k],
+function applyReply(cur,c,hitter,team){var rows=replyRows(c),pick=wpick(rows.map(function(x){return [x,x.w]})),b=REPLY_BALL[pick.k],
     sit={shot:pick.k,depth:b.depth,height:b.height,speed:b.speed,side:pick.k==="neutral"?"body":wpick([["fh",4],["body",2],["bh",3]])};
   if(pick.k==="neutral"&&Math.random()<0.35)sit.speed="slow";
   if(pick.k==="lob"){sit.side="bh";var into=state.wind!=="calm"&&windV()[0]>0.7;if(Math.random()<(into?0.5:0.2)){sit.depth="mid";pick=Object.assign({},pick,{why:pick.why+(into?" Into the wind it falls short.":" It came up short.")})}}
@@ -1306,6 +1306,7 @@ function applyReply(cur,c,hitter){var rows=replyRows(c),pick=wpick(rows.map(func
   var hd=Math.min(2,c.d),pd={lob:Math.max(1,hd),hook:2,dig:Math.max(1,hd),drop:0,push:0,flatsmash:0,neutral:1}[pick.k];
   var hk=hitter||(c.l<=2?"A":"B"),ok=hk==="A"?"B":"A";sit[hk]=[hd,hk==="A"?0:2];sit[ok]=[pd,ok==="A"?0:2];
   var mate=pick.to==="mate"?true:pick.to==="server"?c.by==="mate":Math.random()<0.3;
+  if(team)mate=placeBall(sit,pick.k,team,pick.to==="server"?(c.by==="mate"?"mate":"me"):null,false,sit.depth==="mid"&&pick.k==="lob",false);
   cur.sit=sit;cur.mate=mate;cur.srcKey=hk;cur.why=pick.why;cur.rows=rows;return pick}
 function nearFH(cell,sit){if(!cell||!sit)return false;var t=svTarget(cell);return ["A","B"].some(function(k){var o=oP(sit,k);return o&&o[0]<11.5&&Math.abs(t[0]-o[0])<2&&t[1]<o[1]&&o[1]-t[1]<1.6})}
 function replyListHtml(rows){return rows.slice(0,3).map(function(x){return x.pct+"% "+REPLY_TXT[x.k].toLowerCase()}).join(", ")}
@@ -1398,7 +1399,7 @@ function servePhase(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);$("c
       cmd("Select your court position");$("cs-prompt").textContent="Select your court position";
       var from=form[me],tr=el("line",{x1:X(from[0]),y1:Y(from[1]),x2:X(from[0]),y2:Y(from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
       drawAim(null,function(pos){if(cur.svMoved)return;cur.svMoved=pos;cmd("");PL[me].g.style.transitionDuration="700ms";place(me,pos,false);tr.setAttribute("x2",X(pos[0]));tr.setAttribute("y2",Y(pos[1]));
-        setTimeout(function(){serveFeedback2(form,function(){clearAim();applyReply(cur,replyCtx("serve",sv.cell,sv.speed==="neutral"?"med":sv.speed,"in",cur.serveQ,"me"),rkey);cur.sit.me0=cur.svMoved;cur.sit.mate0=[4.4,form[pt][1]];cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()})},750)})},d+300)}
+        setTimeout(function(){serveFeedback2(form,function(){clearAim();applyReply(cur,replyCtx("serve",sv.cell,sv.speed==="neutral"?"med":sv.speed,"in",cur.serveQ,"me"),rkey,[cur.svMoved,[4.4,form[pt][1]]]);cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()})},750)})},d+300)}
   var secs=decideSecs(m.r,"serve");setWindBadge();startBar(secs,300);
   clearTimeout(cTimer);if(secs)cTimer=setTimeout(function(){if(!cur.served)doServe(true)},secs*1000+300)}
 var TIERC={good:["#2ECC71","High percentage"],ok:["#FF9F1C","Medium percentage"],risky:["#FF4D6D","Low percentage"]};
@@ -1424,7 +1425,7 @@ function mateServe(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideS
   setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;var t=serveTarget(z,side),d=runBall({f:[form[pt][0]+0.3,form[pt][1]],to:t,shot:"serve"},true);
     var rk=Math.abs(t[1]-form.A[1])<Math.abs(t[1]-form.B[1])?"A":"B";cur.srcKey=rk;cur.sit[rk]=[1,t[1]<2.67?0:t[1]<5.33?1:2];
     setTimeout(function(){["L","R"].forEach(function(k){PL[k].g.style.transitionDuration="900ms";place(k,[k===pt?3.8:4.4,form[k][1]],false)})},300);
-    setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;drawZones(false);applyReply(cur,replyCtx("serve",[1,Math.max(0,Math.min(4,z-1))],"med","in","ok","mate"),rk);cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()},d+700)},1600)}
+    setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;drawZones(false);applyReply(cur,replyCtx("serve",[1,Math.max(0,Math.min(4,z-1))],"med","in","ok","mate"),rk,[[4.4,form[me][1]],[3.8,form[pt][1]]]);cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()},d+700)},1600)}
 /* Partner points. The ball goes to your partner, you read their shot and take up position */
 var MATE_X={push:5.6,flatsmash:5.6,hook:4.6,neutral:4.5,dig:4.5,lob:5.2,drop:4.8},MATE_SPD={push:"fast",flatsmash:"fast",hook:"fast",dig:"med",neutral:"med",lob:"slow",drop:"slow"};
 var MATE_TXT={push:"After an attack, step in level with your partner, about 2.5 m from the net.",flatsmash:"After an attack, step in level with your partner, about 2.5 m from the net.",
@@ -1442,7 +1443,12 @@ function drawPoint(smooth){var m=MATCH,sit=m.cur.sit,sp=sitPos(sit),osv=m.cur.sr
   if(form)setTimeout(function(){if(!MATCH||!MATCH.cur||MATCH.cur.sit!==sit)return;["A","B","L","R"].forEach(function(k){PL[k].g.style.transitionDuration="1000ms";place(k,sp.pos[k],false)})},250);
   PROF._in={d:{fast:380,med:850,slow:1800}[sit.speed],h:function(k){return 1.2*(1-k)+endH*k+arc*S(PI*k)}};
   var cur=m.cur,to=cur.mate?sp.mateContact:sp.contact;
-  var d=runBall({f:src,to:to,shot:"_in",spin:{fast:2.4,med:1.0,slow:0.35}[sit.speed],trail:sit.speed},false);m.cur.arrive=d;
+  /* When you have to run, the ball stops in the air while you read their shot, then drops towards its shadow once you go */
+  var needRun=!cur.mate&&!osv&&dst(sp.pos[state.side],sp.contact)>0.5,d,spin0={fast:2.4,med:1.0,slow:0.35}[sit.speed];cur.flight=null;
+  if(needRun){var F=0.6,inH=PROF._in.h,M=[src[0]+(to[0]-src[0])*F,src[1]+(to[1]-src[1])*F];PROF._inA={d:PROF._in.d*F,h:function(k){return inH(F*k)}};
+    d=runBall({f:src,to:M,shot:"_inA",spin:spin0,trail:sit.speed},false);cur.flight={M:M,hM:inH(F),to:to,hit:endH}}
+  else d=runBall({f:src,to:to,shot:"_in",spin:spin0,trail:sit.speed},false);
+  m.cur.arrive=d;
   clearTimeout(tagTimer);if(ballTag){ballTag.remove();ballTag=null}
   if(oppPill){oppPill.remove();oppPill=null}oppPill=courtPill(src,osv?"Serve":SHOTS[oppPose(sit)].name);
   if(cur.mate){var ms=cur.ans.shot,d2=RM?150:(PROF[ms]||PROF.neutral).d*1.3;m.cur.arrive=d+250+d2;
@@ -1455,14 +1461,20 @@ function drawPoint(smooth){var m=MATCH,sit=m.cur.sit,sp=sitPos(sit),osv=m.cur.sr
   if(cur.mate){cur.atBall=true;return d}
   var st=sp.pos[state.side],ct=sp.contact,dd=dst(st,ct),back=ct[0]<st[0]-1,tPhys=osv?9:(TIN[sit.shot||oppPose(sit)]||{fast:.45,med:1,slow:1.6}[sit.speed]),
     need=0.3+Math.max(0,dd-1.1)/(4.2*(back?0.6:1));cur.runNeed=need;cur.runT=tPhys;cur.unreach=!osv&&need>tPhys+0.25;
-  if(cur.unreach)setTimeout(function(){if(MATCH&&MATCH.cur===cur&&!cur.done)sandLoss(cur,"far")},d+250);
-  else if(dd>0.9){cur.spot=el("circle",{cx:X(ct[0]),cy:Y(ct[1]),r:22,fill:"#FFD23F","fill-opacity":0.25,stroke:"#0D1B2A","stroke-width":2.5,"stroke-dasharray":"5 4","class":"ballspot","pointer-events":"none"},gM)}
+  if(cur.unreach)setTimeout(function(){if(MATCH&&MATCH.cur===cur&&!cur.done){cmd("Too far");dropBall(cur,800,function(){sandLoss(cur,"far",true)})}},d+500);
+  else if(dd>0.5){cur.spot=el("circle",{cx:X(ct[0]),cy:Y(ct[1]),r:22,fill:"#FFD23F","fill-opacity":0.25,stroke:"#0D1B2A","stroke-width":2.5,"stroke-dasharray":"5 4","class":"ballspot","pointer-events":"none"},gM)}
   else cur.atBall=true;
   return d}
+/* The ball falls towards its shadow. Get there before it lands */
+function dropBall(cur,ms,onLand){var f=cur.flight;if(!f){onLand();return}PROF._inB={d:ms/1.3,h:function(k){return f.hM*(1-k)}};cur.fallT0=performance.now();cur.fallMs=ms;
+  runBall({f:f.M,to:f.to,shot:"_inB",land:true},true);clearTimeout(cur.fallTimer);cur.fallTimer=setTimeout(onLand,ms+40)}
+function holdBall(cur){var f=cur.flight;clearTimeout(cur.fallTimer);if(!f)return;if(raf)cancelAnimationFrame(raf);var k=cur.fallT0?Math.min(1,(performance.now()-cur.fallT0)/cur.fallMs):0,
+    p=[f.M[0]+(f.to[0]-f.M[0])*k,f.M[1]+(f.to[1]-f.M[1])*k],h=Math.max(f.hit||0.6,f.hM*(1-k));PROF._hold={d:180,h:function(){return h}};runBall({f:p,to:f.to,shot:"_hold"},false)}
+function runWindow(cur){var b=1.2+(TIN[cur.sit.shot||oppPose(cur.sit)]||1)+({beginner:1.0,intermediate:.6,advanced:.3,pro:0}[state.level]||.5);return Math.round((state.clock==="practice"?b*2:b)*1000)}
 /* Out of reach. The ball drops into the sand and you pull up short */
-function sandLoss(cur,why){var m=MATCH;if(!m||m.cur!==cur||cur.done)return;cur.done=true;clearTimeout(cTimer);stopBar();hideShotUI();cmd("");
+function sandLoss(cur,why,landed){var m=MATCH;if(!m||m.cur!==cur||cur.done)return;cur.done=true;clearTimeout(cTimer);stopBar();hideShotUI();cmd("");
   var sp=sitPos(cur.sit),ct=sp.contact,st=PL[state.side]?(cur.start||sp.pos[state.side]):ct,h0={low:0.4,med:1.4,high:3.0}[cur.sit.height]||1;
-  PROF._sand={d:420,h:function(k){return h0*(1-k)}};runBall({f:ct,to:[ct[0]-0.4,ct[1]],shot:"_sand",land:true},true);
+  if(cur.ghost){cur.ghost.remove();cur.ghost=null}if(!landed){PROF._sand={d:420,h:function(k){return h0*(1-k)}};runBall({f:ct,to:[ct[0]-0.4,ct[1]],shot:"_sand",land:true},true)}if(cur.spot)cur.spot.remove();
   var gap=dst(st,ct),stop=toward(st,ct,Math.max(0,gap-1.7));PL[state.side].g.style.transitionDuration="700ms";place(state.side,stop,false);
   pointEnd(m,false,"sand");renderScore();track("point_played",{rival:m.r.id,end:why==="far"?"too_far":"too_slow_to_ball",distance:+gap.toFixed(1)});
   var over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2,
@@ -1471,7 +1483,7 @@ function sandLoss(cur,why){var m=MATCH;if(!m||m.cur!==cur||cur.done)return;cur.d
     tip=why==="far"?"Your position after your last shot left that space open. Recover to the middle of your half, level with your partner, before their ball comes.":"Tap where the ball is coming as soon as you've read their shot.";
   var html='<div class="ptres l"><b>'+head+'</b> '+txt+'</div><div class="fbbest"><b>Next time</b><p>'+tip+'</p></div><!--more-->'+fbSec("Their shot",cur.why||"")+fbSec("Wind",windText());
   setTimeout(function(){shout(why==="far"?"TOO FAR":"TOO SLOW","them")},450);setTimeout(function(){cheer(false,m.r.pair)},1700);buzz([60]);
-  setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;fbShow(html,over?"See the result":"Next point",function(){playOn(over)})},3200)}
+  setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;fbShow(html,over?"See the result":"Next point",function(){playOn(over)})},4200)}
 /* Your ball goes into the net or out. It drops and shrinks */
 function errBall(from,y,net){if(net){PROF._net={d:430,h:function(k){return 1.2*(1-k)+0.5*k+0.5*S(PI*k)}};runBall({f:from,to:[7.85,y],shot:"_net"},false);
     setTimeout(function(){PROF._drop={d:300,h:function(k){return 1.0*(1-k)}};runBall({f:[7.85,y],to:[7.45,y],shot:"_drop",land:true},false)},RM?160:430*1.3)}
@@ -1611,9 +1623,9 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
   c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">'+(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Read the ball")+'</p><p class="aimhint" id="sh-sum"></p>';
   cur.pick={speed:"neutral",spin:"flat"};var p=cur.pick;cmd(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Watch the ball");
   var sp0=sitPos(cur.sit);cur.from=sp0.pos[state.side];cur.start=cur.from.slice();if(cur.unreach){cmd("");return}
-  var gs=52*PS,gh=el("g",{transform:"translate("+X(cur.from[0])+" "+Y(cur.from[1])+")"+(PORT?" rotate(90)":""),opacity:0.3},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);
+  var gs=52*PS,gh=el("g",{transform:"translate("+X(cur.from[0])+" "+Y(cur.from[1])+")"+(PORT?" rotate(90)":""),opacity:0.3},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);cur.ghost=gh;
   cur.trail=el("line",{x1:X(cur.from[0]),y1:Y(cur.from[1]),x2:X(cur.from[0]),y2:Y(cur.from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
-  function moveTo(pos){var dx=pos[0]-cur.from[0];PL[state.side].g.style.transitionDuration="600ms";place(state.side,pos,false);cur.trail.setAttribute("x2",X(pos[0]));cur.trail.setAttribute("y2",Y(pos[1]));
+  function moveTo(pos){if(cur.ghost){cur.ghost.remove();cur.ghost=null}var dx=pos[0]-cur.from[0];PL[state.side].g.style.transitionDuration="600ms";place(state.side,pos,false);cur.trail.setAttribute("x2",X(pos[0]));cur.trail.setAttribute("y2",Y(pos[1]));
     p.move=dx>0.6?"in":dx<-0.6?"back":"hold";p.pos=pos;cmd("");maybeResolve()}
   var wait=(cur.arrive||450)+150;
   if(MT){drawAim(null,function(pos){if(cur.done)return;moveTo(pos)});
@@ -1627,10 +1639,13 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
       '<div class="svbtns" id="sv-spin"><button data-v="flat" aria-pressed="true">Flat</button>'+'</div>'+
       '<p class="svtip">Swipe the ball for spin. Up for topspin, left or right to curve, down for backspin.</p><button class="btn primary svdone" id="sh-done">Done &#8250;</button></div></div></div>';
     var started=false;
-    function runPhase(){if(!started){started=true;startClock(0)}if(!pop.hidden)popMin(pop,tab,"Shot");cmd("Run to the ball");$("cs-prompt").textContent="Run to the ball";if(cur.spot)cur.spot.classList.add("go")}
+    function runPhase(){if(!started){started=true;var T=runWindow(cur);cur.runEnd=performance.now()+T;startBar(T/1000,0);
+        dropBall(cur,T,function(){if(MATCH&&MATCH.cur===cur&&!cur.done&&!cur.atBall)sandLoss(cur,"slow",true)})}if(!pop.hidden)popMin(pop,tab,"Shot");cmd("Run to the ball");$("cs-prompt").textContent="Run to the ball";if(cur.spot)cur.spot.classList.add("go")}
     function runTo(pos){if(cur.done||cur.atBall)return;var c=sitPos(cur.sit).contact,d=dst(cur.start,pos),ms=Math.max(250,Math.min(1100,d/4.2*600));
       PL[state.side].g.style.transitionDuration=ms+"ms";place(state.side,pos,false);cur.trail.setAttribute("x2",X(pos[0]));cur.trail.setAttribute("y2",Y(pos[1]));
-      if(dst(pos,c)<=1.4){cur.atBall=true;var hit=[c[0]-0.3,c[1]];setTimeout(function(){if(cur.done)return;PL[state.side].g.style.transitionDuration="200ms";place(state.side,hit,false);cur.from=hit;
+      if(cur.ghost){cur.ghost.remove();cur.ghost=null}
+      if(dst(pos,c)<=1.4&&cur.runEnd&&performance.now()+ms>cur.runEnd){cur.start=pos;cmd("Too slow!");return}
+      if(dst(pos,c)<=1.4){cur.atBall=true;var hit=[c[0]-0.3,c[1]];setTimeout(function(){if(cur.done)return;holdBall(cur);stopBar();startClock(0);PL[state.side].g.style.transitionDuration="200ms";place(state.side,hit,false);cur.from=hit;
           cur.trail.setAttribute("x1",X(hit[0]));cur.trail.setAttribute("y1",Y(hit[1]));cur.trail.setAttribute("x2",X(hit[0]));cur.trail.setAttribute("y2",Y(hit[1]));if(cur.spot)cur.spot.remove();buzz(15);popOpen(pop,tab);showPane("ret")},ms)}
       else{cur.start=pos;cmd("Closer. Get to the ball")}}
     cur.runTo=runTo;
@@ -1743,6 +1758,20 @@ function findGap(from,team){var c=[["lob",[1.2,1.5]],["lob",[1.2,4]],["lob",[1.2
     tMe=(gap>0?0.32+gap/(4.2*(back?0.55:1)):0.15),sc=tMe-tThem;if(!best||sc>best.sc)best={sh:sh,tg:tg,sc:sc,near:near}});
   return best}
 var GAPTXT={lob:"a lob over you into the empty back court",drop:"a drop into the space in front of you",push:"a push through the open court"};
+/* Where they aim in your court. Into space, away from whoever takes it, so you have to run. Better pairs find the space more often */
+var AIMY=[0.7,1.9,3.1,4.0,4.9,6.1,7.3],AIMX={fast:[2.6,3.6,4.6,5.6],lob:[0.8,1.4],slob:[3.0,3.6],drop:[6.5,7.1],pop:[5.4,6.0],neutral:[3.0,3.8]};
+function aimAt(k,team,prefer,opening,short,pop){var R=rv(),xs=short?AIMX.slob:pop?AIMX.pop:k==="lob"?AIMX.lob:k==="drop"?AIMX.drop:k==="neutral"?AIMX.neutral:AIMX.fast,
+    ys=k==="neutral"&&!opening?[3.1,4.0,4.9]:AIMY,c=[];xs.forEach(function(x){ys.forEach(function(y){c.push([x,y])})});
+  var who=prefer==="me"?0:prefer==="mate"?1:(Math.random()<0.65?0:1),P=team[who],O=team[1-who];
+  /* They place it where you can only just get to it. Better pairs push it a little further, out of reach */
+  var tin=TIN[k]||1,slack=0.12-(R.aim||.5)*0.18,ok=function(q){var d=dst(q,P),back=q[0]<P[0]-1,need=0.3+Math.max(0,d-1.1)/(4.2*(back?0.6:1));return d>=1.5&&need<=tin+0.25-slack};
+  var pool=c.filter(function(q){return ok(q)&&dst(q,P)<=dst(q,O)+0.3});if(!pool.length)pool=c.filter(ok);if(!pool.length)pool=c.filter(function(q){return dst(q,P)<=1.8});if(!pool.length)pool=c;
+  var t;if(!opening&&Math.random()<(R.aim||0.5)){t=pool.reduce(function(b,q){return Math.min(dst(q,P),dst(q,O))>Math.min(dst(b,P),dst(b,O))?q:b})}
+  else{var mid=pool.filter(function(q){var d=dst(q,P);return d<=2.6});t=(mid.length?mid:pool)[Math.floor(Math.random()*(mid.length?mid:pool).length)]}
+  t=[t[0]+(Math.random()-.5)*0.4,t[1]+(Math.random()-.5)*0.4];
+  return {c:[Math.max(0.4,Math.min(7.4,t[0])),Math.max(0.4,Math.min(7.6,t[1]))],mate:dst(t,team[1])<dst(t,team[0])}}
+function placeBall(sit,k,team,prefer,opening,short,pop,tg){var a=tg?{c:tg.slice(),mate:dst(tg,team[1])<dst(tg,team[0])}:aimAt(k,team,prefer,opening,short,pop),P=a.mate?team[1]:team[0],hs0=state.hand==="L"?-1:1,dy=(a.c[1]-P[1])*hs0;
+  sit.cxy=a.c;sit.depth=a.c[0]>5.2?"front":a.c[0]>2.3?"mid":"back";sit.side=dy>0.3?"fh":dy<-0.3?"bh":"body";sit.me0=team[0].slice();sit.mate0=team[1].slice();return a.mate}
 /* Their reply, with their positions carried through the rally */
 function rallyReply(cur,ctx,out,team,meKey){var R=rv(),Q=out.Q,rc=out.rc,pick=null,opening=false;
   if(Q<0.35){opening=true;var sl=R.shortLob+0.35-Q;
@@ -1769,15 +1798,7 @@ function rallyReply(cur,ctx,out,team,meKey){var R=rv(),Q=out.Q,rc=out.rc,pick=nu
     else{o[pk][0]=Math.max(o[pk][0],13.6);bl=nm(pk)+" stayed deep. Drop it short in front of them."}}
   sit.oA=o.A;sit.oB=o.B;sit.A=toGrid(o.A);sit.B=toGrid(o.B);
   var mate=pick.to==="mate"?true:pick.to==="me"?false:Math.random()<(opening?0.15:0.3);
-  if(team){var P=mate?team[1]:team[0],rnd=function(a){return (Math.random()-.5)*a},c;
-    if(pick.tg)c=pick.tg.slice();
-    else if(pick.short)c=[3.4+rnd(1),P[1]+rnd(1)];else if(pick.pop)c=[Math.max(5.6,P[0]),P[1]+rnd(1)];
-    else if(pick.k==="lob")c=[sit.depth==="mid"?3.2+rnd(.8):1.0+Math.random()*.6,P[1]+0.6];
-    else if(pick.k==="drop")c=[6.6+Math.random()*.5,P[1]+rnd(1.4)];
-    else if(pick.k==="neutral")c=[3.6+rnd(.8),4+rnd(1.2)];
-    else c=[P[0]+rnd(.6),P[1]+(Math.random()<.5?-1:1)*(0.4+Math.random()*0.5)];
-    c=[Math.max(0.4,Math.min(7.4,c[0])),Math.max(0.4,Math.min(7.6,c[1]))];var hs0=state.hand==="L"?-1:1,dy=(c[1]-P[1])*hs0;
-    sit.cxy=c;sit.depth=c[0]>5.2?"front":c[0]>2.3?"mid":"back";sit.side=dy>0.3?"fh":dy<-0.3?"bh":"body";sit.me0=team[0].slice();sit.mate0=team[1].slice()}
+  if(team)mate=placeBall(sit,pick.k,team,pick.to==="mate"?"mate":pick.to==="me"?"me":opening?"me":null,opening,pick.short,pick.pop,pick.tg);
   cur.sit=sit;cur.mate=mate;cur.srcKey=hk;cur.opening=opening;cur.blunder=bl;
   cur.why=pick.why+(bl&&(state.level==="beginner"||state.level==="intermediate")?" "+bl:"");return pick}
 /* Set-ups that won the point */
@@ -1814,7 +1835,7 @@ function resolveMate(late){var m=MATCH,cur=m.cur,a=cur.ans,p=cur.pick,sp=sitPos(
     fbSec("Your position",(q==="late"?"Too slow. The clock ran out. ":q==="right"?"Great position. ":q==="close"?"Close. The green mark was the best spot. ":"Out of position. The green mark was the best spot. ")+(MATE_TXT[ms]||""))+
     fbSec("Opponents",oppText(cur.sit))+fbSec("Wind",windText());
   hideShotUI();cmd("");stopBar();var cm=m.cur;if(!cont){if(E)setTimeout(function(){shout(E[0],won?"":"them")},300);setTimeout(function(){cheer(won,m.r.pair)},late?100:1500);buzz(won?[30,40,30]:[60])}else buzz([20]);
-  setTimeout(function(){if(!MATCH||MATCH.cur!==cm)return;fbShow(html,cont?"Play on":over?"See the result":"Next point",function(){if(cont)nextShot(cm);else playOn(over)})},cont?1400:late?2000:3400)}
+  setTimeout(function(){if(!MATCH||MATCH.cur!==cm)return;fbShow(html,cont?"Play on":over?"See the result":"Next point",function(){if(cont)nextShot(cm);else playOn(over)})},cont?1400:late?3000:4400)}
 function resolvePoint(late){var m=MATCH;if(!m||!m.cur||m.cur.done)return;var cur=m.cur,a=cur.ans,p=cur.pick;cur.done=true;clearTimeout(cTimer);if(!cur.from){cur.done=false;return}if(cur.mate)return resolveMate(late);
   if(late&&!cur.atBall){cur.done=false;return sandLoss(cur,"slow")}
   if(late&&p.shot&&p.cell){if(!p.move)p.move="hold";if(!p.pos)p.pos=cur.from;cur.rushed=true;late=false}
@@ -1854,7 +1875,7 @@ function resolvePoint(late){var m=MATCH;if(!m||!m.cur||m.cur.done)return;var cur
     fbSec("Where you aimed",locT)+fbSec("Your position",posT)+fbSec("Opponents",oppText(cur.sit))+fbSec("Wind",windText());
   hideShotUI();cmd("");stopBar();var cm=m.cur;
   if(!cont){setTimeout(function(){shout(E[0],won?"":"them",combo||"")},300);setTimeout(function(){cheer(won,m.r.pair)},late?100:1700);buzz(won?[30,40,30]:[60])}else{buzz([20]);if(cur.opening)setTimeout(function(){shout("OPENING!","",cur.blunder&&state.level!=="advanced"&&state.level!=="pro"?"":"Their reply is weak")},500)}
-  setTimeout(function(){if(!MATCH||MATCH.cur!==cm)return;fbShow(html,cont?"Play on":over?"See the result":"Next point",function(){if(cont)nextShot(cm);else playOn(over)})},cont?1600:late?2000:3600)}
+  setTimeout(function(){if(!MATCH||MATCH.cur!==cm)return;fbShow(html,cont?"Play on":over?"See the result":"Next point",function(){if(cont)nextShot(cm);else playOn(over)})},cont?1600:late?3000:4600)}
 /* The rally goes on. Their reply and positions were set when your shot landed */
 function nextShot(prev){var m=MATCH;if(!m)return;var cur={sit:prev.sit,pick:{},t0:0,srv:"rally",os:prev.os,rally:(prev.rally||0)+1,mate:prev.mate,srcKey:prev.srcKey,why:prev.why,hist:prev.hist,wasOpening:prev.opening,blunder:prev.blunder};
   m.cur=cur;cur.ans=solveSit(cur.sit);clearAim();drawPoint(true);decidePanel()}
