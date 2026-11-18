@@ -64,6 +64,7 @@ body{background:var(--bg);color:var(--fg);font-family:var(--font);font-size:16px
 .cpanel .moves{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .cpanel .moves button{justify-content:center}
 .timer{height:10px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+.ctimer.hurry,.hurry .timer{animation:hurry .5s ease-in-out infinite alternate;box-shadow:0 0 0 2px #FF4D6D}@keyframes hurry{to{transform:scaleY(1.6)}}@media (prefers-reduced-motion:reduce){.ctimer.hurry,.hurry .timer{animation:none}}
 .timer i{display:block;height:100%;background:linear-gradient(90deg,#2ECC71,#FFD23F,#FF4D6D);transform-origin:left;transition:transform linear}
 .ptres{border-radius:14px;padding:14px 16px;font-weight:600;line-height:1.5}
 .ptres.w{background:#E3F8EC;color:#146C3A}.ptres.l{background:#FDE6EA;color:#9E1734}

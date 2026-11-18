@@ -1184,13 +1184,20 @@ function wpick(a){var t=0;a.forEach(function(x){t+=x[1]});var r=Math.random()*t;
 function beaten(){try{return JSON.parse(load("sand-beaten","{}"))||{}}catch(e){return {}}}
 function eb(e){return '<span class="eb" aria-hidden="true">'+avImg(e)+'</span>'}
 function pairSvg(r){return '<span class="av-pair">'+eb(rAv(r,0))+eb(rAv(r,1))+'</span>'}
-var LVT={beginner:8,intermediate:5,advanced:3,pro:2};function decideSecs(r){return 2*(r.time+(LVT[state.level]||4))}
+/* Decision clock. Short, like the real thing. Set by your level, the ball coming at you and the pair you play. Practice mode has no clock */
+var LVT={beginner:12,intermediate:9,advanced:6,pro:4},BALLT={push:.6,flatsmash:.55,hook:.75,dig:.85,neutral:1,drop:.9,lob:1.2};
+state.clock=load("clock","match");
+function decideSecs(r,kind){if(state.clock==="practice")return 0;var b=LVT[state.level]||9,cur=MATCH&&MATCH.cur,f=1;
+  if(kind==="serve")f=1.6;else if(cur&&cur.mate)f=0.9;else if(cur&&cur.srv==="opp"&&!cur.rally)f=0.8;else if(cur&&cur.sit)f=BALLT[cur.sit.shot||oppPose(cur.sit)]||1;
+  return Math.max(kind==="serve"?5:3,Math.round(b*f*(1-((r.level||1)-1)*0.08)*10)/10)}
 function renderLobby(list){var w=document.createElement("div");w.className="rivals";var bt=beaten();
   RIVALS.forEach(function(r,i){var locked=i>0&&!bt[RIVALS[i-1].id]&&!bt[r.id],b=document.createElement("button");b.className="rival";b.disabled=locked;
-    b.innerHTML=pairSvg(r)+'<b>'+r.pair+'</b><small>'+r.p[0].n+' and '+r.p[1].n+' · '+r.from+'</small><small>'+r.style+'</small><span class="meta"><span class="lvl">'+"●●●●●".slice(0,r.level)+"○○○○○".slice(0,5-r.level)+'</span><span>'+(bt[r.id]?"Beaten "+bt[r.id]:locked?"Beat "+RIVALS[i-1].pair+" to unlock":decideSecs(r)+" s to decide")+'</span></span>';
+    b.innerHTML=pairSvg(r)+'<b>'+r.pair+'</b><small>'+r.p[0].n+' and '+r.p[1].n+' · '+r.from+'</small><small>'+r.style+'</small><span class="meta"><span class="lvl">'+"●●●●●".slice(0,r.level)+"○○○○○".slice(0,5-r.level)+'</span><span>'+(bt[r.id]?"Beaten "+bt[r.id]:locked?"Beat "+RIVALS[i-1].pair+" to unlock":state.clock==="practice"?"No clock":"About "+Math.round((LVT[state.level]||9)*(1-(r.level-1)*0.08))+" s to decide")+'</span></span>';
     b.onclick=function(){startMatch(r)};w.appendChild(b)});list.appendChild(w)}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clearAim();hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");$("csit").hidden=true;var c=$("cpanel");c.innerHTML='<span class="kicker">Sand Series</span><h3>Play the best pairs</h3><p class="say">Each point, read the ball, then pick your shot, tap where to aim on their side of the court and tap where you&rsquo;d move on your side, all before the clock runs out. When the ball goes to your partner, read their shot and get into position. Every point starts with a serve, two each in turn. First to '+WIN_AT+' points, win by 2.</p><p class="say">Beat a pair to unlock the next one.</p>';
+function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clearAim();hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");$("csit").hidden=true;var c=$("cpanel");c.innerHTML='<span class="kicker">Sand Series</span><h3>Play the best pairs</h3><p class="say">Each point, read the ball, then pick your shot, tap where to aim on their side of the court and tap where you&rsquo;d move on your side, all before the clock runs out. When the ball goes to your partner, read their shot and get into position. Every point starts with a serve, two each in turn. First to '+WIN_AT+' points, win by 2.</p><p class="say">Beat a pair to unlock the next one.</p><div class="pgroup"><span>Clock</span><div class="seg" id="seg-clock"><button data-v="match">Match, timed</button><button data-v="practice">Practice, no clock</button></div><p class="hint" id="clock-hint"></p></div>';
+  (function(){var hint=function(){var e=$("clock-hint");if(!e)return;e.textContent=state.clock==="practice"?"Take your time. Good for learning a new pair or a new shot.":"About "+(LVT[state.level]||9)+" seconds at your level, less against fast balls and better pairs. Feedback is never timed."};
+    [].forEach.call($("seg-clock").children,function(b){b.setAttribute("aria-pressed",String(b.dataset.v===state.clock));b.onclick=function(){state.clock=b.dataset.v;save("clock",state.clock);track("setting_changed",{setting:"clock",to:state.clock});[].forEach.call($("seg-clock").children,function(x){x.setAttribute("aria-pressed",String(x===b))});hint();if(typeof renderList==="function"&&!MATCH)renderList()}});hint()})();
   ["A","B","L","R"].forEach(function(k){place(k,{A:[12.5,2.7],B:[12.5,5.3],L:[4.5,2.7],R:[4.5,5.3]}[k],true)});runBall(null)}
 var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breezy",4],["gusty",2]],breeze:[["calm",2],["breezy",4],["gusty",3]],feather:[["calm",2],["breezy",4],["gusty",3]],champs:[["calm",2],["breezy",3],["gusty",4]]};
 function startMatch(r){MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
@@ -1392,8 +1399,8 @@ function servePhase(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);$("c
       var from=form[me],tr=el("line",{x1:X(from[0]),y1:Y(from[1]),x2:X(from[0]),y2:Y(from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
       drawAim(null,function(pos){if(cur.svMoved)return;cur.svMoved=pos;cmd("");PL[me].g.style.transitionDuration="700ms";place(me,pos,false);tr.setAttribute("x2",X(pos[0]));tr.setAttribute("y2",Y(pos[1]));
         setTimeout(function(){serveFeedback2(form,function(){clearAim();applyReply(cur,replyCtx("serve",sv.cell,sv.speed==="neutral"?"med":sv.speed,"in",cur.serveQ,"me"),rkey);cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()})},750)})},d+300)}
-  var secs=decideSecs(m.r);setWindBadge();startBar(secs,300);
-  clearTimeout(cTimer);cTimer=setTimeout(function(){if(!cur.served)doServe(true)},secs*1000+300)}
+  var secs=decideSecs(m.r,"serve");setWindBadge();startBar(secs,300);
+  clearTimeout(cTimer);if(secs)cTimer=setTimeout(function(){if(!cur.served)doServe(true)},secs*1000+300)}
 var TIERC={good:["#2ECC71","High percentage"],ok:["#FF9F1C","Medium percentage"],risky:["#FF4D6D","Low percentage"]};
 function serveFeedback2(form,go){var m=MATCH,cur=m.cur,sv=cur.sv,rk=cur.serveRisk,me=state.side,lane=form[me][1];
   drawAim(function(){},null);[].forEach.call(gA.children,function(g){var k=g.getAttribute("data-c");if(!k)return;var c=k.split(",").map(Number),q=serveRisk(c[0],c[1],sv.speed,sv.spin).tier,r=g.firstChild,on=c[0]===sv.cell[0]&&c[1]===sv.cell[1];
@@ -1461,9 +1468,12 @@ function showTag(sit,c,endH,lab){if(!MATCH||!MATCH.cur||MATCH.cur.sit!==sit)retu
   if(MATCH.cur.pick.shot||MATCH.cur.pick.pos)g.classList.add("dim")}
 function describe(sit){return {low:"Low",med:"Net height",high:"High"}[sit.height]+", "+{fast:"fast",med:"medium pace",slow:"slow"}[sit.speed]+", on your "+{fh:"forehand",body:"body",bh:"backhand"}[sit.side]+". You're "+{front:"inside 3 m",mid:"3 to 6 m back",back:"deep"}[sit.depth]+"."}
 /* Timer bars, in the side panel and on the court */
-function startBar(secs,wait){["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;bar.style.transitionDuration="0ms";bar.style.transform="scaleX(1)";bar.getBoundingClientRect();
+var hurryT=null;
+function startBar(secs,wait){clearTimeout(hurryT);var ct=$("ctimer");ct.classList.remove("hurry");if(!secs){ct.hidden=true;["tbar"].forEach(function(id){var b=$(id);if(b&&b.parentNode)b.parentNode.hidden=true});return}
+  hurryT=setTimeout(function(){if(!ct.hidden){ct.classList.add("hurry");buzz([30,170,30,170,30,170,30])}},Math.max(0,(secs-2)*1000+wait));
+  ["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;bar.style.transitionDuration="0ms";bar.style.transform="scaleX(1)";bar.getBoundingClientRect();
   setTimeout(function(){bar.style.transitionDuration=secs+"s";bar.style.transform="scaleX(0)"},wait)});$("ctimer").hidden=false}
-function stopBar(){["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;var t=getComputedStyle(bar).transform;bar.style.transitionDuration="0ms";bar.style.transform=t==="none"?"scaleX(1)":t})}
+function stopBar(){clearTimeout(hurryT);var ct=$("ctimer");if(ct)ct.classList.remove("hurry");["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;var t=getComputedStyle(bar).transform;bar.style.transitionDuration="0ms";bar.style.transform=t==="none"?"scaleX(1)":t})}
 function setWindBadge(){var w=$("cwind");if(state.wind==="calm"){w.hidden=true;return}w.hidden=false;w.className="cwind w-"+state.wind;w.textContent={breezy:"Breezy",gusty:"Gusty"}[state.wind]+" · "+windWords().replace(/^(Breezy|Gusty) /,"").replace(/^wind /,"")}
 /* Collapsible overlay boxes */
 var GRAB='<button class="grab" aria-label="Resize panel"><i></i></button>';
@@ -1625,7 +1635,7 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
     return}
   startClock(wait)}
 function startClock(wait){var m=MATCH;if(!m||!m.cur)return;var secs=decideSecs(m.r);startBar(secs,wait);
-  clearTimeout(cTimer);cTimer=setTimeout(function(){resolvePoint(true)},secs*1000+wait)}
+  clearTimeout(cTimer);if(secs)cTimer=setTimeout(function(){resolvePoint(true)},secs*1000+wait)}
 /* Ball height against your own body */
 var HB_ICON='<svg class="hb" viewBox="-14 -14 28 28" aria-hidden="true"><circle r="12" fill="#DDF02B" stroke="#9C9A12"/><path d="M0 -12C-11 -4 11 4 0 12A12 12 0 0 0 0 -12Z" fill="#FF5A1F"/></svg>';
 var HB_ROWS=[["high","High","Above your head"],["med","Mid","Chest to head"],["low","Low","Waist and below"]];
@@ -1764,6 +1774,7 @@ function resolveMate(late){var m=MATCH,cur=m.cur,a=cur.ans,p=cur.pick,sp=sitPos(
   hideShotUI();cmd("");stopBar();var cm=m.cur;if(!cont){if(E)setTimeout(function(){shout(E[0],won?"":"them")},300);setTimeout(function(){cheer(won,m.r.pair)},late?100:1500);buzz(won?[30,40,30]:[60])}else buzz([20]);
   setTimeout(function(){if(!MATCH||MATCH.cur!==cm)return;fbShow(html,cont?"Play on":over?"See the result":"Next point",function(){if(cont)nextShot(cm);else playOn(over)})},cont?1400:late?2000:3400)}
 function resolvePoint(late){var m=MATCH;if(!m||!m.cur||m.cur.done)return;var cur=m.cur,a=cur.ans,p=cur.pick;cur.done=true;clearTimeout(cTimer);if(!cur.from){cur.done=false;return}if(cur.mate)return resolveMate(late);
+  if(late&&p.shot){if(!p.cell)p.cell=[1,2];if(!p.move)p.move="hold";cur.rushed=true;late=false}
   var R=rv(),tierP=p.shot?shotTiers(cur.sit,a.shot)[p.shot]:-1,shotOk=tierP===2,shotMid=tierP===1,mvKey=shotOk?p.shot:a.shot,
     aimCtx={shot:p.shot||a.shot,sit:cur.sit},ct=p.cell?aimTier(p.cell,aimCtx.shot,cur.sit,p.speed):2,aimWhy=p.cell?aimScore(p.cell,aimCtx.shot,cur.sit,p.speed).why:"",sq=ct===0?"right":ct===1?"close":"wrong",ss=p.shot?ssVerdict(p.shot,p.speed,p.spin,cur.sit):{ok:false,part:false},
     moveOk=p.move&&p.move===MOVE_OK[mvKey];
@@ -1791,7 +1802,7 @@ function resolvePoint(late){var m=MATCH;if(!m||!m.cur||m.cur.done)return;var cur
   var E=ENDTXT[kind]||null,head=cont?(cur.opening?"Opening coming! ":"Rally on. ")+cur.why:E[1]+" "+(kind==="miss"?out.why:kind==="gap"?"They played "+GAPTXT[rep.gap.sh]+". "+(moveOk?"":"Your position left it open."):E[2]);
   var html='<div class="ptres '+(cont?(cur.opening?"w":"m"):won?"w":"l")+'"><b>'+head+'</b> '+sumT+'</div>'+(combo?'<div class="fbbest"><b>Set-up</b><p>'+combo+'</p></div>':'')+
     '<div class="fbbest"><b>Guto&rsquo;s play</b><p>'+SHOTS[a.shot].name+", "+bestSS.toLowerCase()+", to the "+cellName5(a.cell5).toLowerCase()+", then "+(MOVE_OK[a.shot]==="in"?"step in together.":"hold level and get ready.")+'</p></div><!--more-->'+
-    fbSec("Shot",shotT)+tiersHtml(cur.sit,a.shot,p.shot)+(out.rc?fbSec("Reach",reachText(out.rc,R)):"")+
+    (cur.rushed?fbSec("Clock","Time ran out, so you played what you had picked"+(p.cell[0]===1&&p.cell[1]===2?", to the middle":"")+". Decide faster: shot, target, then move."):"")+fbSec("Shot",shotT)+tiersHtml(cur.sit,a.shot,p.shot)+(out.rc?fbSec("Reach",reachText(out.rc,R)):"")+
     (p.shot?fbSec("Speed and spin","You played it "+SPD_L[p.speed].toLowerCase()+", "+SPIN_LBL[p.spin].toLowerCase()+". "+ss.text):"")+
     fbSec("Where you aimed",locT)+fbSec("Your position",posT)+fbSec("Opponents",oppText(cur.sit))+fbSec("Wind",windText());
   hideShotUI();cmd("");stopBar();var cm=m.cur;
