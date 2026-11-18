@@ -48,11 +48,13 @@
   </header>
 
   <nav class="tabs" role="tablist">
+    <button id="tab-home" role="tab" aria-selected="false" data-tab="home">Home</button>
     <button id="tab-shots" role="tab" aria-selected="true" data-tab="shots">Shots</button>
     <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Train</button>
     <button id="tab-compete" role="tab" aria-selected="false" data-tab="compete">Compete</button>
   </nav>
 
+  <section id="home" hidden></section>
   <section id="selector">
     <h2 class="sec" id="sel-title">Choose a shot</h2>
     <nav class="list" id="list" aria-label="Choose"></nav>
@@ -249,6 +251,7 @@
     <section class="psec" id="pt-notify" hidden>
       <label class="tgl"><input type="checkbox" id="n-content"><span><b>New lessons and content</b><small>New shots, drills and videos as they land</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-tips"><span><b>Weekly tip from Coach Guto</b><small>One tactic to try at your next session</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-sound"><span><b>Sound</b><small>Paddle, sand and point sounds</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-vibe"><span><b>Vibration</b><small>A short buzz when you pick and when a point ends</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-compete"><span><b>Sand Series</b><small>New opponents and challenges</small></span></label>
       <label class="fld"><span>Send updates to</span><input type="email" id="n-email" autocomplete="email" placeholder="you@example.com"></label>
