@@ -560,6 +560,7 @@ function avSrc(id){return "avatars/"+id+".webp"}function avImg(id,cls){return '<
 var LEVELS=[["beginner","Beginner"],["intermediate","Intermediate"],["advanced","Advanced"],["pro","Pro"]],LVN={beginner:"Beginner",intermediate:"Intermediate",advanced:"Advanced",pro:"Pro"};
 var LVHINT={beginner:"Simple targets and the basics of each shot.",intermediate:"The full shot with tactics for club and social play.",advanced:"Angles, disguise and patterns with your partner.",pro:"Tour-level detail. Every ball sets up the next."};
 (function(){var ok=function(e){return EMOJIS.indexOf(e)>=0};try{["emoji","mate"].forEach(function(k){var v=localStorage.getItem("btp-"+k);if(v&&!ok(v))localStorage.removeItem("btp-"+k)})}catch(e){}})();
+if(load("swiped","")==="1")document.body.classList.add("swiped");
 var state={hand:load("hand","R"),level:load("level","beginner"),emoji:load("emoji","a01"),mate:load("mate","a06"),name:load("name",""),tab:load("tab","shots"),side:load("side","L"),rules:load("rules","open"),zones:load("zones","0")==="1",id:null,step:0,playing:false,branch:null};
 var scene=null,timer=null,raf=null,pkTimer=null,preTimer=null;
 
@@ -827,7 +828,7 @@ function renderList(){var list=$("list"),l2=$("list2");list.innerHTML="";l2.inne
     VISIBLE.forEach(function(id){var b=iconBtn(id,SHOTS[id].name,function(){select(id)});b.setAttribute("aria-current",String(id===state.id));list.appendChild(b)})}
   else if(t==="pick"){$("sel-title").textContent="Your call. Tap a shot";$("sel2-title").textContent="Real situations";
     VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=iconBtn(id,SHOTS[id].name,function(){pickShot(id)});b.setAttribute("aria-current",String(id===PK.pickShot));list.appendChild(b)});
-    PRESETS.forEach(function(pr,i){var b=document.createElement("button");b.className="item chip";b.textContent=pr.name;b.setAttribute("aria-current",String(i===PK.preset));b.onclick=function(){usePreset(i)};l2.appendChild(b)})}
+    $("sel2-title").hidden=true;l2.hidden=true}
   else{$("sel-title").textContent="Sand Series. Choose your opponents";$("sel2-title").hidden=true;l2.hidden=true;list.className="list";renderLobby(list)}}
 function select(id){stop();state.id=id;save("id-"+state.tab,id);
   scene=SHOTS[id]?shotScene(id):SCENES[id];state.step=0;state.branch=null;
@@ -872,7 +873,7 @@ function renderStep(){var all=stepsOf(),i=state.step,st=all[i];renderDots();
   var ln=$("lvl-note"),lf=state.tab==="shots"&&LV[state.id]&&LV[state.id][state.level];ln.hidden=!lf;if(lf)ln.innerHTML="<b>"+LVN[state.level]+"</b>"+lf.f;
   var pend=!!scene.branches&&state.branch==null&&i===all.length-1;
   $("step-k").textContent=pend?"Step "+(i+1)+" · pick an option to continue":"Step "+(i+1)+" of "+all.length;
-  $("step-title").textContent=st.t;$("mcap-t").textContent=st.t;$("court-t").textContent=st.t+". "+(st.say||"");$("say").textContent=st.say||"";
+  $("step-title").textContent=st.t;$("mcap-t").textContent=st.t;$("mcap-s").textContent=st.say||"";$("court-t").textContent=st.t+". "+(st.say||"");$("say").textContent=st.say||"";
   var ol=$("say-list");ol.innerHTML="";(st.list||[]).forEach(function(t,j){var li=document.createElement("li");var n=document.createElement("b");n.textContent=j+1;li.appendChild(n);li.appendChild(document.createTextNode(t));ol.appendChild(li)});ol.hidden=!st.list;
   var im=$("say-img");im.innerHTML=st.img?ILLUS[st.img]+(st.cap?"<figcaption>"+st.cap+"</figcaption>":""):"";im.hidden=!st.img;
   $("say-after").textContent=st.after||"";$("say-after").hidden=!st.after;
@@ -907,7 +908,8 @@ function setTab(t){stop();clearTimeout(pkTimer);if(t==="play")t="shots";if(state
   $("cpanel").hidden=!comp;$("score").hidden=true;$("csit").hidden=true;document.body.classList.remove("c-live");clearAim();
   if(typeof drawWind==="function"){state.wind=pick?load("wind","calm"):"calm";[].forEach.call($("seg-wind").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===state.wind))});drawWind();drawDial()}
   renderLegend();
-  if(pick){resetCall();$("cards").hidden=true;$("cards-m").hidden=true;$("title").textContent="Train";var ct=$("cat");ct.textContent="Decision tool";renderList();renderPickInputs();renderPick();return}
+  hideTrainUI();
+  if(pick){resetCall();$("cards").hidden=true;$("cards-m").hidden=true;$("title").textContent="Train";var ct=$("cat");ct.textContent="Decision tool";renderList();renderPickInputs();renderPick();trainUI();return}
   if(comp){gG.innerHTML="";gM.innerHTML="";drawZones(false);runBall(null);$("title").textContent="Sand Series";renderList();lobbyPanel();return}
   gG.innerHTML="";
   var saved=load("id-shots","serve"),ok=VISIBLE.indexOf(saved)>=0||(!!SCENES[saved]&&saved===DEEP_ID);state.id=ok?saved:"serve";
@@ -958,6 +960,7 @@ $("pw-save").onclick=function(){var m=$("pw-msg"),cur=$("pw-cur").value,nw=$("pw
 /* Notifications */
 var NP;try{NP=JSON.parse(load("notify","")||"null")}catch(e){NP=null}NP=NP||{content:false,tips:false,compete:false,email:""};
 ["content","tips","compete"].forEach(function(k){var c=$("n-"+k);c.checked=!!NP[k];c.onchange=function(){NP[k]=c.checked;saveNP();track("notification_preference",{topic:k,on:c.checked})}});
+$("n-vibe").checked=load("vibe","1")==="1";$("n-vibe").onchange=function(){save("vibe",this.checked?"1":"0");if(this.checked)buzz(15)};
 $("n-email").value=NP.email||"";$("n-email").addEventListener("change",function(){NP.email=this.value.trim();saveNP()});
 function saveNP(){save("notify",JSON.stringify(NP));var m=$("n-msg"),on=NP.content||NP.tips||NP.compete;
   if(on&&NP.email&&!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(NP.email)){m.className="pmsg err";m.textContent="Check your email address.";return}
@@ -1068,8 +1071,8 @@ var DEP=["Short","Middle","Deep"],LAN=["Left","Middle","Right"];
 function cellOf(p){return [p[0]<11?0:p[0]<14?1:2,p[1]<2.67?0:p[1]<5.33?1:2]}
 function cellName(c){return (DEP[c[0]]+" "+LAN[c[1]].toLowerCase()).replace("Middle middle","Middle of the court")}
 function pickShot(id){if(PK.revealed)resetCall();PK.pickShot=id;[].forEach.call($("list").children,function(x){x.setAttribute("aria-current",String(x.id==="item-"+id))});
-  $("call-hint").textContent="You picked "+SHOTS[id].name.toLowerCase()+". Now pick where you'd aim it.";$("aim-step").hidden=false;
-  if(innerWidth<900)$("aim-step").scrollIntoView({behavior:RM?"auto":"smooth",block:"center"})}
+  ["trsit","trball"].forEach(function(k){var e=$(k);if(!e.hidden)popMin(e,$("trsit-tab"),"Set up")});$("trball-tab").hidden=true;buzz(10);
+  cmd(SHOTS[id].name+". Select where to hit");if(innerWidth<900)document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"})}
 var PRESETS=[
  {name:"Their block pops up",s:{side:"fh",depth:"front",speed:"med",height:"high",A:[2,0],B:[2,2]},watch:"pushdig"},
  {name:"Pushed at your feet",s:{side:"body",depth:"mid",speed:"fast",height:"low",A:[0,0],B:[0,2]},watch:"defend"},
@@ -1079,11 +1082,27 @@ var PRESETS=[
  {name:"Receiving the serve",s:{side:"fh",depth:"mid",speed:"med",height:"low",A:[2,0],B:[1,2]},watch:"receiving"},
  {name:"Disguise chance",s:{side:"fh",depth:"mid",speed:"slow",height:"med",A:[1,0],B:[1,2]},watch:"fake"}];
 function usePreset(i){var pr=PRESETS[i];PK.preset=i;["side","depth","speed","height"].forEach(function(k){PK[k]=pr.s[k];save("pk-"+k,pr.s[k])});PK.A=pr.s.A.slice();PK.B=pr.s.B.slice();
-  save("pk-opp",JSON.stringify({A:PK.A,B:PK.B}));resetCall();renderList();renderPickInputs();renderPick()}
+  save("pk-opp",JSON.stringify({A:PK.A,B:PK.B}));resetCall();renderList();renderPickInputs();renderPick();
+  var e=$("trsit");if(!e.hidden)popMin(e,$("trsit-tab"),"Set up");paintSit()}
 function buildCall(){var g=$("aim-grid");if(g.children.length)return;g.appendChild(document.createElement("span"));LAN.forEach(function(n){var h=document.createElement("span");h.className="ax";h.textContent=n;g.appendChild(h)});
   [2,1,0].forEach(function(dI){var lab=document.createElement("span");lab.className="ay";lab.textContent=DEP[dI];g.appendChild(lab);
     [0,1,2].forEach(function(lI){var b=document.createElement("button");b.setAttribute("aria-label","Aim "+cellName([dI,lI]));b.setAttribute("aria-pressed","false");
       b.onclick=function(){[].forEach.call(g.querySelectorAll("button"),function(x){x.setAttribute("aria-pressed",String(x===b))});judge([dI,lI])};g.appendChild(b)})})}
+function judge5(cell){var ok=shotTiers(PK,PK.answer)[PK.pickShot]===2,exact=PK.pickShot===PK.answer,ic=PK.ideal5,t=cellTier(cell,ic,"neutral"),sq=t===0?"right":t===1?"close":"wrong";
+  PK.streak=(ok&&sq==="right")?PK.streak+1:0;save("pk-streak",String(PK.streak));PK.revealed=true;PK.chosen=cell;
+  track("shot_picker_resolved",{side:PK.side,depth:PK.depth,speed:PK.speed,height:PK.height,picked:PK.pickShot,answer:PK.answer,correct:ok,square:sq});
+  renderPick();var c=choose(),tg=target(c.shot),s=SHOTS[PK.answer],b=SHOTS[BACK2[PK.answer]],pr=PRESETS[PK.preset];
+  var head=ok&&sq==="right"?"Spot on."+(PK.streak>1?" Streak "+PK.streak+".":""):ok?"Good shot, but the target could be better.":sq==="right"?"Good target, but not the best shot.":"Not this time.";
+  var html='<div class="ptres '+(ok&&sq==="right"?"w":ok||sq==="right"?"m":"l")+'"><b>'+head+'</b></div>'+
+    '<div class="fbbest"><b>Guto&rsquo;s play</b><p>'+s.name+" to the "+cellName5(ic).toLowerCase()+".</p></div>"+(pr&&pr.watch?'<button class="btn soft" id="fb-watch">Watch the point</button>':'')+"<!--more-->"+
+    fbSec("Shot",exact?"Right shot. "+c.why:ok?"Good choice, a high percentage shot. Guto would play a "+s.name.toLowerCase()+". "+c.why:"Guto would play a "+s.name.toLowerCase()+". "+c.why)+tiersHtml(PK,PK.answer,PK.pickShot)+
+    fbSec("Where you aimed",(sq==="right"?"Great target, ":sq==="close"?"Close, ":"Risky target, ")+cellName5(cell).toLowerCase()+"."+(sq==="right"?"":" Guto aims "+cellName5(ic).toLowerCase()+". "+tg.txt)+" Green squares are high percentage, orange medium, red low.")+
+    fbSec("Opponents",formationText())+fbSec("Wind",windText())+
+    fbSec("Then",s.afterH+" Your partner. "+s.afterP)+(b?fbSec("Other option",b.name+". "+(BWHY[PK.answer]||b.when)):"")+
+    fbSec("Target",tg.txt);
+  ["trsit","trball"].forEach(function(k){var e=$(k);if(!e.hidden)popMin(e,$("trsit-tab"),"Set up")});$("trball-tab").hidden=true;
+  fbShow(html,"Try another",function(){resetCall();renderPick()});
+  var w=$("fb-watch");if(w)w.onclick=function(){save("id-shots",pr.watch);setTab("shots")};cmd("")}
 function judge(cell){var ok=PK.pickShot===PK.answer,ic=PK.ideal,off=Math.abs(cell[0]-ic[0])+Math.abs(cell[1]-ic[1]),sq=off===0?"right":off===1?"close":"wrong";
   PK.streak=(ok&&sq==="right")?PK.streak+1:0;save("pk-streak",String(PK.streak));PK.revealed=true;PK.chosen=cell;
   var v=$("verdict"),shotTxt=ok?"Right shot":"Guto would play "+SHOTS[PK.answer].name.toLowerCase()+", not "+SHOTS[PK.pickShot].name.toLowerCase(),
@@ -1093,14 +1112,14 @@ function judge(cell){var ok=PK.pickShot===PK.answer,ic=PK.ideal,off=Math.abs(cel
   track("shot_picker_resolved",{side:PK.side,depth:PK.depth,speed:PK.speed,height:PK.height,picked:PK.pickShot,answer:PK.answer,correct:ok,square:sq});
   var pr=PRESETS[PK.preset],wb=$("r-watch");wb.hidden=!(pr&&pr.watch);if(pr&&pr.watch)wb.onclick=function(){save("id-shots",pr.watch);setTab("shots")};
   renderPick();$("reveal").scrollIntoView({behavior:RM?"auto":"smooth",block:"nearest"})}
-function resetCall(){PK.revealed=false;PK.pickShot=null;var a=$("aim-step");if(a){a.hidden=true;[].forEach.call(document.querySelectorAll("#aim-grid button"),function(x){x.setAttribute("aria-pressed","false")})}
+function resetCall(){PK.revealed=false;PK.pickShot=null;if(state.tab==="pick"){var f=$("fbpop");if(f){f.hidden=true;$("fbtab").hidden=true}cmd("Pick a situation or a shot")}var a=$("aim-step");if(a){a.hidden=true;[].forEach.call(document.querySelectorAll("#aim-grid button"),function(x){x.setAttribute("aria-pressed","false")})}
   if(state.tab==="pick")[].forEach.call($("list").children,function(x){x.setAttribute("aria-current","false")});var h=$("call-hint");if(h)h.textContent="Tap a shot in the row above, then pick where you'd aim it."}
 function renderPickInputs(){buildCall();["side","depth","speed","height"].forEach(pkSeg)}
 function renderPick(){var c=choose(),t=target(c.shot),mid=simple(c.shot),s=SHOTS[mid],D=DI[PK.depth];
   var youX=[6.4,3.6,1.0][D],youY=state.side==="L"?2.6:5.4,partner=state.side==="L"?"R":"L";
   var pos={A:oppPos(PK.A),B:oppPos(PK.B)};pos[state.side]=[youX,youY];pos[partner]=[D===0?5.4:3.8,state.side==="L"?5.4:2.6];
   ["A","B","L","R"].forEach(function(k){place(k,pos[k],false);PL[k].ring.setAttribute("opacity",k===state.side?1:0)});
-  gM.innerHTML="";drawZones(state.zones,"R","opp");drawGrid();
+  gM.innerHTML="";drawZones(state.zones,"R","opp");trainAim();
 
   var cy=youY+(PK.side==="fh"?0.45:PK.side==="bh"?-0.45:0),cx=youX+0.3,src=pos.A[0]<=pos.B[0]?pos.A:pos.B;
   var endH={low:0.4,med:1.4,high:3.0}[PK.height],arc={fast:0.4,med:1.2,slow:2.2}[PK.speed];
@@ -1110,9 +1129,8 @@ function renderPick(){var c=choose(),t=target(c.shot),mid=simple(c.shot),s=SHOTS
   var d1=runBall({f:src,to:[cx,cy],shot:"_in"},false);
   if(PK.revealed)pkTimer=setTimeout(function(){runBall({f:[cx,cy],to:t.p,shot:c.shot},true)},d1+450);
   $("call").hidden=PK.revealed;$("reveal").hidden=!PK.revealed;PK.answer=mid;PK.ideal=cellOf(t.p);
-  if(PK.revealed){var cx0=[8,11,14],cw=[3,3,2],cy0=[0,2.67,5.33];
-    el("rect",{x:X(cx0[PK.ideal[0]])+3,y:Y(cy0[PK.ideal[1]])+3,width:cw[PK.ideal[0]]*40-6,height:2.67*40-6,rx:6,fill:"#2ECC71","fill-opacity":.25,stroke:"#1E9E55","stroke-width":3,"pointer-events":"none"},gG);
-    if(PK.chosen&&(PK.chosen[0]!==PK.ideal[0]||PK.chosen[1]!==PK.ideal[1]))el("rect",{x:X(cx0[PK.chosen[0]])+3,y:Y(cy0[PK.chosen[1]])+3,width:cw[PK.chosen[0]]*40-6,height:2.67*40-6,rx:6,fill:"none",stroke:"#0D1B2A","stroke-width":3,"stroke-dasharray":"6 5","pointer-events":"none"},gG)}
+  PK.ideal5=[cellOf(t.p)[0],Math.max(0,Math.min(4,Math.floor(t.p[1]/1.6)))];
+  if(PK.revealed)heatAim(PK.chosen,PK.ideal5,"neutral",gG);
   $("r-shot").textContent=s.name;if(ICON[mid])document.documentElement.style.setProperty("--shotc",ICON[mid].c);$("r-open").dataset.shot=mid;$("r-why").textContent=c.why;
   $("r-target").textContent=t.txt;$("r-form").textContent=formationText();
   var b=SHOTS[BACK2[mid]];$("r-backup").textContent=b?b.name+". "+(BWHY[mid]||b.when):"";
@@ -1172,13 +1190,13 @@ function renderLobby(list){var w=document.createElement("div");w.className="riva
     b.innerHTML=pairSvg(r)+'<b>'+r.pair+'</b><small>'+r.p[0].n+' and '+r.p[1].n+' · '+r.from+'</small><small>'+r.style+'</small><span class="meta"><span class="lvl">'+"●●●●●".slice(0,r.level)+"○○○○○".slice(0,5-r.level)+'</span><span>'+(bt[r.id]?"Beaten "+bt[r.id]:locked?"Beat "+RIVALS[i-1].pair+" to unlock":decideSecs(r)+" s to decide")+'</span></span>';
     b.onclick=function(){startMatch(r)};w.appendChild(b)});list.appendChild(w)}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
-function lobbyPanel(){clearAim();setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");$("csit").hidden=true;var c=$("cpanel");c.innerHTML='<span class="kicker">Sand Series</span><h3>Play the best pairs</h3><p class="say">Each point, read the ball, then pick your shot, tap where to aim on their side of the court and tap where you&rsquo;d move on your side, all before the clock runs out. When the ball goes to your partner, read their shot and get into position. Every point starts with a serve, two each in turn. First to '+WIN_AT+' points, win by 2.</p><p class="say">Beat a pair to unlock the next one.</p>';
+function lobbyPanel(){clearAim();hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");$("csit").hidden=true;var c=$("cpanel");c.innerHTML='<span class="kicker">Sand Series</span><h3>Play the best pairs</h3><p class="say">Each point, read the ball, then pick your shot, tap where to aim on their side of the court and tap where you&rsquo;d move on your side, all before the clock runs out. When the ball goes to your partner, read their shot and get into position. Every point starts with a serve, two each in turn. First to '+WIN_AT+' points, win by 2.</p><p class="say">Beat a pair to unlock the next one.</p>';
   ["A","B","L","R"].forEach(function(k){place(k,{A:[12.5,2.7],B:[12.5,5.3],L:[4.5,2.7],R:[4.5,5.3]}[k],true)});runBall(null)}
 var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breezy",4],["gusty",2]],breeze:[["calm",2],["breezy",4],["gusty",3]],feather:[["calm",2],["breezy",4],["gusty",3]],champs:[["calm",2],["breezy",3],["gusty",4]]};
 function startMatch(r){MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null};
   state.wind=wpick(MWIND[r.id]||[["calm",1]]);state.windA=90*Math.floor(Math.random()*4);MATCH.wind=state.wind;drawWind();renderLegend();$("selector").hidden=true;$("score").hidden=false;track("match_started",{rival:r.id});
   document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});newPoint()}
-function leaveMatch(){clearTimeout(cTimer);clearInterval(cTick);MATCH=null;$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
+function leaveMatch(){hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
 /* On-court aim. Nine squares on the opponents' side */
 var gA=el("g",{id:"g-aim"},WORLD),gTag=el("g",{id:"g-tag","pointer-events":"none"},WORLD);
 function clearAim(){if(gA)gA.innerHTML="";if(typeof ballTag!=="undefined"&&ballTag&&!(MATCH&&MATCH.cur&&!MATCH.cur.done)){ballTag.remove();ballTag=null}}
@@ -1196,6 +1214,7 @@ function drawAim(onPick,onMove){clearAim();
   var ln=el("g",{"pointer-events":"none"},gA),st={stroke:"#0D1B2A","stroke-opacity":0.6,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"};
   [11,14].forEach(function(x){el("line",Object.assign({x1:X(x),y1:Y(0),x2:X(x),y2:Y(8)},st),ln)});
   [1.6,3.2,4.8,6.4].forEach(function(y){el("line",Object.assign({x1:X(8),y1:Y(y),x2:X(16),y2:Y(y)},st),ln)})}
+function ripple(d,l){var c=svTarget([d,l]),r=el("circle",{cx:X(c[0]),cy:Y(c[1]),r:6,fill:"none",stroke:"#0D1B2A","stroke-width":3,"class":"ripple","pointer-events":"none"},gTag);setTimeout(function(){r.remove()},600)}
 function markAim(c,best){[].forEach.call(gA.children,function(g){var k=g.getAttribute("data-c");if(!k)return;var r=g.firstChild,on=c&&k===c[0]+","+c[1],ok=best&&k===best[0]+","+best[1];
   r.setAttribute("fill",ok?"#2ECC71":on?"#FFD23F":"#FFFFFF");r.setAttribute("fill-opacity",ok?0.4:on?0.5:0)})}
 function renderScore(){var m=MATCH,r=m.r;$("score").innerHTML='<div class="team"><span class="av-pair">'+eb(state.emoji,"#FFF3C4")+eb(state.mate,"#DDF6F3")+'</span><span class="names"><b>'+(state.name?esc(state.name):"You")+'</b><small>and your partner</small></span></div>'+
@@ -1245,36 +1264,41 @@ function serveRisk(d,l,speed,spin){var r=0,why=[],add=function(n,t,base){if(n){r
       if(l===dl&&!against)add(with_?2*mw:mw,with_?"The crosswind and your side spin both push it out.":"The crosswind blows the serve towards that line.")}}
   r=Math.max(0,r);why.sort(function(a,b){return b[0]-a[0]});return {r:r,tier:r<=1?"good":r===2?"ok":"risky",why:why.length?why[0][1]:""}}
 function svTarget(c){return [(AX[c[0]][0]+AX[c[0]][1])/2,(AY[c[1]][0]+AY[c[1]][1])/2]}
-function servePhase(){$("cpanel").classList.remove("fb");var m=MATCH,cur=m.cur,me=state.side,pt=me==="L"?"R":"L",form=serveForm("me");
+var BALLSVG='<span class="swipehint" aria-hidden="true">&#8593;</span><svg viewBox="-50 -50 100 100" role="img" tabindex="0" aria-label="Swipe the ball to set the spin"><defs><clipPath id="svclip"><circle r="44"/></clipPath></defs><circle r="44" fill="#DDF02B" stroke="#9C9A12" stroke-width="1.5"/><g id="sv-seam" clip-path="url(#svclip)"><path d="M0 -44C-40 -15 40 15 0 44A44 44 0 0 0 0 -44Z" fill="#FF5A1F"/><path d="M0 -44C-40 -15 40 15 0 44" fill="none" stroke="#fff" stroke-width="3"/></g><line id="sv-arrow" x1="0" y1="0" x2="0" y2="0" stroke="#0D1B2A" stroke-width="5" stroke-linecap="round" opacity="0"/></svg>';
+function hideServeUI(){["cmd","svpop","svtab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in")}})}
+function cmd(t){var e=$("cmd");if(!t){e.hidden=true;return}e.textContent=t;e.hidden=false;e.classList.remove("pulse");void e.offsetWidth;e.classList.add("pulse")}
+function servePhase(){$("cpanel").classList.remove("fb");hideServeUI();hideShotUI();var m=MATCH,cur=m.cur,me=state.side,pt=me==="L"?"R":"L",form=serveForm("me");
   gG.innerHTML="";gM.innerHTML="";clearTimeout(tagTimer);if(ballTag){ballTag.remove();ballTag=null}runBall(null);drawZones(false);
   ["A","B","L","R"].forEach(function(k){place(k,form[k],true)});var pm={};pm[me]="serve";setPoses(pm);
   var hb=el("circle",{cx:X(form[me][0]+0.4),cy:Y(form[me][1]),r:6,fill:"#DDF02B",stroke:"#FF5A1F","stroke-width":2},gM);
-  document.body.classList.add("c-live");$("csit").hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". Your serve. "+windWords()+". Tap a square, choose a speed, then swipe the ball to serve.";
-  cur.sv={cell:null,speed:"neutral",spin:"flat"};
-  var c=$("cpanel");c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">Your serve. Tap a square</p>'+
-    '<div class="seg sv-spd" id="sv-spd"><button data-v="slow" aria-pressed="false">Slow</button><button data-v="neutral" aria-pressed="true">Neutral</button><button data-v="fast" aria-pressed="false">Fast</button></div>'+
-    '<div class="svball" id="svball"><svg viewBox="-50 -50 100 100" role="img" aria-label="Swipe the ball to set the spin and serve"><defs><clipPath id="svclip"><circle r="44"/></clipPath></defs><circle r="44" fill="#DDF02B" stroke="#9C9A12" stroke-width="1.5"/><g id="sv-seam" clip-path="url(#svclip)"><path d="M0 -44C-40 -15 40 15 0 44A44 44 0 0 0 0 -44Z" fill="#FF5A1F"/><path d="M0 -44C-40 -15 40 15 0 44" fill="none" stroke="#fff" stroke-width="3"/></g><line id="sv-arrow" x1="0" y1="0" x2="0" y2="0" stroke="#0D1B2A" stroke-width="5" stroke-linecap="round" opacity="0"/></svg><span class="svlbl" id="sv-lbl">Flat</span></div>'+
-    '<div class="svbtns" id="sv-spin"><button data-v="flat" aria-pressed="true">Flat</button><button data-v="top" aria-pressed="false">Top</button><button data-v="left" aria-pressed="false" aria-label="Curve left">&#9664;</button><button data-v="right" aria-pressed="false" aria-label="Curve right">&#9654;</button>'+(state.level==="advanced"||state.level==="pro"?'<button data-v="slice" aria-pressed="false">Slice</button>':'')+'</div>'+
-    '<button class="btn primary svgo" id="sv-go">Serve</button><p class="aimhint" id="sv-hint">Swipe the ball. Up for topspin, left or right to curve it.</p>';
-  drawAim(function(cell){if(cur.served)return;cur.sv.cell=cell;$("cs-prompt").textContent="Now swipe the ball to serve"},null);
-  [].forEach.call($("sv-spd").children,function(b){b.onclick=function(){cur.sv.speed=b.dataset.v;[].forEach.call($("sv-spd").children,function(x){x.setAttribute("aria-pressed",String(x===b))});svRate()}});
-  function setSpin(v){cur.sv.spin=v;$("sv-lbl").textContent=SPIN_LBL[v];[].forEach.call($("sv-spin").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))});svRate()}
-  [].forEach.call($("sv-spin").children,function(b){b.onclick=function(){setSpin(b.dataset.v)}});
-  /* live ball rotation */
+  document.body.classList.add("c-live");$("csit").hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". Your serve. "+windWords()+". Choose a speed and spin, then select where to serve.";
+  cur.sv={cell:null,speed:"neutral",spin:"flat",set:false};
+  var c=$("cpanel");c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">Your serve</p><p class="aimhint" id="sv-sum">Flat, neutral speed</p><p class="aimhint">'+ruleNote()+'</p>';
+  var pop=$("svpop"),tab=$("svtab"),adv=state.level==="advanced"||state.level==="pro";
+  pop.innerHTML=GRAB+'<div class="svhead"><b>Your serve</b><button class="svmin" id="sv-min" aria-label="Minimise serve settings">&#8250;</button></div>'+
+    '<p class="svtip">Swipe the ball to choose the spin direction. Up for topspin, left or right to curve'+(adv?", down for slice":"")+'.</p>'+
+    '<div class="svgrid"><div class="svball" id="svball">'+BALLSVG+'<span class="svlbl" id="sv-lbl">Flat</span></div><div class="svside"><div class="seg sv-spd" id="sv-spd"><button data-v="slow" aria-pressed="false">Slow</button><button data-v="neutral" aria-pressed="true">Neutral</button><button data-v="fast" aria-pressed="false">Fast</button></div>'+
+    '<div class="svbtns" id="sv-spin"><button data-v="flat" aria-pressed="true">Flat</button><button data-v="top" aria-pressed="false">Top</button><button data-v="left" aria-pressed="false" aria-label="Curve left">&#9664;</button><button data-v="right" aria-pressed="false" aria-label="Curve right">&#9654;</button>'+(adv?'<button data-v="slice" aria-pressed="false">Slice</button>':'')+'</div><button class="btn primary svdone" id="sv-done">Done &#8250;</button></div></div>';
+  function summary(){var t=SPIN_LBL[cur.sv.spin]+", "+cur.sv.speed+" speed";$("sv-sum").textContent=t;tab.innerHTML='<span aria-hidden="true">&#8249;</span><small>'+SPIN_LBL[cur.sv.spin]+'<br>'+cur.sv.speed[0].toUpperCase()+cur.sv.speed.slice(1)+'</small>'}
+  function openPop(){tab.hidden=true;pop.hidden=false;pop.classList.remove("min");void pop.offsetWidth;pop.classList.add("in");sheetState();wireGrab(pop,tab,"Serve");cmd("Set your speed and spin")}
+  function minPop(){if(pop.hidden)return;setTimeout(sheetState,320);pop.classList.remove("in");pop.classList.add("min");setTimeout(function(){if(pop.classList.contains("min")){pop.hidden=true;pop.classList.remove("min")}},300);tab.hidden=false;summary();if(!cur.served)cmd("Select where to serve")}
+  tab.onclick=function(){if(cur.served)return;openPop()};$("sv-min").onclick=minPop;$("sv-done").onclick=minPop;
+  setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.served)return;openPop()},1000);cmd("Your serve");
+  drawAim(function(cell){if(cur.served)return;cur.sv.cell=cell;doServe(false)},null);
+  [].forEach.call($("sv-spd").children,function(b){b.onclick=function(){cur.sv.speed=b.dataset.v;[].forEach.call($("sv-spd").children,function(x){x.setAttribute("aria-pressed",String(x===b))});svRate();summary()}});
+  var autoMin=null;function setSpin(v,fromUser){cur.sv.spin=v;$("sv-lbl").textContent=SPIN_LBL[v];[].forEach.call($("sv-spin").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))});svRate();summary();
+    if(fromUser){clearTimeout(autoMin);autoMin=setTimeout(minPop,700)}}
+  [].forEach.call($("sv-spin").children,function(b){b.onclick=function(){setSpin(b.dataset.v,true)}});
   var seamEl=$("sv-seam"),ang=0,rate=0,last=0,live=true;function svRate(){rate=cur.sv.spin==="flat"?0.12:SV_ROT[cur.sv.speed]*(cur.sv.spin==="slice"?-1:1)}svRate();
   (function loop(t){if(!live||!document.body.contains(seamEl))return;var dt=last?Math.min(50,t-last):0;last=t;if(!RM)ang=(ang+rate*dt)%360;seamEl.setAttribute("transform","rotate("+ang.toFixed(1)+")");requestAnimationFrame(loop)})(0);
-  /* swipe */
   var svg=$("svball").querySelector("svg"),arrow=$("sv-arrow"),start=null,dir=null;
   svg.addEventListener("pointerdown",function(e){if(cur.served)return;start=[e.clientX,e.clientY];dir=null;svg.setPointerCapture(e.pointerId);e.preventDefault()});
   svg.addEventListener("pointermove",function(e){if(!start)return;var dx=e.clientX-start[0],dy=e.clientY-start[1],dist=Math.hypot(dx,dy),r=svg.getBoundingClientRect(),k=100/r.width;
     arrow.setAttribute("x2",(dx*k).toFixed(1));arrow.setAttribute("y2",(dy*k).toFixed(1));arrow.setAttribute("opacity",dist>6?0.8:0);
-    if(dist>=24){var nd=Math.abs(dx)>Math.abs(dy)?(dx<0?"left":"right"):(dy<0?"top":(state.level==="advanced"||state.level==="pro"?"slice":"flat"));if(nd!==dir){dir=nd;setSpin(nd)}svRate();rate*=1+Math.min(1.5,dist/120)}});
-  svg.addEventListener("pointerup",function(e){if(!start)return;start=null;arrow.setAttribute("opacity",0);if(!dir)setSpin(cur.sv.spin);go()});
-  svg.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}});svg.setAttribute("tabindex","0");
-  $("sv-go").onclick=go;
-  function go(){if(cur.served)return;if(!cur.sv.cell){$("cs-prompt").textContent="Tap a square on their side first";return}doServe(false)}
-  function doServe(late){cur.served=true;live=false;clearTimeout(cTimer);if(late&&!cur.sv.cell)cur.sv.cell=[1,2];var sv=cur.sv;markAim(sv.cell);hb.remove();
-    [].forEach.call(document.querySelectorAll("#cpanel button"),function(b){b.disabled=true});
+    if(dist>=24){var nd=Math.abs(dx)>Math.abs(dy)?(dx<0?"left":"right"):(dy<0?"top":(adv?"slice":"flat"));if(nd!==dir){dir=nd;setSpin(nd,false)}svRate();rate*=1+Math.min(1.5,dist/120)}});
+  svg.addEventListener("pointerup",function(){if(!start)return;start=null;arrow.setAttribute("opacity",0);if(dir){setSpin(dir,true);save("swiped","1");document.body.classList.add("swiped")}});
+  function doServe(late){cur.served=true;live=false;clearTimeout(cTimer);clearTimeout(autoMin);if(late&&!cur.sv.cell)cur.sv.cell=[1,2];var sv=cur.sv;markAim(sv.cell);hb.remove();
+    pop.hidden=true;tab.hidden=true;cmd("");sheetState();
     var rk=serveRisk(sv.cell[0],sv.cell[1],sv.speed,sv.spin);cur.serveQ=rk.tier;cur.serveRisk=rk;cur.serveLate=late;
     $("cs-prompt").textContent="Serving";track("serve_played",{rival:m.r.id,cell:sv.cell.join(","),speed:sv.speed,spin:sv.spin,quality:rk.tier,late:late});
     var t=svTarget(sv.cell),dur=SV_SPD[sv.speed]/1.3,top=sv.spin==="top",sl=sv.spin==="slice";
@@ -1282,13 +1306,12 @@ function servePhase(){$("cpanel").classList.remove("fb");var m=MATCH,cur=m.cur,m
     var d=runBall({f:[form[me][0]+0.3,form[me][1]],to:t,shot:"_sv",spin:SV_ROT[sv.speed]*(sv.spin==="flat"?0.5:1.4),curve:sv.spin==="left"?-30:sv.spin==="right"?30:0,land:true},true);
     var rkey=Math.abs(t[1]-form.A[1])<Math.abs(t[1]-form.B[1])?"A":"B";cur.srcKey=rkey;cur.sit[rkey]=[1,t[1]<2.67?0:t[1]<5.33?1:2];
     setTimeout(function(){PL[pt].g.style.transitionDuration="900ms";place(pt,[4.4,form[pt][1]],false);PL[rkey].g.style.transitionDuration="500ms";place(rkey,[form[rkey][0],t[1]],false)},Math.min(d,400));
-    setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;/* now move in */
-      $("cs-prompt").textContent="Now move in. Tap your side of the court";$("sv-hint").textContent="Follow your serve in to just behind your 3 m line.";
-      cur.from=null;var from=form[me];var tr=el("line",{x1:X(from[0]),y1:Y(from[1]),x2:X(from[0]),y2:Y(from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
-      drawAim(null,function(pos){if(cur.svMoved)return;cur.svMoved=pos;PL[me].g.style.transitionDuration="700ms";place(me,pos,false);tr.setAttribute("x2",X(pos[0]));tr.setAttribute("y2",Y(pos[1]));
+    setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;
+      cmd("Select your court position");$("cs-prompt").textContent="Select your court position";
+      var from=form[me],tr=el("line",{x1:X(from[0]),y1:Y(from[1]),x2:X(from[0]),y2:Y(from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
+      drawAim(null,function(pos){if(cur.svMoved)return;cur.svMoved=pos;cmd("");PL[me].g.style.transitionDuration="700ms";place(me,pos,false);tr.setAttribute("x2",X(pos[0]));tr.setAttribute("y2",Y(pos[1]));
         setTimeout(function(){serveFeedback2(form,function(){clearAim();cur.ans=solveSit(cur.sit);drawPoint(true);decidePanel()})},750)})},d+300)}
-  var secs=decideSecs(m.r),bar=$("tbar");bar.style.transitionDuration="0ms";bar.style.transform="scaleX(1)";bar.getBoundingClientRect();
-  setTimeout(function(){bar.style.transitionDuration=secs+"s";bar.style.transform="scaleX(0)"},300);
+  var secs=decideSecs(m.r);setWindBadge();startBar(secs,300);
   clearTimeout(cTimer);cTimer=setTimeout(function(){if(!cur.served)doServe(true)},secs*1000+300)}
 var TIERC={good:["#2ECC71","High percentage"],ok:["#FF9F1C","Medium percentage"],risky:["#FF4D6D","Low percentage"]};
 function serveFeedback2(form,go){var m=MATCH,cur=m.cur,sv=cur.sv,rk=cur.serveRisk,me=state.side,lane=form[me][1];
@@ -1300,22 +1323,16 @@ function serveFeedback2(form,go){var m=MATCH,cur=m.cur,sv=cur.sv,rk=cur.serveRis
   var head={good:"Good serve.",ok:"Playable serve.",risky:"Risky serve."}[rk.tier],sub=SPIN_LBL[sv.spin]+", "+sv.speed+", to the "+cellName5(sv.cell).toLowerCase()+".";
   var why=rk.tier==="good"?"High percentage target for that speed, spin and wind.":rk.why;
   var mv=mq==="good"?"Good follow in.":mq==="ok"?"Close. Follow in to just behind your 3 m line, the green mark.":"Follow your serve in to just behind your 3 m line, the green mark.";
-  var cs=$("csit");cs.hidden=false;cs.innerHTML='<span class="kicker">Your serve</span><div class="ptres '+(rk.tier==="risky"?"l":"w")+'"><b>'+head+' </b>'+(cur.serveLate?"Too slow, so you served flat. ":"")+sub+' '+why+' '+mv+'</div><p class="aimhint">Every square is coloured for that speed, spin and wind. Green is high percentage, orange medium, red low.</p>';
-  var b=document.createElement("button");b.className="btn primary nextpt";b.innerHTML="Play on &#8594;";b.onclick=function(){if(!MATCH||MATCH.cur!==cur)return;b.disabled=true;cs.hidden=true;go()};cs.appendChild(b);
-  var e=$("cs-prompt");if(e)e.textContent="Read the feedback, then play on";
-  if(window.matchMedia&&matchMedia("(min-width:901px)").matches){var c=$("cpanel");c.innerHTML="";c.classList.add("fb");while(cs.firstChild)c.appendChild(cs.firstChild);cs.hidden=true}
-  track("serve_move",{quality:mq,distance:+dist.toFixed(2)});setTimeout(function(){try{b.focus({preventScroll:true})}catch(x){}},50)}
-/* Aim squares coloured by percentage after the shot */
-function heatAim(pick,best){[].forEach.call(gA.children,function(g){var k=g.getAttribute("data-c");if(!k)return;var r=g.firstChild,c=k.split(",").map(Number),d=best?Math.abs(c[0]-best[0])+Math.abs(c[1]-best[1]):9,
-    col=d===0?"#2ECC71":d===1?"#FF9F1C":"#FF4D6D",on=pick&&c[0]===pick[0]&&c[1]===pick[1];
-  r.setAttribute("fill",col);r.setAttribute("fill-opacity",d===0?0.5:0.32);r.setAttribute("stroke",on?"#0D1B2A":"none");r.setAttribute("stroke-width",on?3:0)})}
-function mateServe(){$("cpanel").classList.remove("fb");var m=MATCH,cur=m.cur,me=state.side,pt=me==="L"?"R":"L",form=serveForm("mate"),side=form[pt][1]<4?"L":"R",z=wpick([[3,4],[2,4],[4,2],[1,1],[5,1]]);
+  var html='<div class="ptres '+(rk.tier==="risky"?"l":rk.tier==="ok"?"m":"w")+'"><b>'+head+'</b> '+(rk.tier==="good"?"":rk.why)+'</div><p class="fbline">'+mv+'</p><!--more-->'+fbSec("Your serve",(cur.serveLate?"Too slow, so you served flat. ":"")+sub+" "+why)+
+    fbSec("Where you aimed","Every square is coloured for that speed, spin and wind. Green is high percentage, orange medium, red low.")+fbSec("Your position",mv)+fbSec("Opponents","Both receivers were waiting just behind their 3 m line.")+fbSec("Wind",windText());
+  track("serve_move",{quality:mq,distance:+dist.toFixed(2)});fbShow(html,"Play on",function(){if(!MATCH||MATCH.cur!==cur)return;go()})}
+function mateServe(){hideServeUI();hideShotUI();setWindBadge();$("ctimer").hidden=true;$("cpanel").classList.remove("fb");var m=MATCH,cur=m.cur,me=state.side,pt=me==="L"?"R":"L",form=serveForm("mate"),side=form[pt][1]<4?"L":"R",z=wpick([[3,4],[2,4],[4,2],[1,1],[5,1]]);
   gG.innerHTML="";gM.innerHTML="";clearTimeout(tagTimer);if(ballTag){ballTag.remove();ballTag=null}runBall(null);
   ["A","B","L","R"].forEach(function(k){place(k,form[k],true)});var pm={};pm[pt]="serve";setPoses(pm);drawZones(true,side,"opp",z);
   document.body.classList.add("c-live");$("csit").hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". Your partner serves to zone "+z+". "+windWords()+".";
   showTag(cur.sit,form[pt],0,{hw:"SIGNAL",t2:"ZONE "+z});
   var c=$("cpanel");c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<p class="cprompt" id="cs-prompt">Your partner serves. They signal zone '+z+'</p><p class="aimhint">'+(z===5?"Zone 5 opens the line on your side. Guard it.":"Watch the serve, then get ready.")+' '+ruleNote()+'</p>';
-  cur.serveQ="ok";cur.serveNote="";
+  cur.serveQ="ok";cur.serveNote="";cmd("Your partner serves to zone "+z);
   setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;var t=serveTarget(z,side),d=runBall({f:[form[pt][0]+0.3,form[pt][1]],to:t,shot:"serve"},true);
     var rk=Math.abs(t[1]-form.A[1])<Math.abs(t[1]-form.B[1])?"A":"B";cur.srcKey=rk;cur.sit[rk]=[1,t[1]<2.67?0:t[1]<5.33?1:2];
     setTimeout(function(){["L","R"].forEach(function(k){PL[k].g.style.transitionDuration="900ms";place(k,[k===pt?3.8:4.4,form[k][1]],false)})},300);
@@ -1357,29 +1374,128 @@ function showTag(sit,c,endH,lab){if(!MATCH||!MATCH.cur||MATCH.cur.sit!==sit)retu
   var a=el("tspan",{fill:"#F7F4E9"},t);a.textContent=hw;var dot=el("tspan",{fill:"#F7F4E9","fill-opacity":0.5},t);dot.textContent=" · ";var b=el("tspan",{fill:sc},t);b.textContent=sw;
   if(MATCH.cur.pick.shot||MATCH.cur.pick.pos)g.classList.add("dim")}
 function describe(sit){return {low:"Low",med:"Net height",high:"High"}[sit.height]+", "+{fast:"fast",med:"medium pace",slow:"slow"}[sit.speed]+", on your "+{fh:"forehand",body:"body",bh:"backhand"}[sit.side]+". You're "+{front:"inside 3 m",mid:"3 to 6 m back",back:"deep"}[sit.depth]+"."}
-function decidePanel(){var m=MATCH,c=$("cpanel"),cur=m.cur;c.classList.remove("fb");
-  document.body.classList.add("c-live");var cs=$("csit");cs.hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". "+windWords()+". "+describe(cur.sit);
-  var MT=cur.mate;if(MT)$("c-sr").textContent="Point "+(m.points+1)+". "+windWords()+". The ball goes to your partner.";
-  c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">'+(MT?"Watch your partner":cur.srv==="opp"?"They serve. Pick your return":"Pick a shot")+'</p>'+(MT?'<div class="grp"><b>Your move</b><p class="aimhint" id="cs-movehint">Tap your side of the court to move</p></div>':
-   '<div class="grp"><b>Shot</b><div class="shots col" id="cs-shots"></div></div><p class="aimhint" id="cs-aimhint">Tap the court to aim</p><div class="grp"><b>Then</b><p class="aimhint" id="cs-movehint">Tap your side of the court to move</p></div>');
-  var sh=$("cs-shots");if(sh)VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=document.createElement("button");var ic=ICON[id];
-    b.innerHTML='<span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span>';b.setAttribute("aria-pressed","false");
-    b.onclick=function(){if(cur.done)return;cur.pick.shot=id;[].forEach.call(sh.children,function(x){x.setAttribute("aria-pressed",String(x===b))});if(ballTag)ballTag.classList.add("dim");prompt();maybeResolve()};sh.appendChild(b)});
-  function prompt(){var p=cur.pick,e=$("cs-prompt");if(MT){if(e&&p.pos)e.textContent="Got it";return}if(e)e.textContent=!p.shot?"Pick a shot":!p.cell?"Tap their side to aim":!p.move?"Tap your side to move":"Playing it"}
-  drawAim(MT?null:function(cell){if(cur.done)return;cur.pick.cell=cell;$("cs-aimhint").textContent="Aim "+cellName5(cell).toLowerCase();prompt();maybeResolve()},
-    function(pos){if(cur.done)return;var dx=pos[0]-cur.from[0];PL[state.side].g.style.transitionDuration="600ms";place(state.side,pos,false);
-      cur.trail.setAttribute("x2",X(pos[0]));cur.trail.setAttribute("y2",Y(pos[1]));cur.pick.move=dx>0.6?"in":dx<-0.6?"back":"hold";cur.pick.pos=pos;
-      $("cs-movehint").textContent=MT?"Moved":{in:"Stepping in",hold:"Holding level",back:"Moving back"}[cur.pick.move];prompt();maybeResolve()});
+/* Timer bars, in the side panel and on the court */
+function startBar(secs,wait){["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;bar.style.transitionDuration="0ms";bar.style.transform="scaleX(1)";bar.getBoundingClientRect();
+  setTimeout(function(){bar.style.transitionDuration=secs+"s";bar.style.transform="scaleX(0)"},wait)});$("ctimer").hidden=false}
+function stopBar(){["tbar","ctbar"].forEach(function(id){var bar=$(id);if(!bar)return;var t=getComputedStyle(bar).transform;bar.style.transitionDuration="0ms";bar.style.transform=t==="none"?"scaleX(1)":t})}
+function setWindBadge(){var w=$("cwind");if(state.wind==="calm"){w.hidden=true;return}w.hidden=false;w.className="cwind w-"+state.wind;w.textContent={breezy:"Breezy",gusty:"Gusty"}[state.wind]+" · "+windWords().replace(/^(Breezy|Gusty) /,"").replace(/^wind /,"")}
+/* Collapsible overlay boxes */
+var GRAB='<button class="grab" aria-label="Resize panel"><i></i></button>';
+function sheetState(){var any=["svpop","fbpop","trsit","trball"].some(function(i){var e=$(i);return e&&!e.hidden&&!e.classList.contains("min")});document.body.classList.toggle("sheet-open",any);
+  var mob=innerWidth<=900,tr=state.tab==="pick"&&mob;document.body.classList.toggle("sheet-pad",tr&&any);
+  if(tr&&any){var cb=document.querySelector(".court-box"),off=8;setTimeout(function(){var y=cb.getBoundingClientRect().top+scrollY-off;window.scrollTo({top:Math.max(0,y),behavior:RM?"auto":"smooth"})},60)}}
+function popOpen(pop,tab){tab.hidden=true;pop.hidden=false;pop.classList.remove("min");void pop.offsetWidth;pop.classList.add("in");sheetState();
+  setTimeout(function(){var h=pop.querySelector(".svhead b");if(h){h.setAttribute("tabindex","-1");try{h.focus({preventScroll:true})}catch(x){}}},80)}
+function wireGrab(pop,tab,label){var g=pop.querySelector(".grab");if(!g)return;var y0=null;
+  g.onclick=function(){if(y0!==null)return;pop.classList.toggle("full")};
+  g.addEventListener("pointerdown",function(e){y0=e.clientY;g.setPointerCapture(e.pointerId)});
+  g.addEventListener("pointerup",function(e){if(y0===null)return;var dy=e.clientY-y0;y0=null;if(dy<-30)pop.classList.add("full");else if(dy>30){if(pop.classList.contains("full"))pop.classList.remove("full");else popMin(pop,tab,label)}})}
+function buzz(p){try{if(load("vibe","1")==="1"&&navigator.vibrate)navigator.vibrate(p)}catch(e){}}
+function popMin(pop,tab,label){if(pop.hidden)return;var hadF=pop.contains(document.activeElement);setTimeout(function(){sheetState();if(hadF)try{tab.focus({preventScroll:true})}catch(x){}},320);pop.classList.remove("in");pop.classList.add("min");setTimeout(function(){if(pop.classList.contains("min")){pop.hidden=true;pop.classList.remove("min")}},300);tab.innerHTML='<span aria-hidden="true">&#8249;</span><small>'+label+'</small>';tab.hidden=false}
+var SPD_L={slow:"Slow",neutral:"Neutral",fast:"Fast"};
+/* Speed and spin that suit each shot */
+function idealSS(shot,sit){var v=windV(),tail=state.wind!=="calm"&&v[0]>0.7,head=state.wind!=="calm"&&v[0]<-0.7;
+  var I={push:{sp:["fast","neutral"],sn:["flat","top"],why:"A push is hit firm and forward, flat or with a little topspin."},
+    flatsmash:{sp:["fast"],sn:sit.depth==="front"?["flat","top"]:["top","flat"],why:sit.depth==="front"?"Close to the net, smash it fast and flat.":"Further back, smash it fast with topspin so it comes down."},
+    hook:{sp:["neutral","fast"],sn:["top","flat"],why:"Snap the hook down with topspin."},
+    neutral:{sp:["neutral","slow"],sn:["top","flat"],why:"A neutral ball wants height and depth, at neutral pace with topspin."},
+    lob:{sp:head?["neutral","slow"]:["slow","neutral"],sn:["top"],why:tail?"With the wind behind you, lob slow with lots of topspin so it comes down in.":head?"Into the wind, lob a little firmer with topspin.":"Lob slow and high with topspin so it drops deep."},
+    drop:{sp:["slow"],sn:["flat","slice"],why:"A drop shot is soft and slow, flat or with a touch of slice."},
+    dig:{sp:["neutral","slow"],sn:["flat","top"],why:"Block it firm and flat, at neutral pace, long over them."}};return I[shot]||I.neutral}
+function ssVerdict(shot,speed,spin,sit){var I=idealSS(shot,sit),sp=I.sp.indexOf(speed)>=0,sn=I.sn.indexOf(spin)>=0;
+  return {ok:sp&&sn,part:sp||sn,text:(sp&&sn?"Good speed and spin. ":sp?"Good speed, but the spin could be better. ":sn?"Good spin, but the speed could be better. ":"The speed and spin didn't suit it. ")+I.why,best:SPD_L[I.sp[0]]+(I.sn[0]==="flat"?" and flat":" with "+SPIN_LBL[I.sn[0]].toLowerCase())}}
+function oppText(sit){var n=["at the net","mid-court","deep"],a=n[sit.A[0]],b=n[sit.B[0]];return a===b?"Both opponents were "+a+".":"One opponent was "+a+", the other "+b+"."}
+function windText(){if(state.wind==="calm")return "No wind on this point.";var v=windV(),w=windWords()+". ";
+  if(v[0]>0.7)return w+"It carries long balls further, so aim a little shorter and use topspin.";if(v[0]<-0.7)return w+"It holds the ball up, so hit a little firmer and aim deeper.";
+  return w+"It drifts the ball sideways, so aim away from the line it blows towards."}
+function cellTier(c,best,speed){var d=Math.abs(c[0]-best[0])+Math.abs(c[1]-best[1]),t=d===0?0:d===1?1:2,v=windV(),mw=state.wind==="calm"?0:1;
+  if(mw&&v[0]>0.7&&c[0]===2)t++;if(mw&&v[0]<-0.7&&c[0]===0&&d>0)t++;if(mw&&Math.abs(v[1])>0.7&&c[1]===(v[1]>0?4:0)&&d>0)t++;if(speed==="fast"&&c[0]===2&&d>0)t++;return Math.min(2,t)}
+function heatAim(pick,best,speed,grp){[].forEach.call((grp||gA).children,function(g){var k=g.getAttribute("data-c");if(!k)return;var r=g.firstChild,c=k.split(",").map(Number),t=cellTier(c,best,speed),
+    col=["#2ECC71","#FF9F1C","#FF4D6D"][t],on=pick&&c[0]===pick[0]&&c[1]===pick[1];
+  r.setAttribute("fill",col);r.setAttribute("fill-opacity",t===0?0.5:0.34);r.setAttribute("stroke",on?"#0D1B2A":"none");r.setAttribute("stroke-width",on?3:0)})}
+/* Feedback box with Play on */
+function fbShow(html,btn,onPlay){var pop=$("fbpop"),tab=$("fbtab");hideShotUI();cmd("");stopBar();var parts=html.split("<!--more-->");
+  pop.innerHTML=GRAB+'<div class="svhead"><b tabindex="-1">Feedback</b><button class="svmin" id="fb-min" aria-label="Minimise feedback">&#8250;</button></div><div class="fbbody">'+parts[0]+'</div>'+(parts[1]?'<details class="why"><summary>Why <span aria-hidden="true">&#9662;</span></summary><div class="fbbody">'+parts[1]+'</div></details>':'');
+  var b=document.createElement("button");b.className="btn primary nextpt";b.innerHTML=btn+" &#8594;";b.onclick=function(){b.disabled=true;pop.hidden=true;tab.hidden=true;sheetState();onPlay()};pop.insertBefore(b,pop.querySelector(".why"));
+  var wd=pop.querySelector(".why");if(wd)wd.addEventListener("toggle",function(){pop.classList.toggle("full",wd.open)});pop.classList.remove("full");wireGrab(pop,tab,"Feedback");
+  popOpen(pop,tab);$("fb-min").onclick=function(){popMin(pop,tab,"Feedback")};tab.onclick=function(){popOpen(pop,tab)};
+  var e=$("cs-prompt");if(e)e.textContent="Read the feedback, then play on";$("c-sr").textContent=pop.textContent.slice(0,400);buzz([20,40,20]);
+  setTimeout(function(){try{b.focus({preventScroll:true})}catch(x){}},60)}
+/* Train. Two sidebars, real situations and describe the ball, and 15 aim squares on court */
+function trainAim(){gG.innerHTML="";for(var d=0;d<3;d++)for(var l=0;l<5;l++)(function(d,l){var g=el("g",{"class":"ac",tabindex:"0",role:"button","aria-label":"Aim "+cellName5([d,l]),"data-c":d+","+l},gG);
+    var x0=X(AX[d][0]),y0=Y(AY[l][0]);el("rect",{x:x0,y:y0,width:X(AX[d][1])-x0,height:Y(AY[l][1])-y0,fill:"#FFFFFF","fill-opacity":0},g);
+    var go=function(){if(PK.revealed)return;if(!PK.pickShot){cmd("Pick a shot first");return}ripple(d,l);buzz(10);judge5([d,l])};g.addEventListener("click",go);g.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();go()}})})(d,l);
+  var ln=el("g",{"pointer-events":"none"},gG),st={stroke:"#0D1B2A","stroke-opacity":0.55,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"};
+  [11,14].forEach(function(x){el("line",Object.assign({x1:X(x),y1:Y(0),x2:X(x),y2:Y(8)},st),ln)});[1.6,3.2,4.8,6.4].forEach(function(y){el("line",Object.assign({x1:X(8),y1:Y(y),x2:X(16),y2:Y(y)},st),ln)})}
+function paintSit(){var l=$("trsit-list");if(!l)return;[].forEach.call(l.children,function(b,i){b.setAttribute("aria-pressed",String(i===PK.preset))})}
+function hideTrainUI(){["trsit","trball","trsit-tab","trball-tab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in")}});var pk=$("picker");if(pk&&$("pk-home")&&pk.parentNode!==$("pk-home"))$("pk-home").appendChild(pk);
+  if(state.tab!=="pick"){var f=$("fbpop");if(f&&!document.body.classList.contains("competing")){f.hidden=true;$("fbtab").hidden=true}}}
+function trainUI(){var sit=$("trsit"),bal=$("trball"),st=$("trsit-tab"),bt=$("trball-tab");
+  var SW=function(on){return '<div class="seg trsw"><button data-to="trsit" aria-pressed="'+(on==="trsit")+'">Situations</button><button data-to="trball" aria-pressed="'+(on==="trball")+'">The ball</button></div>'};
+  sit.innerHTML=GRAB+'<div class="svhead"><b>Set up</b><button class="svmin" aria-label="Minimise set up">&#8250;</button></div>'+SW("trsit")+'<p class="svtip">Pick a moment from a real match. The ball plays in, then you choose the shot.</p><div class="sitlist" id="trsit-list"></div>';
+  PRESETS.forEach(function(pr,i){var b=document.createElement("button");b.textContent=pr.name;b.onclick=function(){usePreset(i)};$("trsit-list").appendChild(b)});paintSit();
+  bal.innerHTML=GRAB+'<div class="svhead"><b>Set up</b><button class="svmin" aria-label="Minimise set up">&#8250;</button></div>'+SW("trball")+'<div id="trball-body"></div><button class="btn primary svdone">Done &#8250;</button>';
+  var pk=$("picker");pk.hidden=false;$("trball-body").appendChild(pk);
+  function wire(box,tab,label,other,otab,olabel){box.querySelector(".svmin").onclick=function(){popMin(box,tab,label)};var d=box.querySelector(".svdone");if(d)d.onclick=function(){popMin(box,tab,label)};
+    tab.onclick=function(){if(!other.hidden)popMin(other,otab,olabel);popOpen(box,tab);otab.hidden=false;otab.innerHTML='<span aria-hidden="true">&#8249;</span><small>'+olabel+'</small>'}}
+  var lastBox=sit;function minAll(){[sit,bal].forEach(function(b){if(!b.hidden)popMin(b,st,"Set up")});bt.hidden=true}
+  [sit,bal].forEach(function(box){box.querySelector(".svmin").onclick=minAll;var d=box.querySelector(".svdone");if(d)d.onclick=minAll;wireGrab(box,st,"Set up");
+    [].forEach.call(box.querySelectorAll(".trsw button"),function(b){b.onclick=function(){var to=$(b.dataset.to);if(to===box)return;box.hidden=true;box.classList.remove("in");lastBox=to;popOpen(to,st);bt.hidden=true}})});
+  st.onclick=function(){popOpen(lastBox,st);bt.hidden=true};bt.hidden=true;
+  st.innerHTML='<span aria-hidden="true">&#8249;</span><small>Set up</small>';st.hidden=false;
+  cmd("Pick a situation or a shot");
+  setTimeout(function(){if(state.tab==="pick"&&!PK.revealed&&sit.hidden&&bal.hidden){popOpen(sit,st)}},1000)}
+function hideShotUI(){["svpop","svtab","fbpop","fbtab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in","full")}});sheetState()}
+function fbSec(h,t){return '<div class="fbsec"><b>'+h+'</b><p>'+t+'</p></div>'}
+function playOn(over){if(!MATCH)return;if(over)endMatch();else newPoint()}
+function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=m.cur,MT=cur.mate;c.classList.remove("fb");
+  document.body.classList.add("c-live");$("csit").hidden=true;setWindBadge();
+  $("c-sr").textContent="Point "+(m.points+1)+". "+windWords()+". "+(MT?"The ball goes to your partner.":describe(cur.sit));
+  c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">'+(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Read the ball")+'</p><p class="aimhint" id="sh-sum"></p>';
+  cur.pick={speed:"neutral",spin:"flat"};var p=cur.pick;cmd(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Watch the ball");
   var sp0=sitPos(cur.sit);cur.from=sp0.pos[state.side];
-  var gs=52*PS,gh=el("g",{transform:"translate("+X(cur.from[0])+" "+Y(cur.from[1])+")"+(PORT?" rotate(90)":""),opacity:0.3},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);cur.trail=el("line",{x1:X(cur.from[0]),y1:Y(cur.from[1]),x2:X(cur.from[0]),y2:Y(cur.from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
-  var secs=decideSecs(m.r),bar=$("tbar");bar.style.transitionDuration="0ms";bar.style.transform="scaleX(1)";bar.getBoundingClientRect();
-  var wait=(cur.arrive||450)+150;setTimeout(function(){bar.style.transitionDuration=secs+"s";bar.style.transform="scaleX(0)"},wait);
+  var gs=52*PS,gh=el("g",{transform:"translate("+X(cur.from[0])+" "+Y(cur.from[1])+")"+(PORT?" rotate(90)":""),opacity:0.3},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);
+  cur.trail=el("line",{x1:X(cur.from[0]),y1:Y(cur.from[1]),x2:X(cur.from[0]),y2:Y(cur.from[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"1 7","stroke-linecap":"round"},gM);
+  function moveTo(pos){var dx=pos[0]-cur.from[0];PL[state.side].g.style.transitionDuration="600ms";place(state.side,pos,false);cur.trail.setAttribute("x2",X(pos[0]));cur.trail.setAttribute("y2",Y(pos[1]));
+    p.move=dx>0.6?"in":dx<-0.6?"back":"hold";p.pos=pos;cmd("");maybeResolve()}
+  var wait=(cur.arrive||450)+150;
+  if(MT){drawAim(null,function(pos){if(cur.done)return;moveTo(pos)});
+    setTimeout(function(){if(MATCH&&MATCH.cur===cur&&!cur.done)cmd("Select your court position")},wait)}
+  else{var pop=$("svpop"),tab=$("svtab"),adv=state.level==="advanced"||state.level==="pro";
+    pop.innerHTML=GRAB+'<div class="svhead"><b>Your shot</b><button class="svmin" id="sh-min" aria-label="Minimise shot settings">&#8250;</button></div>'+
+      '<div class="shgrid" id="sh-list" role="group" aria-label="Shot"></div>'+
+      '<div class="svgrid"><div class="svball" id="svball">'+BALLSVG+'<span class="svlbl" id="sv-lbl">Flat</span></div><div class="svside"><div class="seg sv-spd" id="sv-spd"><button data-v="slow" aria-pressed="false">Slow</button><button data-v="neutral" aria-pressed="true">Neutral</button><button data-v="fast" aria-pressed="false">Fast</button></div>'+
+      '<div class="svbtns" id="sv-spin"><button data-v="flat" aria-pressed="true">Flat</button><button data-v="top" aria-pressed="false">Top</button><button data-v="left" aria-pressed="false" aria-label="Curve left">&#9664;</button><button data-v="right" aria-pressed="false" aria-label="Curve right">&#9654;</button>'+(adv?'<button data-v="slice" aria-pressed="false">Slice</button>':'')+'</div>'+
+      '<p class="svtip">Swipe the ball for spin. Up for topspin, left or right to curve.</p><button class="btn primary svdone" id="sh-done">Done &#8250;</button></div></div>';
+    var list=$("sh-list");VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=document.createElement("button"),ic=ICON[id];b.dataset.v=id;b.setAttribute("aria-pressed","false");
+      b.innerHTML='<span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span>';
+      b.onclick=function(){if(cur.done)return;p.shot=id;[].forEach.call(list.children,function(x){x.setAttribute("aria-pressed",String(x===b))});if(ballTag)ballTag.classList.add("dim");sum();buzz(10);later(p.spinSet?700:2500)};list.appendChild(b)});
+    function sum(){var t=(p.shot?SHOTS[p.shot].name:"No shot yet")+", "+SPD_L[p.speed].toLowerCase()+", "+SPIN_LBL[p.spin].toLowerCase();$("sh-sum").textContent=t}
+    function label(){return (p.shot?SHOTS[p.shot].name:"Shot")+"<br>"+SPD_L[p.speed]}
+    function close(){popMin(pop,tab,label());next()}
+    function next(){if(cur.done)return;cmd(!p.shot?"Choose your shot":!p.cell?"Select where to hit":!p.move?"Select your court position":"")}
+    var autoMin=null;function later(ms){clearTimeout(autoMin);if(p.shot)autoMin=setTimeout(close,ms||700)}
+    tab.onclick=function(){if(cur.done)return;popOpen(pop,tab);cmd("Choose your shot")};$("sh-min").onclick=close;$("sh-done").onclick=close;
+    [].forEach.call($("sv-spd").children,function(b){b.onclick=function(){p.speed=b.dataset.v;[].forEach.call($("sv-spd").children,function(x){x.setAttribute("aria-pressed",String(x===b))});rateFn();sum();if(p.shot)later(2500)}});
+    function setSpin(v,user){p.spin=v;$("sv-lbl").textContent=SPIN_LBL[v];[].forEach.call($("sv-spin").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))});rateFn();sum();if(user){p.spinSet=true;later()}}
+    [].forEach.call($("sv-spin").children,function(b){b.onclick=function(){setSpin(b.dataset.v,true)}});
+    var seamEl=$("sv-seam"),ang=0,rate=0,last=0;function rateFn(){rate=p.spin==="flat"?0.12:SV_ROT[p.speed]*(p.spin==="slice"?-1:1)}rateFn();
+    (function loop(t){if(cur.done||!document.body.contains(seamEl))return;var dt=last?Math.min(50,t-last):0;last=t;if(!RM)ang=(ang+rate*dt)%360;seamEl.setAttribute("transform","rotate("+ang.toFixed(1)+")");requestAnimationFrame(loop)})(0);
+    var svg=$("svball").querySelector("svg"),arrow=$("sv-arrow"),start=null,dir=null;
+    svg.addEventListener("pointerdown",function(e){if(cur.done)return;start=[e.clientX,e.clientY];dir=null;svg.setPointerCapture(e.pointerId);e.preventDefault()});
+    svg.addEventListener("pointermove",function(e){if(!start)return;var dx=e.clientX-start[0],dy=e.clientY-start[1],dist=Math.hypot(dx,dy),r=svg.getBoundingClientRect(),k=100/r.width;
+      arrow.setAttribute("x2",(dx*k).toFixed(1));arrow.setAttribute("y2",(dy*k).toFixed(1));arrow.setAttribute("opacity",dist>6?0.8:0);
+      if(dist>=24){var nd=Math.abs(dx)>Math.abs(dy)?(dx<0?"left":"right"):(dy<0?"top":(adv?"slice":"flat"));if(nd!==dir){dir=nd;setSpin(nd,false)}rateFn();rate*=1+Math.min(1.5,dist/120)}});
+    svg.addEventListener("pointerup",function(){if(!start)return;start=null;arrow.setAttribute("opacity",0);if(dir){setSpin(dir,true);save("swiped","1");document.body.classList.add("swiped")}});
+    sum();
+    drawAim(function(cell){if(cur.done)return;if(!p.shot){cmd("Choose a shot first");popOpen(pop,tab);return}p.cell=cell;markAim(cell);ripple(cell[0],cell[1]);buzz(10);
+      if(cur.aimLine)cur.aimLine.remove();var tc=svTarget(cell),sc=sitPos(cur.sit).contact;cur.aimLine=el("line",{x1:X(sc[0]),y1:Y(sc[1]),x2:X(tc[0]),y2:Y(tc[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"2 6","stroke-linecap":"round","pointer-events":"none"},gM);if(!pop.hidden)popMin(pop,tab,label());next()},
+      function(pos){if(cur.done)return;if(!p.shot||!p.cell){next();if(!p.shot)popOpen(pop,tab);return}moveTo(pos)});
+    setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.done)return;popOpen(pop,tab);cmd("Choose your shot");$("cs-prompt").textContent="Your shot"},wait)}
+  var secs=decideSecs(m.r);startBar(secs,wait);
   clearTimeout(cTimer);cTimer=setTimeout(function(){resolvePoint(true)},secs*1000+wait)}
-function maybeResolve(){var p=MATCH.cur.pick;if(MATCH.cur.mate?p.pos:(p.shot&&p.cell&&p.move)){clearTimeout(cTimer);setTimeout(function(){resolvePoint(false)},250)}}
+function maybeResolve(){var p=MATCH.cur.pick;if(MATCH.cur.mate?p.pos:(p.shot&&p.cell&&p.move)){clearTimeout(cTimer);setTimeout(function(){resolvePoint(false)},350)}}
 var SVB={good:.06,ok:0,risky:-.12};
-function nextBtn(over){var cs=$("csit"),b=document.createElement("button");b.className="btn primary nextpt";b.innerHTML=over?"See the result &#8594;":"Next point &#8594;";
-  b.onclick=function(){if(!MATCH)return;b.disabled=true;if(over)endMatch();else newPoint()};cs.appendChild(b);
-  if(window.matchMedia&&matchMedia("(min-width:901px)").matches){var c=$("cpanel");c.innerHTML="";c.classList.add("fb");while(cs.firstChild)c.appendChild(cs.firstChild);cs.hidden=true}var e=$("cs-prompt");if(e)e.textContent="Read the feedback, then play on";setTimeout(function(){try{b.focus({preventScroll:true})}catch(x){}},50)}
 /* Shot percentages for this ball. High, medium or low */
 function shotTiers(sit,best){var H=sit.height,t={};
   var base={low:{dig:2,neutral:2,lob:1,drop:1,push:0,flatsmash:0,hook:0},med:{push:2,neutral:1,dig:1,drop:1,lob:1,flatsmash:0,hook:0},high:{flatsmash:2,hook:1,push:1,neutral:1,lob:0,drop:0,dig:0}}[H];
@@ -1404,33 +1520,39 @@ function resolveMate(late){var m=MATCH,cur=m.cur,a=cur.ans,p=cur.pick,sp=sitPos(
   track("point_played",{rival:m.r.id,type:"position",partner_shot:ms,quality:q,distance:+dist.toFixed(2),late:late,won:won});
   el("circle",{cx:X(ideal[0]),cy:Y(ideal[1]),r:20,fill:"#2ECC71","fill-opacity":0.25,stroke:"#146C3A","stroke-width":2.5,"stroke-dasharray":"4 4"},gM);
   PL[sp.partner].g.style.transitionDuration="900ms";place(sp.partner,[ideal[0],laneY(sp.partner)],false);
-  if(!p.pos){PL[state.side].g.style.transitionDuration="900ms"}
-  var parts=[];parts.push("Your partner played a "+SHOTS[ms].name.toLowerCase()+".");
-  parts.push(q==="late"?"Too slow. The clock ran out.":q==="right"?"Great position.":q==="close"?"Close. The green mark was the best spot.":"Out of position. The green mark was the best spot.");
-  parts.push(MATE_TXT[ms]||"");
-  [].forEach.call(document.querySelectorAll("#cpanel button"),function(b){b.disabled=true});if(ballTag)ballTag.classList.add("dim");
-  $("csit").hidden=false;$("csit").innerHTML='<span class="kicker">Point '+m.points+'</span><div class="ptres '+(won?"w":"l")+'"><b>'+(won?"Point to you. ":"Point to "+m.r.pair+". ")+'</b>'+parts.join(" ")+'</div>';
-  renderScore();var over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2;
-  nextBtn(over)}
+  if(ballTag)ballTag.classList.add("dim");renderScore();var over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2;
+  var html='<div class="ptres '+(won?"w":"l")+'"><b>'+(won?"Point to you.":"Point to "+m.r.pair+".")+'</b> '+(q==="right"?"Great position.":q==="close"?"Close position.":q==="late"?"Too slow.":"Out of position.")+'</div><div class="fbbest"><b>Best spot</b><p>'+(MATE_TXT[ms]||"")+'</p></div><!--more-->'+
+    fbSec("Your partner's shot","They played a "+SHOTS[ms].name.toLowerCase()+". "+a.why)+
+    fbSec("Your position",(q==="late"?"Too slow. The clock ran out. ":q==="right"?"Great position. ":q==="close"?"Close. The green mark was the best spot. ":"Out of position. The green mark was the best spot. ")+(MATE_TXT[ms]||""))+
+    fbSec("Opponents",oppText(cur.sit))+fbSec("Wind",windText());
+  fbShow(html,over?"See the result":"Next point",function(){playOn(over)})}
 function resolvePoint(late){var m=MATCH;if(!m||!m.cur||m.cur.done)return;var cur=m.cur,a=cur.ans,p=cur.pick;cur.done=true;clearTimeout(cTimer);if(!cur.from){cur.done=false;return}if(cur.mate)return resolveMate(late);
-  var tierP=p.shot?shotTiers(cur.sit,a.shot)[p.shot]:-1,shotOk=tierP===2,shotMid=tierP===1,mvKey=shotOk?p.shot:a.shot,off=p.cell?Math.abs(p.cell[0]-a.cell5[0])+Math.abs(p.cell[1]-a.cell5[1]):9,sq=off===0?"right":off===1?"close":"wrong",
-    moveOk=p.move&&p.move===MOVE_OK[mvKey],prob=late?0:(shotOk?(sq==="right"?.55:sq==="close"?.45:.3)+(moveOk?.32:.08):shotMid?(sq==="right"?.35:.25)+(moveOk?.12:.04):.12+(moveOk?.05:0))-m.r.mod+(SVB[cur.serveQ]||0),
+  var tierP=p.shot?shotTiers(cur.sit,a.shot)[p.shot]:-1,shotOk=tierP===2,shotMid=tierP===1,mvKey=shotOk?p.shot:a.shot,
+    ct=p.cell?cellTier(p.cell,a.cell5,p.speed):2,sq=ct===0?"right":ct===1?"close":"wrong",ss=p.shot?ssVerdict(p.shot,p.speed,p.spin,cur.sit):{ok:false,part:false},
+    moveOk=p.move&&p.move===MOVE_OK[mvKey],
+    prob=late?0:(shotOk?(sq==="right"?.5:sq==="close"?.4:.25)+(moveOk?.28:.06):shotMid?(sq==="right"?.32:.22)+(moveOk?.1:.03):.1+(moveOk?.05:0))+(ss.ok?.08:ss.part?.03:-.04)-m.r.mod+(SVB[cur.serveQ]||0),
     won=Math.random()<Math.max(.03,Math.min(.93,prob));
   if(shotOk&&sq==="right"&&moveOk)m.right++;m.points++;if(won)m.me++;else m.them++;m.log.push(won?"w":"l");
-  track("point_played",{rival:m.r.id,picked:p.shot||null,answer:a.shot,square:sq,move:p.move||null,late:late,won:won});
-  var sp=sitPos(cur.sit),dest=p.cell?[[9.5,12.5,15][p.cell[0]],(p.cell[1]+0.5)*1.6]:[12,4],dx={in:1.3,hold:0,back:-1}[p.move||"hold"];
-  if(!late&&p.shot){POSE[state.side]=POSE_MAP[p.shot]||null;updImg(state.side)}
-  if(!late)runBall({f:sp.contact,to:dest,shot:p.shot==="flatsmash"?"flatsmash":p.shot||"neutral",land:true},true);
-  var mvPos=merge(sp.pos,null);mvPos.L=[sp.pos.L[0]+dx,sp.pos.L[1]];mvPos.R=[sp.pos.R[0]+dx,sp.pos.R[1]];if(p.pos)mvPos[state.side]=p.pos;PL[state.side].g.classList.remove("me-drag");
-  ["L","R"].forEach(function(k){PL[k].g.style.transitionDuration="900ms";place(k,mvPos[k],false)});
-  var parts=[];parts.push(late?"Too slow. The clock ran out.":p.shot===a.shot?"Right shot.":shotOk?"Good choice, a high percentage shot. Guto would play a "+SHOTS[a.shot].name.toLowerCase()+".":shotMid?"Medium percentage. The best shot was a "+SHOTS[a.shot].name.toLowerCase()+". "+a.why:"The shot was "+SHOTS[a.shot].name.toLowerCase()+". "+a.why);
-  if(!late){parts.push(sq==="right"?"Perfect aim.":"Best aim was "+cellName5(a.cell5).toLowerCase()+".");parts.push(moveOk?"Good movement.":"After a "+SHOTS[mvKey].name.toLowerCase()+", "+(MOVE_OK[mvKey]==="in"?"step in together.":"hold level and get ready."))}
-  [].forEach.call(document.querySelectorAll("#cpanel button"),function(b){b.disabled=true});heatAim(p.cell,a.cell5);
-  $("csit").hidden=false;$("csit").innerHTML='<span class="kicker">Point '+m.points+'</span><div class="ptres '+(won?"w":"l")+'"><b>'+(won?"Point to you. ":"Point to "+m.r.pair+". ")+'</b>'+parts.join(" ")+'</div>'+tiersHtml(cur.sit,a.shot,p.shot)+'<p class="aimhint">On the court, green squares are high percentage, orange medium, red low.</p>';
-  renderScore();
-  var over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2;
-  nextBtn(over)}
-function endMatch(){var m=MATCH,won=m.me>m.them,bt=beaten();if(won&&!bt[m.r.id]){bt[m.r.id]=m.me+"–"+m.them;save("sand-beaten",JSON.stringify(bt))}
+  track("point_played",{rival:m.r.id,picked:p.shot||null,answer:a.shot,square:sq,speed:p.speed,spin:p.spin,move:p.move||null,late:late,won:won});
+  var sp=sitPos(cur.sit),dest=p.cell?svTarget(p.cell):[12,4],dx={in:1.3,hold:0,back:-1}[p.move||"hold"];
+  if(!late&&p.shot){POSE[state.side]=POSE_MAP[p.shot]||null;updImg(state.side);var pr=PROF[p.shot]||PROF.neutral;PROF._me={d:pr.d*{slow:1.3,neutral:1,fast:0.75}[p.speed],h:pr.h};
+    runBall({f:sp.contact,to:dest,shot:"_me",spin:SV_ROT[p.speed]*(p.spin==="flat"?0.6:1.5)*(p.spin==="slice"?-1:1),curve:p.spin==="left"?-24:p.spin==="right"?24:0,land:true},true)}
+  var mvPos=merge(sp.pos,null),pt=sp.partner;mvPos[pt]=[sp.pos[pt][0]+dx,sp.pos[pt][1]];if(p.pos)mvPos[state.side]=p.pos;
+  PL[pt].g.style.transitionDuration="900ms";place(pt,mvPos[pt],false);if(!p.pos){PL[state.side].g.style.transitionDuration="900ms";place(state.side,[sp.pos[state.side][0]+dx,sp.pos[state.side][1]],false)}
+  heatAim(p.cell,a.cell5,p.speed);if(ballTag)ballTag.classList.add("dim");renderScore();
+  var over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2,I=idealSS(a.shot,cur.sit),bestSS=ssVerdict(a.shot,I.sp[0],I.sn[0],cur.sit).best;
+  var shotT=late?"Too slow. The clock ran out before you played.":p.shot===a.shot?"Right shot. A "+SHOTS[a.shot].name.toLowerCase()+" was the best choice here.":shotOk?"Good choice, a high percentage shot. Guto would play a "+SHOTS[a.shot].name.toLowerCase()+".":shotMid?"Medium percentage. The best shot was a "+SHOTS[a.shot].name.toLowerCase()+". "+a.why:"Low percentage. The best shot was a "+SHOTS[a.shot].name.toLowerCase()+". "+a.why;
+  var locT=!p.cell?"You didn't choose a target.":(sq==="right"?"Great target, ":sq==="close"?"Close, ":"Risky target, ")+cellName5(p.cell).toLowerCase()+"."+(sq==="right"?"":" The best target was "+cellName5(a.cell5).toLowerCase()+".")+" On the court, green squares are high percentage, orange medium, red low.";
+  var posT=!p.move?"You didn't move.":moveOk?"Good movement.":"After a "+SHOTS[mvKey].name.toLowerCase()+", "+(MOVE_OK[mvKey]==="in"?"step in together, about 3 m from the net.":"hold level just behind your 3 m line and get ready.");
+  var sumT=late?"Too slow.":[p.shot===a.shot?"Right shot":shotOk?"Good shot":shotMid?"Medium percentage shot":"Low percentage shot",sq==="right"?"great target":sq==="close"?"close target":"risky target",moveOk?"good position":"position off"].join(", ")+".";
+  if(!won&&!late)sumT+=shotOk&&sq==="right"&&moveOk?" Good play. They made a great get.":shotOk&&sq!=="right"?" The risky target gave them a chance.":shotOk&&!moveOk?" Your position let them back in.":"";
+  var html='<div class="ptres '+(won?"w":"l")+'"><b>'+(won?"Point to you.":"Point to "+m.r.pair+".")+'</b> '+sumT+'</div>'+
+    '<div class="fbbest"><b>Guto&rsquo;s play</b><p>'+SHOTS[a.shot].name+", "+bestSS.toLowerCase()+", to the "+cellName5(a.cell5).toLowerCase()+", then "+(MOVE_OK[a.shot]==="in"?"step in together.":"hold level and get ready.")+'</p></div><!--more-->'+
+    fbSec("Shot",shotT)+tiersHtml(cur.sit,a.shot,p.shot)+
+    (p.shot?fbSec("Speed and spin","You played it "+SPD_L[p.speed].toLowerCase()+", "+SPIN_LBL[p.spin].toLowerCase()+". "+ss.text):"")+
+    fbSec("Where you aimed",locT)+fbSec("Your position",posT)+fbSec("Opponents",oppText(cur.sit))+fbSec("Wind",windText());
+  fbShow(html,over?"See the result":"Next point",function(){playOn(over)})}
+function endMatch(){hideShotUI();$("ctimer").hidden=true;var m=MATCH,won=m.me>m.them,bt=beaten();if(won&&!bt[m.r.id]){bt[m.r.id]=m.me+"–"+m.them;save("sand-beaten",JSON.stringify(bt))}
   track("match_completed",{rival:m.r.id,me:m.me,them:m.them,won:won,perfect_decisions:m.right,points:m.points});
   clearAim();document.body.classList.remove("c-live");$("csit").hidden=true;var idx=RIVALS.indexOf(m.r),nx=RIVALS[idx+1],c=$("cpanel");
   c.innerHTML='<div class="endcard"><span class="kicker">Match over</span><span class="big">'+(won?"You win":"They win")+' '+m.me+'–'+m.them+'</span><p class="say">'+m.right+' of '+m.points+' points had the right shot, aim and movement.'+(won?(nx?" "+nx.pair+" is unlocked.":" You beat the world's best pair."):" Look at the points you lost, then try again.")+'</p>'+

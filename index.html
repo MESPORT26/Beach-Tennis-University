@@ -72,6 +72,17 @@
         <div class="wind" id="wind-ctl"><span>Wind</span><svg id="wdial" viewBox="0 0 64 64" tabindex="0" role="slider" aria-label="Wind direction. Drag or use the arrow keys" aria-valuemin="0" aria-valuemax="359"></svg><div class="seg" id="seg-wind"><button data-v="calm" aria-pressed="true">Calm</button><button data-v="breezy" aria-pressed="false">Breezy</button><button data-v="gusty" aria-pressed="false">Gusty</button></div></div>
       </div>
       <div class="court-box">
+        <div class="ctimer" id="ctimer" hidden><i id="ctbar"></i></div>
+        <div class="cmd" id="cmd" hidden aria-live="polite"></div>
+        <div class="cwind" id="cwind" hidden></div>
+        <div class="svpop fbpop" id="fbpop" hidden role="dialog" aria-label="Feedback"></div>
+        <button class="svtab fbtab" id="fbtab" hidden aria-label="Open feedback"></button>
+        <div class="svpop trpop" id="trsit" hidden role="dialog" aria-label="Real situations"></div>
+        <div class="svpop trpop" id="trball" hidden role="dialog" aria-label="Describe the ball"></div>
+        <button class="svtab trtab" id="trsit-tab" hidden aria-label="Open real situations"></button>
+        <button class="svtab trtab trtab2" id="trball-tab" hidden aria-label="Open describe the ball"></button>
+        <div class="svpop" id="svpop" hidden role="dialog" aria-label="Serve settings"></div>
+        <button class="svtab" id="svtab" hidden aria-label="Open serve settings"></button>
         <svg id="court" viewBox="0 0 760 400" role="img" aria-labelledby="court-t">
           <title id="court-t">Top-down beach tennis court showing player positions and the ball</title>
           <defs>
@@ -103,7 +114,7 @@
         <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
       </div>
       <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
-      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><a href="#stepbox">Details below &#8595;</a></div>
+      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><a href="#stepbox">More detail &#8595;</a></div>
       <div class="legend" id="legend"></div>
       <section class="result" id="result" hidden>
         <div class="call" id="call">
@@ -158,13 +169,14 @@
         <p class="note" id="note" hidden></p>
       </div>
 
+      <div id="pk-home"></div>
       <div class="picker" id="picker" hidden>
         <span class="kicker">Describe the ball</span>
         <div class="pgroup"><span>The ball comes to my</span><div class="seg" id="pk-side"><button id="pk-side-bh" data-v="bh">Backhand</button><button id="pk-side-body" data-v="body">Body</button><button id="pk-side-fh" data-v="fh">Forehand</button></div></div>
         <div class="pgroup"><span>I'm standing</span><div class="seg" id="pk-depth"><button id="pk-depth-front" data-v="front">Inside 3 m</button><button id="pk-depth-mid" data-v="mid">3–6 m</button><button id="pk-depth-back" data-v="back">6–8 m</button></div></div>
         <div class="pgroup"><span>Ball speed</span><div class="seg" id="pk-speed"><button id="pk-speed-fast" data-v="fast">Fast</button><button id="pk-speed-med" data-v="med">Medium</button><button id="pk-speed-slow" data-v="slow">Slow</button></div></div>
         <div class="pgroup"><span>Height when I hit it</span><div class="seg" id="pk-height"><button id="pk-height-low" data-v="low">Low</button><button id="pk-height-med" data-v="med">Medium</button><button id="pk-height-high" data-v="high">High</button></div><p class="hint">Low is below the net. Medium is net to shoulder. High is overhead.</p></div>
-        <div class="pgroup"><span>Opponents</span><p class="hint">Tap their side of the court to place them. <b id="pk-next"></b></p></div>
+        <div class="pgroup"><span>Opponents</span><p class="hint">Drag the opponents on the court to place them.</p><b id="pk-next" hidden></b></div>
       </div>
     </aside>
   </div>
@@ -219,6 +231,7 @@
     <section class="psec" id="pt-notify" hidden>
       <label class="tgl"><input type="checkbox" id="n-content"><span><b>New lessons and content</b><small>New shots, drills and videos as they land</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-tips"><span><b>Weekly tip from Coach Guto</b><small>One tactic to try at your next session</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-vibe"><span><b>Vibration</b><small>A short buzz when you pick and when a point ends</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-compete"><span><b>Sand Series</b><small>New opponents and challenges</small></span></label>
       <label class="fld"><span>Send updates to</span><input type="email" id="n-email" autocomplete="email" placeholder="you@example.com"></label>
       <button class="btn" id="n-device">Also notify me on this device</button>
@@ -227,6 +240,7 @@
     <button class="btn primary" id="p-done">Done</button>
   </div>
 </div>
+<div class="rotate" aria-hidden="true"><div><span>&#10227;</span><b>Turn your phone upright</b><p>The court is built for portrait.</p></div></div>
 <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
 <script src="app.js"></script>
 </body>
