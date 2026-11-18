@@ -73,6 +73,22 @@
       </div>
       <div class="court-box">
         <div class="ctimer" id="ctimer" hidden><i id="ctbar"></i></div>
+        <div class="shout" id="shout" aria-hidden="true"></div>
+        <div class="hgauge" id="hgauge" hidden><svg viewBox="0 0 64 200" role="img" aria-label="Height of the ball when you hit it"><title>Contact height</title>
+          <rect x="0" y="0" width="64" height="200" rx="12" fill="#0D1B2A" fill-opacity="0.88"/>
+          <rect class="hb hb-high" x="6" y="22" width="52" height="54" rx="6" fill="#FF4D6D" fill-opacity="0.22"/>
+          <rect class="hb hb-med" x="6" y="76" width="52" height="40" rx="0" fill="#FF9F1C" fill-opacity="0.22"/>
+          <rect class="hb hb-low" x="6" y="116" width="52" height="62" rx="6" fill="#00C2B8" fill-opacity="0.22"/>
+          <line x1="4" y1="178" x2="60" y2="178" stroke="#E8D6AE" stroke-width="4" stroke-linecap="round"/>
+          <line x1="10" y1="116" x2="10" y2="178" stroke="#F7F4E9" stroke-width="2"/><line x1="54" y1="116" x2="54" y2="178" stroke="#F7F4E9" stroke-width="2"/>
+          <line x1="10" y1="116" x2="54" y2="116" stroke="#F7F4E9" stroke-width="3"/><path d="M10 124H54M10 134H54M10 144H54M10 154H54M10 164H54M18 116V178M26 116V178M34 116V178M42 116V178" stroke="#F7F4E9" stroke-opacity="0.25" stroke-width="1"/>
+          <text x="32" y="15" text-anchor="middle" fill="#F7F4E9" style="font:800 9px Montserrat,sans-serif;letter-spacing:.08em">HEIGHT</text>
+          <text class="hl hl-high" x="32" y="52" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">HIGH</text>
+          <text class="hl hl-med" x="32" y="100" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">MID</text>
+          <text class="hl hl-low" x="32" y="152" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">LOW</text>
+          <text x="32" y="194" text-anchor="middle" fill="#F7F4E9" fill-opacity="0.7" style="font:700 8px Montserrat,sans-serif">NET 1.7 m</text>
+          <g id="hg-ball"><circle r="9" fill="#DDF02B" stroke="#9C9A12" stroke-width="1"/><path d="M0 -9C-8 -3 8 3 0 9A9 9 0 0 0 0 -9Z" fill="#FF5A1F"/></g>
+        </svg></div>
         <div class="cmd" id="cmd" hidden aria-live="polite"></div>
         <div class="cwind" id="cwind" hidden></div>
         <div class="svpop fbpop" id="fbpop" hidden role="dialog" aria-label="Feedback"></div>
