@@ -1983,7 +1983,7 @@ drawWind();
 var TR=null;
 function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
 var TRMODE=load("tr-mode","quiz");
-function trainOpen(){document.body.classList.add("sheet-open");document.body.classList.remove("trsu");if(TRMODE==="setup"){setupOpen();return}if(TRMODE==="replay"){autoOpen();return}if(!TR||TR.done)trainStart();else trainScene(true)}
+function trainOpen(){document.body.classList.remove("sheet-open");document.body.classList.remove("trsu");if(TRMODE==="setup"){setupOpen();return}if(TRMODE==="replay"){autoOpen();return}if(!TR||TR.done)trainStart();else trainScene(true)}
 function modeSeg(){return '<div class="seg trmode" id="tr-mode"><button data-v="quiz" aria-pressed="'+(TRMODE==="quiz")+'">What next?</button><button data-v="setup" aria-pressed="'+(TRMODE==="setup")+'">Set up</button><button data-v="replay" aria-pressed="'+(TRMODE==="replay")+'">Replay</button></div>'}
 function wireMode(t){[].forEach.call(t.querySelectorAll("#tr-mode button"),function(b){b.onclick=function(){if(TRMODE===b.dataset.v)return;TRMODE=b.dataset.v;save("tr-mode",TRMODE);track("train_mode",{mode:TRMODE});trainOpen()}})}
 function trainStart(){TR={set:shuf(PRESETS.map(function(_,i){return i})).slice(0,5),i:0,res:[],done:false};trainScene()}
@@ -2018,6 +2018,7 @@ function readHtml(sit){var th=SHOTS[sit.shot||oppPose(sit)].name,hw={high:"high"
     sd={fh:"to your forehand",bh:"to your backhand",body:"at your body"}[sit.side],me={front:"near the net",mid:"mid-court",back:"deep"}[sit.depth],
     op=sit.A[0]===sit.B[0]?["Both at the net","Both mid-court","Both deep"][sit.A[0]]:"One up, one back";
   return '<div class="trread"><p><b>They play a '+th.toLowerCase()+'</b>, '+hw+' and '+sw+', '+sd+'.</p><p><span>You</span>'+me+' · <span>Them</span>'+op.toLowerCase()+'</p><p><span>Wind</span>'+(state.wind==="calm"?"none":windWords().toLowerCase())+'</p></div>'}
+function trScroll(to){if(window.innerWidth>900)return;var e=to==="court"?document.querySelector(".court-card"):$("trtray");if(e)e.scrollIntoView({behavior:RM?"auto":"smooth",block:to==="court"?"start":"nearest"})}
 function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;document.body.classList.remove("trsu");document.body.classList.toggle("trmin",!TR.done&&/target|move/.test(TR.step));document.body.classList.toggle("trmid",!TR.done&&TR.step==="read");var _w=function(){wireMode(t)};setTimeout(_w,0);
   if(TR.done){var sc=TR.res.filter(function(r){return r==="good"}).length,best=Math.max(sc,+load("tr-best","0")||0);save("tr-best",String(best));
     t.innerHTML=modeSeg()+trProg()+'<div class="trend"><b>'+sc+'/5</b><small>Best '+best+'/5</small></div><div class="trbtns"><button class="btn primary big" id="tr-again">Again</button><button class="btn soft" id="tr-comp">Compete</button></div>';
@@ -2030,8 +2031,8 @@ function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;d
   else if(TR.step==="move")h+='<p class="trsub">'+SHOTS[TR.pick.shot].name+' · '+SPD_L[TR.pick.speed]+' · '+SPIN_LBL[TR.pick.spin]+' · '+cellName5(TR.pick.cell).toLowerCase()+'</p><h3 class="trq">Then where do you go?</h3><div class="trmoves">'+MOVES.map(function(m){return '<button data-v="'+m[0]+'">'+m[1]+'</button>'}).join("")+'</div>';
   else if(TR.step==="verdict"){var v=TR.v;h+='<h3 class="trq '+v.cls+'">'+v.head+'</h3><div class="trrows">'+v.rows.map(function(r){return '<span class="'+["no","mid","yes"][r[1]]+'"><i>'+["&#10007;","~","&#10003;"][r[1]]+'</i>'+r[0]+'</span>'}).join("")+'</div><p class="trline">'+v.line+'</p><details class="more"><summary>Why?</summary><div class="morein">'+v.more+'</div></details><button class="btn primary big" id="tr-next">'+(TR.i<TR.set.length-1?"Next":"See score")+'</button>'}
   t.innerHTML=h;
-  [].forEach.call(t.querySelectorAll(".trchips button"),function(b){b.onclick=function(){TR.pick.shot=b.dataset.v;sfx("pick",{shot:b.dataset.v});[].forEach.call(t.querySelectorAll(".trchips button"),function(x){x.setAttribute("aria-pressed",String(x===b))});if(TR.step==="shot"){TR.step="target";trainAimOn();trainTray()}}});
-  if($("tr-go"))$("tr-go").onclick=function(){TR.step="shot";trainTray()};
+  [].forEach.call(t.querySelectorAll(".trchips button"),function(b){b.onclick=function(){TR.pick.shot=b.dataset.v;sfx("pick",{shot:b.dataset.v});[].forEach.call(t.querySelectorAll(".trchips button"),function(x){x.setAttribute("aria-pressed",String(x===b))});if(TR.step==="shot"){TR.step="target";trainAimOn();trainTray();setTimeout(function(){trScroll("court")},60)}}});
+  if($("tr-go"))$("tr-go").onclick=function(){TR.step="shot";trainTray();setTimeout(function(){trScroll("tray")},60)};
   [].forEach.call(t.querySelectorAll("#tr-spd button"),function(b){b.onclick=function(){TR.pick.speed=b.dataset.v;[].forEach.call(t.querySelectorAll("#tr-spd button"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});
   var bs=t.querySelector(".trball svg");if(bs){var st0=null,ar=t.querySelector(".tr-arrow"),lb=t.querySelector(".trspin"),seam=t.querySelector(".tr-seam"),setS=function(v){TR.pick.spin=v;lb.textContent=SPIN_LBL[v];seam.setAttribute("transform","rotate("+{flat:0,top:-60,slice:60,left:-90,right:90}[v]+")")};setS(TR.pick.spin);
     bs.addEventListener("pointerdown",function(e){st0=[e.clientX,e.clientY];bs.setPointerCapture(e.pointerId);e.preventDefault()});
@@ -2059,7 +2060,7 @@ function trainJudge(){var sit=TR.sit,a=TR.ans,p=TR.pick,ti=shotTiers(sit,a.shot)
       '<p><b>Position.</b> '+(moveOk?"Good.":"After a "+SHOTS[mvKey].name.toLowerCase()+", "+(MOVE_OK[mvKey]==="in"?"step in together.":MOVE_OK[mvKey]==="back"?"move back.":"hold level.")+" The faded player shows where.")+'</p>'};
   track("train_scenario",{preset:PRESETS[TR.set[TR.i]].name,shot:p.shot,answer:a.shot,result:r});TR.step="verdict";
   var pr=PROF[p.shot]||PROF.neutral;PROF._me={d:pr.d,h:pr.h};runBall({f:TR.sp.contact,to:svTarget(p.cell),shot:"_me",spin:SV_ROT[p.speed]*(p.spin==="flat"?0.6:1.5)*(p.spin==="slice"?-1:1),curve:p.spin==="left"?-24:p.spin==="right"?24:0,land:true},true);
-  setTimeout(function(){sfx(r==="good"?"win":r==="ok"?"ok":"lose",{shots:r==="good"?[p.shot]:[]})},500);trainVerdictDraw();trainTray()}
+  setTimeout(function(){sfx(r==="good"?"win":r==="ok"?"ok":"lose",{shots:r==="good"?[p.shot]:[]})},500);trainVerdictDraw();trainTray();setTimeout(function(){trScroll("tray")},700)}
 function trainVerdictDraw(){var p=TR.pick,a=TR.ans;drawAim(function(){},null);heatAim(p.cell,{shot:p.shot,sit:TR.sit},p.speed);
   var bc=svTarget(a.cell5);el("circle",{cx:X(bc[0]),cy:Y(bc[1]),r:22,fill:"none",stroke:"#00C2B8","stroke-width":4,"pointer-events":"none"},gM);
   var mk=MOVE_OK[shotTiers(TR.sit,a.shot)[p.shot]===2?p.shot:a.shot];if(mk!==p.move){var gp=trMovePos(mk),gs=52*PS,gh=el("g",{transform:"translate("+X(gp[0])+" "+Y(gp[1])+")"+(PORT?" rotate(90)":""),opacity:0.35,"pointer-events":"none"},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh)}
@@ -2124,7 +2125,10 @@ function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.c
     if(pts.length===4){try{SVGC.setPointerCapture(e.pointerId)}catch(x){}}
     path.setAttribute("points",pts.map(function(p){return X(p.c[0]).toFixed(1)+","+Y(p.c[1]).toFixed(1)}).join(" "))});
   function end(){if(!pts)return;var P=pts;pts=null;var a=P[0],z=P[P.length-1],len=Math.hypot(z.x-a.x,z.y-a.y);
-    if(len<24||!live()){if(path){path.remove();path=null}return}
+    if(len<24||!live()){if(path){path.remove();path=null}
+      /* a tap on their half picks that square with the speed and spin you set */
+      if(live()&&z.c[0]>8.2){var tc=[z.c[0]<11?0:z.c[0]<14?1:2,Math.max(0,Math.min(4,Math.floor(z.c[1]/1.6)))];TR.pick.cell=tc;markAim(tc);ripple(tc[0],tc[1]);sfx("aim",{d:tc[0]});TR.step="move";trainMoveOn();trainTray()}
+      return}
     var x=z.c[0],y=z.c[1];if(x<8.2){if(path){path.remove();path=null}toast("Flick it over the net");return}
     var cell=[x<11?0:x<14?1:2,Math.max(0,Math.min(4,Math.floor(y/1.6)))],
       /* pace from the last part of the flick */
@@ -2135,6 +2139,7 @@ function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.c
     var spin=back?"slice":Math.abs(dev)/L>0.12?(dev>0?"left":"right"):speed==="fast"?"top":"flat";
     TR.pick.speed=speed;TR.pick.spin=spin;TR.pick.cell=cell;TR.pick.flick=true;markAim(cell);ripple(cell[0],cell[1]);sfx("aim",{d:cell[0]});
     setTimeout(function(){if(path){path.remove();path=null}},500);TR.step="move";trainMoveOn();trainTray()}
+  SVGC.addEventListener("touchstart",function(e){if(live())e.preventDefault()},{passive:false});SVGC.addEventListener("touchmove",function(e){if(live())e.preventDefault()},{passive:false});
   SVGC.addEventListener("pointerup",end);SVGC.addEventListener("pointercancel",function(){pts=null;if(path){path.remove();path=null}})})();
 
 /* ---------------- Replay: points you lost in Compete. Work out why ---------------- */

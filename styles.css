@@ -649,8 +649,6 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
   .why-open #stepbox{display:block!important;position:fixed;left:0;right:0;bottom:0;max-height:75dvh;overflow:auto;z-index:80;background:var(--surface);border-radius:22px 22px 0 0;padding:18px 16px calc(18px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(13,27,42,.25)}
   .why-open .whyx{display:block;position:sticky;top:0;margin-left:auto;all:unset;cursor:pointer;float:right;font-size:20px;width:44px;height:44px;text-align:center;line-height:44px}
   .picking #side{display:none}
-  .picking .panel{position:fixed;top:auto;left:0;right:0;bottom:0;z-index:60;background:var(--surface);border-radius:22px 22px 0 0;padding:14px 16px calc(14px + env(safe-area-inset-bottom));box-shadow:0 -10px 40px rgba(13,27,42,.18);max-height:52dvh;overflow:auto}
-  .picking .court-box svg#court{height:calc(52dvh - 112px)!important}
   .picking .court-card{padding-bottom:0}
   #side{display:none}
 }
@@ -673,7 +671,6 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .picking .c-head{display:flex;justify-content:center;margin-bottom:4px}.picking .c-head #title,.picking .c-head .cat,.picking .c-head #lvl-chip{display:none!important}
 .picking #wind-ctl{display:flex!important}
 
-@media (max-width:900px){body.sheet-open.picking .court-box svg#court{height:calc(100dvh - 330px - 52dvh)!important;min-height:220px}.picking .court-card{padding-top:10px}}
 
 .trmode{margin-bottom:2px}.trmode button{flex:1}
 .suans{display:grid;gap:4px;padding-bottom:6px;border-bottom:1px solid var(--line)}
@@ -683,7 +680,6 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .picking g.pl{cursor:grab}
 @media (max-width:420px){.sugrp.two{grid-template-columns:1fr}}
 
-@media (max-width:900px){body.trsu.picking .panel{max-height:44dvh}body.trsu.sheet-open.picking .court-box svg#court{height:calc(56dvh - 240px)!important;min-height:230px}}
 
 .trrows{display:flex;flex-wrap:wrap;gap:6px}.trrows span{display:inline-flex;align-items:center;gap:6px;font:600 13px var(--font);border-radius:99px;padding:4px 10px;background:var(--surface-2)}
 .trrows i{font-style:normal;font-weight:800}.trrows .yes i{color:#00A79E}.trrows .mid i{color:#E08A00}.trrows .no i{color:#E2365A}
@@ -732,9 +728,12 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 
 .trread{display:grid;gap:4px;font-size:15px}.trread p{margin:0}.trread span{font:700 11px var(--font);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:6px}
 .sutog{justify-self:start;padding:6px 0}
-@media (max-width:900px){body.trmin.picking .panel{max-height:none}body.trmin.sheet-open.picking .court-box svg#court{height:calc(100dvh - 450px)!important;min-height:220px}}
 
-@media (max-width:900px){body.trmid.picking .panel{max-height:none}body.trmid.sheet-open.picking .court-box svg#court{height:calc(100dvh - 600px)!important;min-height:220px}}
 
-@media (max-width:900px){.picking .wrap{padding-bottom:46dvh}}
-@media (max-width:900px) and (max-height:740px){.picking .top{display:none}.picking .c-head{margin:0}.picking #wind-ctl svg{width:36px;height:36px}body.trmid.sheet-open.picking .court-box svg#court{height:calc(100dvh - 470px)!important;min-height:200px}}
+
+/* Train on phones: the panel sits below the court, nothing covers the court */
+@media (max-width:900px){
+  .picking .panel{position:static;margin-top:12px;padding:16px;border-radius:20px;background:var(--surface);box-shadow:none;border:1px solid var(--line)}
+  .picking .court-box svg#court{height:min(52dvh,520px)!important;min-height:300px}
+  .picking .court-card{padding-top:10px}
+}
