@@ -44,21 +44,7 @@
         <div class="tag">Learn. Play. Win.</div>
       </div>
     </div>
-    <button class="set-btn" id="set-btn" aria-expanded="false" aria-controls="settings"></button>
-    <div class="settings" id="settings">
-      <div class="tg">I play
-        <div class="seg" id="seg-side">
-          <button id="side-L" data-v="L" aria-pressed="true">Left</button>
-          <button id="side-R" data-v="R" aria-pressed="false">Right</button>
-        </div>
-      </div>
-      <div class="tg">Rules
-        <div class="seg" id="seg-rules">
-          <button id="rules-men" data-v="men" aria-pressed="true">Men's pro</button>
-          <button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; social</button>
-        </div>
-      </div>
-    </div>
+    <button class="prof-btn" id="prof-btn" aria-haspopup="dialog" aria-controls="profile"><span class="pe" id="pb-emoji" aria-hidden="true"></span><span class="pn"><b id="pb-name">Profile</b><small id="pb-level"></small></span></button>
   </header>
 
   <nav class="tabs" role="tablist">
@@ -77,9 +63,12 @@
   <div class="main">
     <section class="card-w court-card" aria-live="polite">
       <div class="score" id="score" hidden></div>
+      <div class="csit" id="csit" hidden></div>
+      <p class="vh" id="c-sr" aria-live="polite"></p>
       <div class="c-head">
         <h2 id="title">Serve</h2>
         <span class="cat" id="cat"></span>
+        <button class="lvl-chip" id="lvl-chip" hidden></button>
         <div class="wind" id="wind-ctl"><span>Wind</span><svg id="wdial" viewBox="0 0 64 64" tabindex="0" role="slider" aria-label="Wind direction. Drag or use the arrow keys" aria-valuemin="0" aria-valuemax="359"></svg><div class="seg" id="seg-wind"><button data-v="calm" aria-pressed="true">Calm</button><button data-v="breezy" aria-pressed="false">Breezy</button><button data-v="gusty" aria-pressed="false">Gusty</button></div></div>
       </div>
       <div class="court-box">
@@ -115,12 +104,7 @@
       </div>
       <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
       <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><a href="#stepbox">Details below &#8595;</a></div>
-      <div class="legend">
-        <span><i class="dot" style="background:#00C2B8;width:14px;height:14px;box-shadow:0 0 0 4px rgba(0,194,184,.3)"></i>You</span>
-        <span><i class="dot" style="background:#00C2B8"></i>Partner</span>
-        <span><i class="dot" style="background:#FF4D6D"></i>Opponents</span>
-        <span><i class="dot" style="background:#FFD23F;border:1px solid #8A6A00"></i>Ball</span>
-      </div>
+      <div class="legend" id="legend"></div>
       <section class="result" id="result" hidden>
         <div class="call" id="call">
           <span class="kicker">Your call</span>
@@ -159,6 +143,7 @@
         <span class="kicker" id="step-k"></span>
         <h3 id="step-title"></h3>
         <div class="iara"><span class="av" aria-hidden="true">G</span><div class="iara-b"><b>Coach Guto</b><p class="say" id="say"></p></div></div>
+        <p class="lvl-note" id="lvl-note" hidden></p>
         <p class="windtip" id="windtip" hidden></p>
         <div class="outro" id="outro" hidden><b>Point.</b> <span id="outro-t"></span></div>
         <ol class="zlist" id="say-list" hidden></ol>
@@ -197,10 +182,49 @@
   <div class="welcome-card">
     <span class="kicker">Welcome</span>
     <h2 id="w-title">Let's set up your court</h2>
+    <div class="pgroup"><span>Pick your player</span><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
+    <div class="pgroup"><span>Your level</span><div class="seg lv4" id="w-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div></div>
     <div class="pgroup"><span>Which side do you play?</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
-    <div class="pgroup"><span>How do you play?</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">Social</button><button data-v="men" aria-pressed="false">Men's pro rules</button></div></div>
-    <button class="btn primary" id="w-go">Start with the court guide &#8594;</button>
+    <div class="pgroup"><span>How do you play?</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">Women's &amp; mixed</button><button data-v="men" aria-pressed="false">Men's open &amp; ITF</button></div></div>
+    <button class="btn primary" id="w-go">Start learning &#8594;</button>
     <button class="btn soft" id="w-skip">Skip</button>
+  </div>
+</div>
+<div class="welcome" id="profile" hidden role="dialog" aria-modal="true" aria-labelledby="p-title">
+  <div class="welcome-card prof-card">
+    <div class="prof-head"><span class="pe big" id="p-big" aria-hidden="true"></span><div><span class="kicker">Your account</span><h2 id="p-title">Profile</h2></div><button class="px" id="p-close" aria-label="Close">&times;</button></div>
+    <div class="ptabs" role="tablist">
+      <button role="tab" id="pt-b-profile" aria-selected="true" data-p="profile">Profile</button>
+      <button role="tab" id="pt-b-password" aria-selected="false" data-p="password">Password</button>
+      <button role="tab" id="pt-b-notify" aria-selected="false" data-p="notify">Notifications</button>
+    </div>
+    <section class="psec" id="pt-profile">
+      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="What should Guto call you?"></label>
+      <div class="pgroup"><span>Your player</span><div class="emojis" id="p-emo" role="radiogroup" aria-label="Your player"></div></div>
+      <div class="pgroup"><span>Your partner</span><div class="emojis" id="p-emo2" role="radiogroup" aria-label="Your partner"></div></div>
+      <div class="pgroup"><span>Level</span><div class="seg lv4" id="seg-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div><p class="hint" id="lvl-hint"></p></div>
+      <div class="pgroup"><span>I play</span><div class="seg" id="seg-side"><button id="side-L" data-v="L" aria-pressed="true">Left</button><button id="side-R" data-v="R" aria-pressed="false">Right</button></div></div>
+      <div class="pgroup"><span>Playing hand</span><div class="seg" id="seg-hand"><button data-v="R" aria-pressed="true">Right</button><button data-v="L" aria-pressed="false">Left</button></div></div>
+      <div class="pgroup"><span>Rules</span><div class="seg" id="seg-rules"><button id="rules-men" data-v="men" aria-pressed="true">Men's open &amp; ITF</button><button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; mixed</button></div></div>
+    </section>
+    <section class="psec" id="pt-password" hidden>
+      <label class="fld"><span>Email</span><input type="email" id="pw-email" autocomplete="username"></label>
+      <label class="fld"><span>Current password</span><input type="password" id="pw-cur" autocomplete="current-password"></label>
+      <label class="fld"><span>New password</span><input type="password" id="pw-new" autocomplete="new-password" aria-describedby="pw-rule"></label>
+      <label class="fld"><span>Confirm new password</span><input type="password" id="pw-conf" autocomplete="new-password"></label>
+      <p class="hint" id="pw-rule">At least 8 characters, including a number.</p>
+      <button class="btn primary" id="pw-save">Update password</button>
+      <p class="pmsg" id="pw-msg" role="status"></p>
+    </section>
+    <section class="psec" id="pt-notify" hidden>
+      <label class="tgl"><input type="checkbox" id="n-content"><span><b>New lessons and content</b><small>New shots, drills and videos as they land</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-tips"><span><b>Weekly tip from Coach Guto</b><small>One tactic to try at your next session</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-compete"><span><b>Sand Series</b><small>New opponents and challenges</small></span></label>
+      <label class="fld"><span>Send updates to</span><input type="email" id="n-email" autocomplete="email" placeholder="you@example.com"></label>
+      <button class="btn" id="n-device">Also notify me on this device</button>
+      <p class="pmsg" id="n-msg" role="status"></p>
+    </section>
+    <button class="btn primary" id="p-done">Done</button>
   </div>
 </div>
 <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>

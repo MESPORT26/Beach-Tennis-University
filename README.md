@@ -44,3 +44,28 @@ Shots, scenarios and coaching text all live near the top of `app.js`:
 - `choose()` and `target()`: the rules behind "Which shot?".
 
 Court coordinates are in metres. x runs 0–16 with the net at 8, and your side is 0–8. y runs 0–8, with your left sideline at 0.
+- `LV`: level content for each shot (beginner, intermediate, advanced, pro). Intermediate uses the base `TIPS`. Other levels replace a list or add to it with `add`.
+- `EMOJIS`, `AVN` and `OPP_E`: the player avatars people can pick (images in the `avatars` folder), their descriptions, and the default opponents.
+- `RIVALS`: the Sand Series pairs, including each player's avatar (`e`).
+
+## Profile, password and notifications
+
+The profile (name, emoji, partner emoji, level, side, rules) and notification choices are saved in the visitor's browser.
+
+Changing a password needs real accounts. The site never stores passwords. To switch it on, add a sign in service such as Supabase Auth and define this before `app.js` loads:
+
+```html
+<script>
+window.BTU_AUTH = {
+  updatePassword: ({ email, current, next }) =>
+    supabase.auth.signInWithPassword({ email, password: current })
+      .then(r => { if (r.error) throw r.error; return supabase.auth.updateUser({ password: next }) })
+      .then(r => { if (r.error) throw r.error })
+};
+window.BTU_NOTIFY = {
+  subscribe: prefs => supabase.from('subscribers').upsert({ email: prefs.email, content: prefs.content, tips: prefs.tips, compete: prefs.compete })
+};
+</script>
+```
+
+Until then, the Password tab tells people sign in isn't switched on yet, and notification choices are kept on their device.
