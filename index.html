@@ -74,6 +74,7 @@
       <div class="court-box">
         <div class="ctimer" id="ctimer" hidden><i id="ctbar"></i></div>
         <div class="shout" id="shout" aria-hidden="true"></div>
+        <button class="btn primary retgo" id="retgo" hidden>Play your return &#8594;</button>
         <div class="hgauge" id="hgauge" hidden><svg viewBox="0 0 64 200" role="img" aria-label="Height of the ball when you hit it"><title>Contact height</title>
           <rect x="0" y="0" width="64" height="200" rx="12" fill="#0D1B2A" fill-opacity="0.88"/>
           <rect class="hb hb-high" x="6" y="22" width="52" height="54" rx="6" fill="#FF4D6D" fill-opacity="0.22"/>
@@ -191,7 +192,7 @@
         <div class="pgroup"><span>The ball comes to my</span><div class="seg" id="pk-side"><button id="pk-side-bh" data-v="bh">Backhand</button><button id="pk-side-body" data-v="body">Body</button><button id="pk-side-fh" data-v="fh">Forehand</button></div></div>
         <div class="pgroup"><span>I'm standing</span><div class="seg" id="pk-depth"><button id="pk-depth-front" data-v="front">Inside 3 m</button><button id="pk-depth-mid" data-v="mid">3–6 m</button><button id="pk-depth-back" data-v="back">6–8 m</button></div></div>
         <div class="pgroup"><span>Ball speed</span><div class="seg" id="pk-speed"><button id="pk-speed-fast" data-v="fast">Fast</button><button id="pk-speed-med" data-v="med">Medium</button><button id="pk-speed-slow" data-v="slow">Slow</button></div></div>
-        <div class="pgroup"><span>Height when I hit it</span><div class="seg" id="pk-height"><button id="pk-height-low" data-v="low">Low</button><button id="pk-height-med" data-v="med">Medium</button><button id="pk-height-high" data-v="high">High</button></div><p class="hint">Low is below the net. Medium is net to shoulder. High is overhead.</p></div>
+        <div class="pgroup"><span>Height when I hit it</span><div class="hbody"><img class="hfig" id="pk-hfig" src="poses/a01-push.webp" alt="" decoding="async"><div class="hbands" id="pk-height" role="group" aria-label="Height when I hit it"></div></div></div>
         <div class="pgroup"><span>Opponents</span><p class="hint">Drag the opponents on the court to place them.</p><b id="pk-next" hidden></b></div>
       </div>
     </aside>
