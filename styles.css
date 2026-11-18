@@ -729,3 +729,12 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .hshots{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}.hshots button{all:unset;cursor:pointer;display:grid;justify-items:center;gap:4px;min-width:64px}.hshots .si{width:44px;height:44px;border-radius:50%;display:grid;place-items:center}.hshots .si svg{width:22px;height:22px}.hshots small{font-size:11px;font-weight:600}
 .trmode button{font-size:13px;padding-left:4px;padding-right:4px}
 .aucause{grid-template-columns:1fr 1fr!important}.aucause button{font-size:14px}
+
+.trread{display:grid;gap:4px;font-size:15px}.trread p{margin:0}.trread span{font:700 11px var(--font);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-right:6px}
+.sutog{justify-self:start;padding:6px 0}
+@media (max-width:900px){body.trmin.picking .panel{max-height:none}body.trmin.sheet-open.picking .court-box svg#court{height:calc(100dvh - 450px)!important;min-height:220px}}
+
+@media (max-width:900px){body.trmid.picking .panel{max-height:none}body.trmid.sheet-open.picking .court-box svg#court{height:calc(100dvh - 600px)!important;min-height:220px}}
+
+@media (max-width:900px){.picking .wrap{padding-bottom:46dvh}}
+@media (max-width:900px) and (max-height:740px){.picking .top{display:none}.picking .c-head{margin:0}.picking #wind-ctl svg{width:36px;height:36px}body.trmid.sheet-open.picking .court-box svg#court{height:calc(100dvh - 470px)!important;min-height:200px}}
