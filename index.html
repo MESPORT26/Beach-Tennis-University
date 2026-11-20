@@ -58,7 +58,7 @@
 
   <section id="home" hidden></section>
   <section id="selector">
-    <h2 class="sec" id="sel-title">Choose a shot</h2>
+    <h2 class="sec" id="sel-title" hidden></h2>
     <nav class="list" id="list" aria-label="Choose"></nav>
     <h2 class="sec sec2" id="sel2-title" hidden></h2>
     <nav class="list" id="list2" aria-label="More" hidden></nav>
@@ -213,13 +213,12 @@
 </div>
 <div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="w-title">
   <div class="welcome-card">
-    <span class="kicker">Welcome</span>
-    <h2 id="w-title">Let's set up your court</h2>
-    <div class="pgroup"><span>Pick your player</span><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
+    <h2 id="w-title">Pick your player</h2>
+    <div class="pgroup"><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
     <div class="pgroup"><span>Your level</span><div class="seg lv4" id="w-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div></div>
-    <div class="pgroup"><span>Which side do you play?</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
-    <div class="pgroup"><span>How do you play?</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">Women's &amp; mixed</button><button data-v="men" aria-pressed="false">Men's open &amp; ITF</button></div></div>
-    <button class="btn primary" id="w-go">Start learning &#8594;</button>
+    <div class="pgroup"><span>Your side</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
+    <div class="pgroup"><span>Net height</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">1.70 m</button><button data-v="men" aria-pressed="false">1.80 m</button></div></div>
+    <button class="btn primary" id="w-go">Play &#8594;</button>
     <button class="btn soft" id="w-skip">Skip</button>
   </div>
 </div>
@@ -232,7 +231,7 @@
       <button role="tab" id="pt-b-notify" aria-selected="false" data-p="notify">Notifications</button>
     </div>
     <section class="psec" id="pt-profile">
-      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="What should Guto call you?"></label>
+      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="Your name"></label>
       <div class="pgroup"><span>Your player</span><div class="emojis" id="p-emo" role="radiogroup" aria-label="Your player"></div></div>
       <div class="pgroup"><span>Your partner</span><div class="emojis" id="p-emo2" role="radiogroup" aria-label="Your partner"></div></div>
       <div class="pgroup"><span>Level</span><div class="seg lv4" id="seg-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div><p class="hint" id="lvl-hint"></p></div>
