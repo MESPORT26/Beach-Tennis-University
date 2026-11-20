@@ -1232,7 +1232,8 @@ function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp
 function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clearAim();hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");document.body.classList.add("lobby-on");$("csit").hidden=true;$("cpanel").innerHTML="";
   ["A","B","L","R"].forEach(function(k){place(k,{A:[12.5,2.7],B:[12.5,5.3],L:[4.5,2.7],R:[4.5,5.3]}[k],true)});runBall(null)}
 var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breezy",4],["gusty",2]],breeze:[["calm",2],["breezy",4],["gusty",3]],feather:[["calm",2],["breezy",4],["gusty",3]],champs:[["calm",2],["breezy",3],["gusty",4]]};
-function startMatch(r){MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
+function startMatchLP(){LASTPT=""}
+function startMatch(r){LASTPT="";MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
   state.wind=wpick(MWIND[r.id]||[["calm",1]]);state.windA=90*Math.floor(Math.random()*4);MATCH.wind=state.wind;drawWind();renderLegend();$("selector").hidden=true;$("score").hidden=false;track("match_started",{rival:r.id});
   document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});document.body.classList.remove("lobby-on");newPoint();setTimeout(function(){if(MATCH&&MATCH.r===r)banter("hello",true)},900)}
 function leaveMatch(){fbToastOff();var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
@@ -1392,14 +1393,19 @@ function serveRisk(d,l,speed,spin){var r=0,why=[],add=function(n,t,base){if(n){r
 function svTarget(c){return [(AX[c[0]][0]+AX[c[0]][1])/2,(AY[c[1]][0]+AY[c[1]][1])/2]}
 var BALLSVG='<span class="swipecap">Swipe ball</span><span class="swipehint" aria-hidden="true">&#8593;</span><svg viewBox="-50 -50 100 100" role="img" tabindex="0" aria-label="Swipe the ball to set the spin"><defs><clipPath id="svclip"><circle r="44"/></clipPath></defs><circle r="44" fill="#DDF02B" stroke="#9C9A12" stroke-width="1.5"/><g id="sv-seam" clip-path="url(#svclip)"><path d="M0 -44C-40 -15 40 15 0 44A44 44 0 0 0 0 -44Z" fill="#FF5A1F"/><path d="M0 -44C-40 -15 40 15 0 44" fill="none" stroke="#fff" stroke-width="3"/></g><line id="sv-arrow" x1="0" y1="0" x2="0" y2="0" stroke="#0D1B2A" stroke-width="5" stroke-linecap="round" opacity="0"/></svg>';
 function hideServeUI(){document.body.classList.remove("them-pane");["cmd","svpop","svtab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in")}})}
-function cmd(t){var e=$("cmd");if(!t){e.hidden=true;return}e.textContent=t;e.hidden=false;e.classList.remove("pulse");void e.offsetWidth;e.classList.add("pulse")}
+/* Compete panel below the court: one short instruction, then the last point */
+var LASTPT="";
+function cpanelLive(pr){var c=$("cpanel");if(!c)return;c.innerHTML='<p class="cprompt big" id="cs-prompt">'+(pr||"")+'</p><div class="timer" hidden><i id="tbar"></i></div><p hidden id="sv-sum"></p><p hidden id="sh-sum"></p><div id="lastpt" class="lastpt">'+LASTPT+'</div>';wireLast()}
+function wireLast(){var w=document.querySelector("#lastpt .lp-why");if(w)w.onclick=function(){var d=$("lp-more");if(!d)return;d.hidden=!d.hidden;w.setAttribute("aria-expanded",String(!d.hidden));w.innerHTML=d.hidden?"Why? &#9662;":"Hide &#9652;"}}
+var SHORT={"Pick your shot on the left":"Pick a shot","Pick your shot":"Pick a shot","Pick a shot on the left":"Pick a shot","Flick or tap where to hit":"Aim","Tap where you move":"Move","Select your court position":"Move","Flick or tap where to serve":"Serve: flick or tap a zone","Run to the ball":"Run to the ball","Watch the ball":"Watch the ball","They serve":"Their serve","Watch your partner":"Watch your partner","Read their shot":"Watch the ball","Choose your shot":"Pick a shot"};
+function cmd(t){if(state.tab==="compete"){var cp=$("cs-prompt");if(cp&&t)cp.textContent=SHORT[t]||t}var e=$("cmd");if(!t){e.hidden=true;return}e.textContent=t;e.hidden=false;e.classList.remove("pulse");void e.offsetWidth;e.classList.add("pulse")}
 function servePhase(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);$("cpanel").classList.remove("fb");hideServeUI();hideShotUI();var m=MATCH,cur=m.cur,me=state.side,pt=me==="L"?"R":"L",form=serveForm("me");
-  gG.innerHTML="";gM.innerHTML="";clearTimeout(tagTimer);if(ballTag){ballTag.remove();ballTag=null}runBall(null);drawZones(false);
+  gG.innerHTML="";gM.innerHTML="";clearTimeout(tagTimer);if(ballTag){ballTag.remove();ballTag=null}runBall(null);drawZones(true,form[me][1]<4?"L":"R","opp");
   ["A","B","L","R"].forEach(function(k){place(k,form[k],true)});var pm={};pm[me]="serve";setPoses(pm);
   var hb=el("circle",{cx:X(form[me][0]+0.4),cy:Y(form[me][1]),r:6,fill:"#DDF02B",stroke:"#FF5A1F","stroke-width":2},gM);
   document.body.classList.add("c-live");$("csit").hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". Your serve. "+windWords()+". Choose a speed and spin, then select where to serve.";
   cur.sv={cell:null,speed:"neutral",spin:"flat",set:false};
-  var c=$("cpanel");c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">Your serve</p><p class="aimhint" id="sv-sum">Flat, neutral speed</p><p class="aimhint">'+ruleNote()+'</p>';
+  var c=$("cpanel");cpanelLive("Your serve");
   var pop=$("svpop"),tab=$("svtab"),adv=state.level==="advanced"||state.level==="pro";
   pop.innerHTML=GRAB+'<div class="svhead"><b>Your serve</b><button class="svmin" id="sv-min" aria-label="Minimise serve settings">&#8250;</button></div>'+
     (load("swiped","")?'':'<p class="svtip">Swipe the ball to choose the spin direction. Up for topspin, left or right to curve, down for backspin.</p>')+
@@ -1465,7 +1471,7 @@ function mateServe(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideS
   ["A","B","L","R"].forEach(function(k){place(k,form[k],true)});var pm={};pm[pt]="serve";setPoses(pm);drawZones(true,side,"opp",z);
   document.body.classList.add("c-live");$("csit").hidden=true;$("c-sr").textContent="Point "+(m.points+1)+". Your partner serves to zone "+z+". "+windWords()+".";
   showTag(cur.sit,form[pt],0,{hw:"SIGNAL",t2:"ZONE "+z});
-  var c=$("cpanel");c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<p class="cprompt" id="cs-prompt">Your partner serves. They signal zone '+z+'</p><p class="aimhint">'+(z===5?"Zone 5 opens the line on your side. Guard it.":"Watch the serve, then get ready.")+' '+ruleNote()+'</p>';
+  var c=$("cpanel");cpanelLive("Partner serves to zone "+z+(z===5?". Guard your line":""));
   cur.serveQ="ok";cur.serveNote="";cmd("Your partner serves to zone "+z);
   setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;var t=serveTarget(z,side),d=runBall({f:[form[pt][0]+0.3,form[pt][1]],to:t,shot:"serve"},true);
     var rk=Math.abs(t[1]-form.A[1])<Math.abs(t[1]-form.B[1])?"A":"B";cur.srcKey=rk;cur.sit[rk]=[1,t[1]<2.67?0:t[1]<5.33?1:2];
@@ -1669,7 +1675,9 @@ function fbQuick(html,btn,onPlay){fbToastOff();var cm=MATCH&&MATCH.cur,box=$("cm
     var rest=FBTICKS?FBTICKS.map(function(r){return '<em class="t'+r[1]+'">'+["&#10007;","~","&#10003;"][r[1]]+' '+r[0]+'</em>'}).join(""):"";FBTICKS=null;
   var t=document.createElement("div");t.id="fbtoast";t.className="fbtoast "+k;t.setAttribute("role","status");
   t.innerHTML='<div class="ft-txt"><b>'+hd+'</b>'+(rest?'<span class="ft-ticks">'+rest+'</span>':'')+'</div><button class="ft-why" type="button">Why?</button><i class="ft-bar"></i>';
-  box.appendChild(t);var ms=btn==="Play on"?1500:btn==="See the result"?3000:2200;t.style.setProperty("--ftms",ms+"ms");$("c-sr").textContent=t.textContent.slice(0,300);
+  box.appendChild(t);var ms=btn==="Play on"?2200:btn==="See the result"?3400:3000;
+  var parts=html.split("<!--more-->");LASTPT='<div class="lp '+k+'"><div class="lp-top"><b>'+hd+'</b>'+(rest?'<span class="ft-ticks">'+rest+'</span>':'')+'</div><div class="lp-best">'+parts[0].replace(/<div class="ptres[\s\S]*?<\/div>/,"")+'</div>'+(parts[1]?'<button class="lnk lp-why" type="button" aria-expanded="false">Why? &#9662;</button><div id="lp-more" class="lp-more" hidden>'+parts[1]+'</div>':'')+'</div>';
+  var lp=$("lastpt");if(lp){lp.innerHTML=LASTPT;wireLast()}var cp=$("cs-prompt");if(cp)cp.textContent="";t.style.setProperty("--ftms",ms+"ms");$("c-sr").textContent=t.textContent.slice(0,300);
   var go=function(){fbToastOff();if(!MATCH||MATCH.cur!==cm||state.tab!=="compete")return;onPlay()};
   FBT=setTimeout(go,ms);t.querySelector(".ft-why").onclick=function(){fbToastOff();fbFull(html,btn,onPlay)}}
 function fbShow(html,btn,onPlay){if(state.tab==="compete"&&MATCH){hideShotUI();cmd("");stopBar();fbQuick(html,btn,onPlay);return}fbFull(html,btn,onPlay)}
@@ -1710,7 +1718,7 @@ function playOn(over){if(!MATCH)return;if(over)endMatch();else newPoint()}
 function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=m.cur,MT=cur.mate;c.classList.remove("fb");
   document.body.classList.add("c-live");$("csit").hidden=true;setWindBadge();
   $("c-sr").textContent="Point "+(m.points+1)+". "+windWords()+". "+(MT?"The ball goes to your partner.":describe(cur.sit));
-  c.innerHTML='<span class="kicker">Point '+(m.points+1)+'</span>'+windChip()+'<div class="timer"><i id="tbar"></i></div><p class="cprompt" id="cs-prompt">'+(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Read the ball")+'</p><p class="aimhint" id="sh-sum"></p>';
+  cpanelLive(MT?"Watch your partner":cur.srv==="opp"?"Their serve":"Watch the ball");
   cur.pick={speed:"neutral",spin:"flat"};var p=cur.pick;cmd(MT?"Watch your partner":cur.srv==="opp"?"They serve":"Watch the ball");
   var sp0=sitPos(cur.sit);cur.from=sp0.pos[state.side];cur.start=cur.from.slice();if(cur.unreach&&!cur.flight){cmd("");return}
   var gs=52*PS,gh=el("g",{transform:"translate("+X(cur.from[0])+" "+Y(cur.from[1])+")"+(PORT?" rotate(90)":""),opacity:0.3},gM);el("image",{href:avSrc(state.emoji),x:-gs/2,y:-gs/2,width:gs,height:gs},gh);cur.ghost=gh;
@@ -1739,7 +1747,7 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
       else{cur.start=pos;cmd("Closer. Get to the ball")}}
     cur.runTo=runTo;
     function showPane(w){if(w==="ret"&&!cur.atBall){runPhase();return}if(w==="ret"&&!cur.done)shotRail(p.shot,function(id){var lb=list.querySelector('[data-v="'+id+'"]');if(lb)lb.click();next()});document.body.classList.toggle("them-pane",w==="them");$("pane-them").hidden=w!=="them";$("pane-ret").hidden=w!=="ret";[].forEach.call($("pt-sw").children,function(b){b.setAttribute("aria-pressed",String(b.dataset.p===w))});
-      if(w==="ret"){cmd("Pick your shot on the left");next();$("cs-prompt").textContent="Your shot";if(!started){started=true;startClock(0)}}else cmd("Read their shot")}
+      if(w==="ret"){cmd("Pick your shot on the left");next();$("cs-prompt").textContent="Pick a shot";if(!started){started=true;startClock(0)}}else cmd("Read their shot")}
     [].forEach.call($("pt-sw").children,function(b){b.onclick=function(){showPane(b.dataset.p)}});$("pt-go").onclick=function(){showPane("ret")};
     var list=$("sh-list");VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=document.createElement("button"),ic=ICON[id];b.dataset.v=id;b.setAttribute("aria-pressed","false");
       b.innerHTML='<span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span>';
@@ -2018,7 +2026,7 @@ var TR=null;
 function shuf(a){a=a.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1)),t=a[i];a[i]=a[j];a[j]=t}return a}
 var TRMODE=load("tr-mode","quiz");
 function trainOpen(){document.body.classList.remove("sheet-open");document.body.classList.remove("trsu");if(TRMODE==="setup"){setupOpen();return}if(TRMODE==="replay"){autoOpen();return}if(!TR||TR.done)trainStart();else trainScene(true)}
-function modeSeg(){return '<div class="seg trmode" id="tr-mode"><button data-v="quiz" aria-pressed="'+(TRMODE==="quiz")+'">What next?</button><button data-v="setup" aria-pressed="'+(TRMODE==="setup")+'">Set up</button><button data-v="replay" aria-pressed="'+(TRMODE==="replay")+'">Replay</button></div>'}
+function modeSeg(){return '<div class="seg trmode" id="tr-mode"><button data-v="quiz" aria-pressed="'+(TRMODE==="quiz")+'">Quiz</button><button data-v="setup" aria-pressed="'+(TRMODE==="setup")+'">Ask the coach</button><button data-v="replay" aria-pressed="'+(TRMODE==="replay")+'">Lost points</button></div>'}
 function wireMode(t){[].forEach.call(t.querySelectorAll("#tr-mode button"),function(b){b.onclick=function(){if(TRMODE===b.dataset.v)return;TRMODE=b.dataset.v;save("tr-mode",TRMODE);track("train_mode",{mode:TRMODE});trainOpen()}})}
 function trainStart(){TR={set:shuf(PRESETS.map(function(_,i){return i})).slice(0,5),i:0,res:[],done:false};trainScene()}
 function rr(a,b){return a+Math.random()*(b-a)}
@@ -2217,10 +2225,10 @@ function renderHome(){var h=$("home"),bt=beaten(),nx=0;for(var j=0;j<RIVALS.leng
   h.innerHTML='<div class="hhero"><div class="hh-top"><span>'+(nm||"")+'</span><span class="hdots" aria-label="'+won+' of 5 pairs beaten">'+RIVALS.map(function(x){return '<i class="'+(bt[x.id]?"on":"")+'"></i>'}).join("")+'</span></div>'+
     '<div class="hh-vs"><span class="rav big">'+avImg(state.emoji)+avImg(state.mate)+'</span><b>vs</b><span class="rav big">'+avImg(rAv(r,0))+avImg(rAv(r,1))+'</span></div>'+
     '<h2>'+r.pair+'</h2><button class="btn hbtn" id="h-play">Play</button></div>'+
-    '<div class="hgrid'+(L?'':' three')+'"><button class="hcard" id="h-calls"><b>What next?</b><small>'+(best?"Best "+best+"/5":"5 today")+'</small></button>'+
-    '<button class="hcard" id="h-learn"><b>'+sh.name+'</b><small>Continue</small></button>'+
-    (L?'<button class="hcard" id="h-replay"><b>Replay</b><small>'+L+' lost</small></button>':'')+
-    '<button class="hcard" id="h-setup"><b>Set up</b><small>Any situation</small></button></div>'+
+    '<div class="hgrid'+(L?'':' three')+'"><button class="hcard" id="h-calls"><b>Shot quiz</b><small>'+(best?"Pick the best shot · best "+best+"/5":"Pick the best shot")+'</small></button>'+
+    '<button class="hcard" id="h-learn"><b>Learn the '+sh.name.toLowerCase()+'</b><small>When and how to play it</small></button>'+
+    (L?'<button class="hcard" id="h-replay"><b>Your lost points</b><small>See what went wrong · '+L+'</small></button>':'')+
+    '<button class="hcard" id="h-setup"><b>Ask the coach</b><small>Set a situation, get the best shot</small></button></div>'+
     '';
   $("h-play").onclick=function(){setTab("compete");startMatch(r)};
   $("h-calls").onclick=function(){TRMODE="quiz";save("tr-mode","quiz");TR=null;setTab("pick")};
