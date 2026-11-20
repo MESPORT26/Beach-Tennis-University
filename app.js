@@ -1,3 +1,4 @@
+
 /* Court geometry in metres: x 0..16 (net at 8, your side 0..8), y 0..8 (your left side at the top). */
 var NS="http://www.w3.org/2000/svg";
 function X(m){return 60+m*40}
@@ -901,7 +902,7 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
     timer=setTimeout(function(){if(!state.playing)return;if(state.step>=stepsOf().length-1){stop();return}state.step++;go()},d+2600)};go()}
 
 /* ---------------- Controls ---------------- */
-function setTab(t){stop();document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="play")t="shots";if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
+function setTab(t){stop();railOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="play")t="shots";if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
   ["home","shots","pick","compete"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
   var home=t==="home";document.body.classList.toggle("homing",home);$("home").hidden=!home;if(home){$("trtray").hidden=true;document.body.classList.remove("sheet-open","trsu","picking","competing","c-live");hideShotUI();hideServeUI();renderHome();return}
   var pick=t==="pick",comp=t==="compete";$("picker").hidden=!pick;$("ctrls").hidden=pick||comp;$("stepbox").hidden=pick||comp;$("result").hidden=!pick;
@@ -1207,6 +1208,11 @@ function renderLobby(list){var bt=beaten(),w=document.createElement("div");w.cla
   [].forEach.call(w.querySelectorAll(".rung"),function(r){var i=+r.dataset.i;r.querySelector(".rhead").onclick=function(){if(!rivalOpen(i)){r.classList.remove("shake");void r.offsetWidth;r.classList.add("shake");toast("Beat "+RIVALS[i-1].pair+" first.");return}lobSel=i;renderList()}});
   var pb=w.querySelector("[data-play]");if(pb)pb.onclick=function(){startMatch(RIVALS[+pb.dataset.play])}}
 function toast(t){var e=$("toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.classList.remove("go");void e.offsetWidth;e.classList.add("go")}
+/* Floating shot buttons on the left of the court, only when it is time to play */
+function shotRail(sel,onPick){var box=document.querySelector(".court-box");if(!box)return;var r=$("shotrail");if(!r){r=document.createElement("div");r.id="shotrail";r.className="shotrail";r.setAttribute("role","group");r.setAttribute("aria-label","Your shot");box.appendChild(r)}
+  r.innerHTML=VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(sel===id)+'" aria-label="'+SHOTS[id].name+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><small>'+SHOTS[id].name.replace(" ball","").replace(" shot","")+'</small></button>'}).join("");
+  r.hidden=false;document.body.classList.add("railon");[].forEach.call(r.children,function(b){b.onclick=function(e){e.stopPropagation();[].forEach.call(r.children,function(x){x.setAttribute("aria-pressed",String(x===b))});onPick(b.dataset.v)}})}
+function railOff(){var r=$("shotrail");if(r)r.hidden=true;document.body.classList.remove("railon")}
 /* Speech bubbles over the players on court */
 function bubble(k,text,cls,ms){var box=document.querySelector(".court-box"),pl=PL[k];if(!box||!pl)return;
   var b=document.createElement("div");b.className="cbub "+(cls||"");b.textContent=text;box.appendChild(b);
@@ -1396,8 +1402,8 @@ function servePhase(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);$("c
   function openPop(){tab.hidden=true;pop.hidden=false;pop.classList.remove("min");void pop.offsetWidth;pop.classList.add("in");sheetState();wireGrab(pop,tab,"Serve");cmd("Set your speed and spin")}
   function minPop(){if(pop.hidden)return;setTimeout(sheetState,320);pop.classList.remove("in");pop.classList.add("min");setTimeout(function(){if(pop.classList.contains("min")){pop.hidden=true;pop.classList.remove("min")}},300);tab.hidden=false;summary();if(!cur.served)cmd("Select where to serve")}
   tab.onclick=function(){if(cur.served)return;openPop()};$("sv-min").onclick=minPop;$("sv-done").onclick=minPop;
-  setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.served)return;openPop()},1000);cmd("Your serve");
-  drawAim(function(cell){if(cur.served)return;cur.sv.cell=cell;doServe(false)},null);
+  cmd("Flick or tap where to serve");
+  cur.serveCell=function(cell){if(cur.served)return;cur.sv.cell=cell;doServe(false)};drawAim(cur.serveCell,null);
   [].forEach.call($("sv-spd").children,function(b){b.onclick=function(){cur.sv.speed=b.dataset.v;[].forEach.call($("sv-spd").children,function(x){x.setAttribute("aria-pressed",String(x===b))});svRate();summary()}});
   var autoMin=null;function setSpin(v,fromUser){cur.sv.spin=v;$("sv-lbl").textContent=SPIN_LBL[v];[].forEach.call($("sv-spin").children,function(x){x.setAttribute("aria-pressed",String(x.dataset.v===v))});svRate();summary();
     if(fromUser){clearTimeout(autoMin);autoMin=setTimeout(minPop,700)}}
@@ -1489,7 +1495,7 @@ function drawPoint(smooth){var m=MATCH,sit=m.cur.sit,sp=sitPos(sit),osv=m.cur.sr
   var st=sp.pos[state.side],ct=sp.contact,dd=dst(st,ct),back=ct[0]<st[0]-1,tPhys=osv?9:(TIN[sit.shot||oppPose(sit)]||{fast:.45,med:1,slow:1.6}[sit.speed]),
     need=0.3+Math.max(0,dd-1.1)/(4.2*(back?0.6:1));cur.runNeed=need;cur.runT=tPhys;cur.unreach=!osv&&need>tPhys+0.25;
   if(cur.unreach)setTimeout(function(){if(MATCH&&MATCH.cur===cur&&!cur.done){cmd("Too far");dropBall(cur,800,function(){sandLoss(cur,"far",true)})}},d+500);
-  else if(dd>0.5){cur.spot=el("circle",{cx:X(ct[0]),cy:Y(ct[1]),r:22,fill:"#FFD23F","fill-opacity":0.25,stroke:"#0D1B2A","stroke-width":2.5,"stroke-dasharray":"5 4","class":"ballspot","pointer-events":"none"},gM)}
+  else if(dd>0.5&&cur.flight){cur.spot=el("circle",{cx:X(ct[0]),cy:Y(ct[1]),r:22,fill:"#FFD23F","fill-opacity":0.25,stroke:"#0D1B2A","stroke-width":2.5,"stroke-dasharray":"5 4","class":"ballspot","pointer-events":"none"},gM)}
   else cur.atBall=true;
   return d}
 /* The ball falls towards its shadow. Get there before it lands */
@@ -1541,7 +1547,7 @@ function stopBar(){clearTimeout(hurryT);var ct=$("ctimer");if(ct)ct.classList.re
 function setWindBadge(){var w=$("cwind"),bn=$("banter");if(bn)bn.innerHTML=state.wind==="calm"?"":'<p>Wind: '+windWords().replace(/^(Breezy|Gusty) /,function(x){return x}).toLowerCase()+'</p>';if(state.wind==="calm"){w.hidden=true;return}w.hidden=false;w.className="cwind w-"+state.wind;w.textContent={breezy:"Breezy",gusty:"Gusty"}[state.wind]+" · "+windWords().replace(/^(Breezy|Gusty) /,"").replace(/^wind /,"")}
 /* Collapsible overlay boxes */
 var GRAB='<button class="grab" aria-label="Resize panel"><i></i></button>';
-function sheetState(){var any=["svpop","fbpop","trsit","trball"].some(function(i){var e=$(i);return e&&!e.hidden&&!e.classList.contains("min")});document.body.classList.toggle("sheet-open",any);
+function sheetState(){var any=["svpop","fbpop","trsit","trball"].some(function(i){if(i==="svpop"&&state.tab==="compete")return false;var e=$(i);return e&&!e.hidden&&!e.classList.contains("min")});document.body.classList.toggle("sheet-open",any);
   var mob=innerWidth<=900,tr=state.tab==="pick"&&mob;document.body.classList.toggle("sheet-pad",tr&&any);
   if(tr&&any){var cb=document.querySelector(".court-box"),off=8;setTimeout(function(){var y=cb.getBoundingClientRect().top+scrollY-off;window.scrollTo({top:Math.max(0,y),behavior:RM?"auto":"smooth"})},60)}}
 function popOpen(pop,tab){tab.hidden=true;pop.hidden=false;pop.classList.remove("min");void pop.offsetWidth;pop.classList.add("in");sheetState();
@@ -1670,7 +1676,7 @@ function trainUI(){var sit=$("trsit"),bal=$("trball"),st=$("trsit-tab"),bt=$("tr
   st.innerHTML='<span aria-hidden="true">&#8249;</span><small>Set up</small>';st.hidden=false;
   cmd("Pick a situation or a shot");
   setTimeout(function(){if(state.tab==="pick"&&!PK.revealed&&sit.hidden&&bal.hidden){popOpen(sit,st)}},1000)}
-function hideShotUI(){var rg=$("retgo");if(rg)rg.hidden=true;["svpop","svtab","fbpop","fbtab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in","full")}});sheetState()}
+function hideShotUI(){railOff();var rg=$("retgo");if(rg)rg.hidden=true;["svpop","svtab","fbpop","fbtab"].forEach(function(i){var e=$(i);if(e){e.hidden=true;e.classList.remove("min","in","full")}});sheetState()}
 function fbSec(h,t){return '<div class="fbsec"><b>'+h+'</b><p>'+t+'</p></div>'}
 function playOn(over){if(!MATCH)return;if(over)endMatch();else newPoint()}
 function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=m.cur,MT=cur.mate;c.classList.remove("fb");
@@ -1705,8 +1711,8 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
           cur.trail.setAttribute("x1",X(hit[0]));cur.trail.setAttribute("y1",Y(hit[1]));cur.trail.setAttribute("x2",X(hit[0]));cur.trail.setAttribute("y2",Y(hit[1]));if(cur.spot)cur.spot.remove();sfx("reach");popOpen(pop,tab);showPane("ret")},ms)}
       else{cur.start=pos;cmd("Closer. Get to the ball")}}
     cur.runTo=runTo;
-    function showPane(w){if(w==="ret"&&!cur.atBall){runPhase();return}document.body.classList.toggle("them-pane",w==="them");$("pane-them").hidden=w!=="them";$("pane-ret").hidden=w!=="ret";[].forEach.call($("pt-sw").children,function(b){b.setAttribute("aria-pressed",String(b.dataset.p===w))});
-      if(w==="ret"){cmd("Choose your shot");$("cs-prompt").textContent="Your shot";if(!started){started=true;startClock(0)}}else cmd("Read their shot")}
+    function showPane(w){if(w==="ret"&&!cur.atBall){runPhase();return}if(w==="ret"&&!cur.done)shotRail(p.shot,function(id){var lb=list.querySelector('[data-v="'+id+'"]');if(lb)lb.click();if(!p.cell)cmd("Flick or tap where to hit")});document.body.classList.toggle("them-pane",w==="them");$("pane-them").hidden=w!=="them";$("pane-ret").hidden=w!=="ret";[].forEach.call($("pt-sw").children,function(b){b.setAttribute("aria-pressed",String(b.dataset.p===w))});
+      if(w==="ret"){cmd("Pick your shot on the left");$("cs-prompt").textContent="Your shot";if(!started){started=true;startClock(0)}}else cmd("Read their shot")}
     [].forEach.call($("pt-sw").children,function(b){b.onclick=function(){showPane(b.dataset.p)}});$("pt-go").onclick=function(){showPane("ret")};
     var list=$("sh-list");VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=document.createElement("button"),ic=ICON[id];b.dataset.v=id;b.setAttribute("aria-pressed","false");
       b.innerHTML='<span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span>';
@@ -1714,7 +1720,7 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
     function sum(){var t=(p.shot?SHOTS[p.shot].name:"No shot yet")+", "+SPD_L[p.speed].toLowerCase()+", "+SPIN_LBL[p.spin].toLowerCase();$("sh-sum").textContent=t}
     function label(){return (p.shot?SHOTS[p.shot].name:"Shot")+"<br>"+SPD_L[p.speed]}
     function close(){popMin(pop,tab,label());next()}
-    function next(){if(cur.done)return;cmd(!p.shot?"Choose your shot":!p.cell?"Select where to hit":!p.move?"Select your court position":"")}
+    function next(){if(cur.done)return;cmd(!p.shot?"Pick your shot":!p.cell?"Flick or tap where to hit":!p.move?"Tap where you move":"")}
     var autoMin=null;function later(ms){clearTimeout(autoMin);if(p.shot)autoMin=setTimeout(close,ms||700)}
     tab.onclick=function(){if(cur.done)return;popOpen(pop,tab);cmd("Choose your shot")};$("sh-min").onclick=close;$("sh-done").onclick=close;
     [].forEach.call($("sv-spd").children,function(b){b.onclick=function(){p.speed=b.dataset.v;[].forEach.call($("sv-spd").children,function(x){x.setAttribute("aria-pressed",String(x===b))});rateFn();sum();if(p.shot)later(2500)}});
@@ -1730,12 +1736,13 @@ function decidePanel(){hideServeUI();hideShotUI();var m=MATCH,c=$("cpanel"),cur=
     svg.addEventListener("pointerup",function(){if(!start)return;start=null;arrow.setAttribute("opacity",0);if(dir){setSpin(dir,true);save("swiped","1");document.body.classList.add("swiped")}});
     svg.addEventListener("keydown",function(e){var k={ArrowUp:"top",ArrowLeft:"left",ArrowRight:"right",ArrowDown:"slice"}[e.key];if(k){e.preventDefault();setSpin(k,true)}});
     sum();
-    drawAim(function(cell){if(cur.done)return;if(!p.shot){cmd("Choose a shot first");popOpen(pop,tab);return}p.cell=cell;markAim(cell);ripple(cell[0],cell[1]);buzz(10);
-      if(cur.aimLine)cur.aimLine.remove();var tc=svTarget(cell),sc=cur.from;cur.aimLine=el("line",{x1:X(sc[0]),y1:Y(sc[1]),x2:X(tc[0]),y2:Y(tc[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"2 6","stroke-linecap":"round","pointer-events":"none"},gM);if(!pop.hidden)popMin(pop,tab,label());next()},
-      function(pos){if(cur.done)return;if(!cur.atBall){runTo(pos);return}if(!p.shot||!p.cell){next();if(!p.shot)popOpen(pop,tab);return}moveTo(pos)});
+    cur.pickCell=function(cell){if(cur.done)return;if(!p.shot){cmd("Pick a shot on the left");return}p.cell=cell;markAim(cell);ripple(cell[0],cell[1]);buzz(10);
+      if(cur.aimLine)cur.aimLine.remove();var tc=svTarget(cell),sc=cur.from;cur.aimLine=el("line",{x1:X(sc[0]),y1:Y(sc[1]),x2:X(tc[0]),y2:Y(tc[1]),stroke:"#0D1B2A","stroke-opacity":0.5,"stroke-width":2.5,"stroke-dasharray":"2 6","stroke-linecap":"round","pointer-events":"none"},gM);if(!pop.hidden)popMin(pop,tab,label());next()};
+    drawAim(cur.pickCell,
+      function(pos){if(cur.done)return;if(!cur.atBall){runTo(pos);return}if(!p.shot||!p.cell){next();return}moveTo(pos)});
     var rg=$("retgo");rg.hidden=true;rg.onclick=function(){if(cur.done)return;rg.hidden=true;if(!cur.atBall){runPhase();return}popOpen(pop,tab);showPane("ret")};
-    setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.done)return;cmd("Read their shot");$("cs-prompt").textContent="Read their shot"},wait);
-    setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.done)return;rg.hidden=false;try{rg.focus({preventScroll:true})}catch(x){}},wait+900);
+    setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.done||started)return;cmd("Read their shot");$("cs-prompt").textContent="Read their shot"},wait);
+    setTimeout(function(){if(!MATCH||MATCH.cur!==cur||cur.done||started)return;rg.hidden=false;try{rg.focus({preventScroll:true})}catch(x){}},wait+900);
     return}
   startClock(wait)}
 function startClock(wait){var m=MATCH;if(!m||!m.cur)return;var secs=decideSecs(m.r);startBar(secs,wait);
@@ -2024,13 +2031,14 @@ function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;d
     t.innerHTML=modeSeg()+trProg()+'<div class="trend"><b>'+sc+'/5</b><small>Best '+best+'/5</small></div><div class="trbtns"><button class="btn primary big" id="tr-again">Again</button><button class="btn soft" id="tr-comp">Compete</button></div>';
     $("tr-again").onclick=trainStart;$("tr-comp").onclick=function(){setTab("compete")};return}
   var mini=/target|move/.test(TR.step),h=(mini?'':modeSeg())+trProg()+(mini?'':TR.step==="verdict"?'<p class="trk">'+(TR.sit.label||pr.name)+(state.wind!=="calm"?' · '+windWords():'')+'</p>':'<p class="trk">Read the court</p>');if(mini)h=trProg();
-  if(TR.step==="read")h+=readHtml(TR.sit)+'<button class="btn primary big" id="tr-go">Choose your shot &#8593;</button>';
-  else if(TR.step==="target")h+='<p class="trsub">'+SHOTS[TR.pick.shot].name+' · '+SPD_L[TR.pick.speed]+' · '+SPIN_LBL[TR.pick.spin]+' <button class="lnk" id="tr-back">Change</button></p><h3 class="trq">Flick it to the target</h3><p class="trk suhint">Flick from you, or tap a square. Fast = pace, curve = spin, pull back = backspin.</p>';
-  if(TR.step==="shot")h+='<h3 class="trq">What next?</h3>'+readHtml(TR.sit)+'<div class="trchips t7">'+VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(TR.pick.shot===id)+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span></button>'}).join("")+'</div>'+
+  if(TR.step==="read")h+=readHtml(TR.sit)+'<p class="trk suhint">Pick your shot on the left of the court.</p>';
+  else if(TR.step==="target")h+='<p class="trsub">'+SHOTS[TR.pick.shot].name+' <button class="lnk" id="tr-back">Change</button></p><h3 class="trq">Flick it to the target</h3><p class="trk suhint">Flick from you, or tap a square. Fast = pace, curve = spin, pull back = backspin.</p>';
+  if(TR.step==="shot")h+='<div class="trchips t7">'+VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(TR.pick.shot===id)+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><span>'+SHOTS[id].name+'</span></button>'}).join("")+'</div>'+
     '<div class="trss"><div class="seg" id="tr-spd">'+["slow","neutral","fast"].map(function(v){return '<button data-v="'+v+'" aria-pressed="'+(TR.pick.speed===v)+'">'+SPD_L[v]+'</button>'}).join("")+'</div><div class="trball">'+BALLSVG.replace(/id="sv-seam"/,'class="tr-seam"').replace(/id="sv-arrow"/,'class="tr-arrow"').replace(/svclip/g,"trclip")+'<span class="trspin">'+SPIN_LBL[TR.pick.spin]+'</span></div></div>';
   else if(TR.step==="move")h+='<p class="trsub">'+SHOTS[TR.pick.shot].name+' · '+SPD_L[TR.pick.speed]+' · '+SPIN_LBL[TR.pick.spin]+' · '+cellName5(TR.pick.cell).toLowerCase()+'</p><h3 class="trq">Then where do you go?</h3><div class="trmoves">'+MOVES.map(function(m){return '<button data-v="'+m[0]+'">'+m[1]+'</button>'}).join("")+'</div>';
   else if(TR.step==="verdict"){var v=TR.v;h+='<h3 class="trq '+v.cls+'">'+v.head+'</h3><div class="trrows">'+v.rows.map(function(r){return '<span class="'+["no","mid","yes"][r[1]]+'"><i>'+["&#10007;","~","&#10003;"][r[1]]+'</i>'+r[0]+'</span>'}).join("")+'</div><p class="trline">'+v.line+'</p><details class="more"><summary>Why?</summary><div class="morein">'+v.more+'</div></details><button class="btn primary big" id="tr-next">'+(TR.i<TR.set.length-1?"Next":"See score")+'</button>'}
   t.innerHTML=h;
+  if(!TR.done&&/read|target/.test(TR.step))shotRail(TR.pick.shot,function(id){TR.pick.shot=id;sfx("pick",{shot:id});var first=TR.step==="read";TR.step="target";if(first)trainAimOn();trainTray()});else railOff();
   [].forEach.call(t.querySelectorAll(".trchips button"),function(b){b.onclick=function(){TR.pick.shot=b.dataset.v;sfx("pick",{shot:b.dataset.v});[].forEach.call(t.querySelectorAll(".trchips button"),function(x){x.setAttribute("aria-pressed",String(x===b))});if(TR.step==="shot"){TR.step="target";trainAimOn();trainTray();setTimeout(function(){trScroll("court")},60)}}});
   if($("tr-go"))$("tr-go").onclick=function(){TR.step="shot";trainTray();setTimeout(function(){trScroll("tray")},60)};
   [].forEach.call(t.querySelectorAll("#tr-spd button"),function(b){b.onclick=function(){TR.pick.speed=b.dataset.v;[].forEach.call(t.querySelectorAll("#tr-spd button"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});
@@ -2041,7 +2049,7 @@ function trainTray(){var t=$("trtray"),pr=PRESETS[TR.set[TR.i]];t.hidden=false;d
     bs.addEventListener("pointerup",function(){st0=null;ar.setAttribute("opacity",0)});
     bs.addEventListener("keydown",function(e){var k={ArrowUp:"top",ArrowLeft:"left",ArrowRight:"right",ArrowDown:"slice",Enter:"flat"}[e.key];if(k){e.preventDefault();setS(k)}})}
   [].forEach.call(t.querySelectorAll(".trmoves button"),function(b){b.onclick=function(){trainMove(b.dataset.v)}});
-  if($("tr-back"))$("tr-back").onclick=function(){TR.step="shot";TR.pick.shot=null;clearAim();trainTray()};
+  if($("tr-back"))$("tr-back").onclick=function(){TR.step="read";TR.pick.shot=null;clearAim();trainTray()};
   if($("tr-next"))$("tr-next").onclick=function(){if(TR.i<TR.set.length-1){TR.i++;trainScene()}else{TR.done=true;gM.innerHTML="";clearAim();trainTray()}}}
 function trainAimOn(){drawAim(function(cell){if(TR.step!=="target"||!TR.pick.shot)return;TR.pick.cell=cell;ripple(cell[0],cell[1]);buzz(10);TR.step="move";trainMoveOn();trainTray()},null)}
 function trMovePos(mv){var c=TR.sp.contact;return [Math.max(0.6,Math.min(7.4,c[0]-0.3+{in:1.4,hold:0,back:-1.2}[mv])),TR.sp.pos[state.side][1]]}
@@ -2117,7 +2125,13 @@ function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.c
 /* Flick to hit (Train). Flick from you to where you want it. Where you let go is the target, how fast you flick is the pace,
    a curve in the flick is side spin, pulling back at the end is backspin, a fast straight flick is topspin. A tap on a square still works */
 (function(){var pts=null,path=null;
-  function live(){return state.tab==="pick"&&TRMODE==="quiz"&&TR&&!TR.done&&TR.step==="target"&&TR.pick.shot}
+  function mode(){if(state.tab==="pick"&&TRMODE==="quiz"&&TR&&!TR.done&&TR.step==="target"&&TR.pick.shot)return "train";var c=MATCH&&MATCH.cur;
+    if(state.tab==="compete"&&c&&!c.done){if(c.srv==="me"&&c.sv&&!c.served&&c.serveCell)return "serve";if(c.atBall&&c.pick&&c.pick.shot&&!c.pick.cell&&c.pickCell)return "ret"}return null}
+  function live(){return !!mode()}
+  function apply(cell,speed,spin){var m=mode();if(!m)return;sfx("aim",{d:cell[0]});
+    if(m==="train"){if(speed){TR.pick.speed=speed;TR.pick.spin=spin;TR.pick.flick=true}TR.pick.cell=cell;markAim(cell);ripple(cell[0],cell[1]);TR.step="move";railOff();trainMoveOn();trainTray()}
+    else if(m==="serve"){var c=MATCH.cur;if(speed){c.sv.speed=speed;c.sv.spin=spin}c.serveCell(cell)}
+    else{var c2=MATCH.cur;if(speed){c2.pick.speed=speed;c2.pick.spin=spin}c2.pickCell(cell)}}
   function cm(e){var pt=SVGC.createSVGPoint();pt.x=e.clientX;pt.y=e.clientY;var q=pt.matrixTransform(WORLD.getScreenCTM().inverse());return [(q.x-60)/40,(q.y-40)/40]}
   SVGC.addEventListener("pointerdown",function(e){if(!live())return;pts=[{c:cm(e),x:e.clientX,y:e.clientY,t:performance.now()}];if(path)path.remove();
     path=el("polyline",{fill:"none",stroke:"#FF4D6D","stroke-width":5,"stroke-linecap":"round","stroke-linejoin":"round","stroke-opacity":0.75,"pointer-events":"none"},gM)});
@@ -2127,7 +2141,7 @@ function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.c
   function end(){if(!pts)return;var P=pts;pts=null;var a=P[0],z=P[P.length-1],len=Math.hypot(z.x-a.x,z.y-a.y);
     if(len<24||!live()){if(path){path.remove();path=null}
       /* a tap on their half picks that square with the speed and spin you set */
-      if(live()&&z.c[0]>8.2){var tc=[z.c[0]<11?0:z.c[0]<14?1:2,Math.max(0,Math.min(4,Math.floor(z.c[1]/1.6)))];TR.pick.cell=tc;markAim(tc);ripple(tc[0],tc[1]);sfx("aim",{d:tc[0]});TR.step="move";trainMoveOn();trainTray()}
+      if(live()&&z.c[0]>8.2)apply([z.c[0]<11?0:z.c[0]<14?1:2,Math.max(0,Math.min(4,Math.floor(z.c[1]/1.6)))]);
       return}
     var x=z.c[0],y=z.c[1];if(x<8.2){if(path){path.remove();path=null}toast("Flick it over the net");return}
     var cell=[x<11?0:x<14?1:2,Math.max(0,Math.min(4,Math.floor(y/1.6)))],
@@ -2137,8 +2151,7 @@ function setupTray(a,bs,mv,sit){var t=$("trtray");t.hidden=false;document.body.c
     P.forEach(function(p){var d=((p.c[0]-a.c[0])*dy-(p.c[1]-a.c[1])*dx)/L;if(Math.abs(d)>Math.abs(dev))dev=d});
     var back=false;if(P.length>6){var q=P[P.length-4],r=P[P.length-1];back=((r.c[0]-q.c[0])*dx+(r.c[1]-q.c[1])*dy)<-0.05*L}
     var spin=back?"slice":Math.abs(dev)/L>0.12?(dev>0?"left":"right"):speed==="fast"?"top":"flat";
-    TR.pick.speed=speed;TR.pick.spin=spin;TR.pick.cell=cell;TR.pick.flick=true;markAim(cell);ripple(cell[0],cell[1]);sfx("aim",{d:cell[0]});
-    setTimeout(function(){if(path){path.remove();path=null}},500);TR.step="move";trainMoveOn();trainTray()}
+    setTimeout(function(){if(path){path.remove();path=null}},500);apply(cell,speed,spin)}
   SVGC.addEventListener("touchstart",function(e){if(live())e.preventDefault()},{passive:false});SVGC.addEventListener("touchmove",function(e){if(live())e.preventDefault()},{passive:false});
   SVGC.addEventListener("pointerup",end);SVGC.addEventListener("pointercancel",function(){pts=null;if(path){path.remove();path=null}})})();
 
