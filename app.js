@@ -902,7 +902,7 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
     timer=setTimeout(function(){if(!state.playing)return;if(state.step>=stepsOf().length-1){stop();return}state.step++;go()},d+2600)};go()}
 
 /* ---------------- Controls ---------------- */
-function setTab(t){stop();railOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="play")t="shots";if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
+function setTab(t){stop();railOff();if(typeof fbToastOff==="function")fbToastOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="play")t="shots";if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
   ["home","shots","pick","compete"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
   var home=t==="home";document.body.classList.toggle("homing",home);$("home").hidden=!home;if(home){$("trtray").hidden=true;document.body.classList.remove("sheet-open","trsu","picking","competing","c-live");hideShotUI();hideServeUI();renderHome();return}
   var pick=t==="pick",comp=t==="compete";$("picker").hidden=!pick;$("ctrls").hidden=pick||comp;$("stepbox").hidden=pick||comp;$("result").hidden=!pick;
@@ -1209,7 +1209,7 @@ function renderLobby(list){var bt=beaten(),w=document.createElement("div");w.cla
   var pb=w.querySelector("[data-play]");if(pb)pb.onclick=function(){startMatch(RIVALS[+pb.dataset.play])}}
 function toast(t){var e=$("toast");if(!e){e=document.createElement("div");e.id="toast";e.className="toast";e.setAttribute("role","status");document.body.appendChild(e)}e.textContent=t;e.classList.remove("go");void e.offsetWidth;e.classList.add("go")}
 /* Floating shot buttons on the left of the court, only when it is time to play */
-function shotRail(sel,onPick){var box=document.querySelector(".court-box");if(!box)return;var r=$("shotrail");if(!r){r=document.createElement("div");r.id="shotrail";r.className="shotrail";r.setAttribute("role","group");r.setAttribute("aria-label","Your shot");box.appendChild(r)}
+function shotRail(sel,onPick){var box=$("cmd")&&$("cmd").parentNode;if(!box)return;var r=$("shotrail");if(!r){r=document.createElement("div");r.id="shotrail";r.className="shotrail";r.setAttribute("role","group");r.setAttribute("aria-label","Your shot");box.appendChild(r)}
   r.innerHTML=VISIBLE.filter(function(v){return v!=="serve"}).map(function(id){var ic=ICON[id];return '<button data-v="'+id+'" aria-pressed="'+(sel===id)+'" aria-label="'+SHOTS[id].name+'"><span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ic.d+'</svg></span><small>'+SHOTS[id].name.replace(" ball","").replace(" shot","")+'</small></button>'}).join("");
   r.hidden=false;document.body.classList.add("railon");[].forEach.call(r.children,function(b){b.onclick=function(e){e.stopPropagation();[].forEach.call(r.children,function(x){x.setAttribute("aria-pressed",String(x===b))});onPick(b.dataset.v)}})}
 function railOff(){var r=$("shotrail");if(r)r.hidden=true;document.body.classList.remove("railon")}
@@ -1225,7 +1225,7 @@ function mateKey(){return state.side==="L"?"R":"L"}
 function mateSay(key,p){if(p!=null&&Math.random()>p)return;var t=MATE_TALK[key];bubble(mateKey(),t[Math.floor(Math.random()*t.length)],"mate",1800)}
 /* Banter. A speech bubble from one of them, now and then */
 var banterT=null;
-function banter(key,force){var m=MATCH;if(!m||!m.r.talk)return;if(!force&&Math.random()>0.6)return;var line=sayLine(m.r,key);if(!line)return;var who=Math.random()<.5?0:1,e=$("banter");if(!e)return;
+function banter(key,force){return;/* opponent chatter switched off */var m=MATCH;if(!m||!m.r.talk)return;if(!force&&Math.random()>0.6)return;var line=sayLine(m.r,key);if(!line)return;var who=Math.random()<.5?0:1,e=$("banter");if(!e)return;
   bubble(who===0?"A":"B",line,"rival",2800)}
 function esc(t){return String(t).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]})}
 function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clearAim();hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;setPoses({});if(state.tab==="compete"){state.wind="calm";drawWind()}document.body.classList.remove("c-live");document.body.classList.add("lobby-on");$("csit").hidden=true;$("cpanel").innerHTML="";
@@ -1234,7 +1234,7 @@ var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breez
 function startMatch(r){MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
   state.wind=wpick(MWIND[r.id]||[["calm",1]]);state.windA=90*Math.floor(Math.random()*4);MATCH.wind=state.wind;drawWind();renderLegend();$("selector").hidden=true;$("score").hidden=false;track("match_started",{rival:r.id});
   document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});document.body.classList.remove("lobby-on");newPoint();setTimeout(function(){if(MATCH&&MATCH.r===r)banter("hello",true)},900)}
-function leaveMatch(){var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
+function leaveMatch(){fbToastOff();var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
 /* On-court aim. Nine squares on the opponents' side */
 var gA=el("g",{id:"g-aim"},WORLD),gTag=el("g",{id:"g-tag","pointer-events":"none"},WORLD);
 function clearAim(){if(gA)gA.innerHTML="";if(typeof ballTag!=="undefined"&&ballTag&&!(MATCH&&MATCH.cur&&!MATCH.cur.done)){ballTag.remove();ballTag=null}}
@@ -1645,7 +1645,18 @@ function heatAim(pick,ctx,speed,grp){[].forEach.call((grp||gA).children,function
     col=["#2ECC71","#FF9F1C","#FF4D6D"][t],on=pick&&c[0]===pick[0]&&c[1]===pick[1];
   r.setAttribute("fill",col);r.setAttribute("fill-opacity",t===0?0.5:0.34);r.setAttribute("stroke",on?"#0D1B2A":"none");r.setAttribute("stroke-width",on?3:0)})}
 /* Feedback box with Play on */
-function fbShow(html,btn,onPlay){var pop=$("fbpop"),tab=$("fbtab");hideShotUI();cmd("");stopBar();var parts=html.split("<!--more-->");
+var FBT=null;function fbToastOff(){clearTimeout(FBT);var t=$("fbtoast");if(t)t.remove()}
+/* Compete: a short result banner on the court, then play goes on by itself. Why opens the full feedback and pauses */
+function fbQuick(html,btn,onPlay){fbToastOff();var cm=MATCH&&MATCH.cur,box=$("cmd")&&$("cmd").parentNode;if(!box){onPlay();return}
+  var d=document.createElement("div");d.innerHTML=html.split("<!--more-->")[0];var pr=d.querySelector(".ptres"),k=pr?(pr.classList.contains("w")?"w":pr.classList.contains("l")?"l":"m"):"m",
+    hd=pr&&pr.querySelector("b")?pr.querySelector("b").textContent:"",rest=pr?pr.textContent.replace(hd,"").trim():"";hd=(hd.match(/^[^.!?]*[.!?]/)||[hd])[0];
+  var t=document.createElement("div");t.id="fbtoast";t.className="fbtoast "+k;t.setAttribute("role","status");
+  t.innerHTML='<div class="ft-txt"><b>'+hd+'</b>'+(rest?'<span>'+rest+'</span>':'')+'</div><button class="ft-why" type="button">Why?</button><i class="ft-bar"></i>';
+  box.appendChild(t);var ms=btn==="Play on"?1700:btn==="See the result"?3200:2600;t.style.setProperty("--ftms",ms+"ms");$("c-sr").textContent=t.textContent.slice(0,300);
+  var go=function(){fbToastOff();if(!MATCH||MATCH.cur!==cm||state.tab!=="compete")return;onPlay()};
+  FBT=setTimeout(go,ms);t.querySelector(".ft-why").onclick=function(){fbToastOff();fbFull(html,btn,onPlay)}}
+function fbShow(html,btn,onPlay){if(state.tab==="compete"&&MATCH){hideShotUI();cmd("");stopBar();fbQuick(html,btn,onPlay);return}fbFull(html,btn,onPlay)}
+function fbFull(html,btn,onPlay){var pop=$("fbpop"),tab=$("fbtab");hideShotUI();cmd("");stopBar();var parts=html.split("<!--more-->");
   pop.innerHTML=GRAB+'<div class="svhead"><b tabindex="-1">Feedback</b><button class="svmin" id="fb-min" aria-label="Minimise feedback">&#8250;</button></div><div class="fbbody">'+parts[0]+'</div>'+(parts[1]?'<details class="why"><summary>Why <span aria-hidden="true">&#9662;</span></summary><div class="fbbody">'+parts[1]+'</div></details>':'');
   var b=document.createElement("button");b.className="btn primary nextpt";b.innerHTML=btn+" &#8594;";b.onclick=function(){b.disabled=true;pop.hidden=true;tab.hidden=true;sheetState();onPlay()};pop.insertBefore(b,pop.querySelector(".why"));
   var wd=pop.querySelector(".why");if(wd)wd.addEventListener("toggle",function(){pop.classList.toggle("full",wd.open)});pop.classList.remove("full");wireGrab(pop,tab,"Feedback");

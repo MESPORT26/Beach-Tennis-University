@@ -756,3 +756,14 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 
 .railon .cmd,.railon .cwind{left:74px!important;transform:none!important;max-width:calc(100% - 82px)}
 @media (min-width:901px){.railon .cmd,.railon .cwind{left:100px!important;max-width:calc(100% - 108px)}}
+
+.fbtoast{position:absolute;left:50%;top:8px;transform:translateX(-50%);z-index:40;width:min(92%,420px);display:flex;align-items:center;gap:10px;padding:10px 12px 12px 14px;border-radius:16px;background:#0D1B2A;color:#F7F4E9;box-shadow:0 8px 22px rgba(13,27,42,.3);overflow:hidden;animation:ftIn .25s ease-out}
+.fbtoast.w{background:#146C3A}.fbtoast.l{background:#B3243B}
+.fbtoast .ft-txt{flex:1;min-width:0;font:600 12.5px/1.3 var(--font)}.fbtoast .ft-txt b{display:block;font-weight:800;font-size:15px}
+.fbtoast .ft-txt span{display:block;opacity:.85;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fbtoast .ft-why{flex:none;border:0;border-radius:99px;padding:7px 12px;background:rgba(255,255,255,.18);color:#fff;font:800 12px var(--font);cursor:pointer}
+.fbtoast .ft-bar{position:absolute;left:0;bottom:0;height:3px;width:100%;background:rgba(255,255,255,.55);transform-origin:left;animation:ftBar var(--ftms,2600ms) linear forwards}
+@keyframes ftIn{from{opacity:0;transform:translate(-50%,-8px)}}@keyframes ftBar{from{transform:scaleX(1)}to{transform:scaleX(0)}}
+@media (prefers-reduced-motion: reduce){.fbtoast{animation:none}}
+
+#cmd,.cmd{display:none!important}
