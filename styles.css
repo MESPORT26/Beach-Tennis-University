@@ -853,3 +853,14 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
   .competing .shotrail{gap:4px}.competing .shotrail button{width:62px}.competing .shotrail .si{width:34px;height:34px}
   .competing.c-live .court-box{min-height:480px;align-items:center}
 }
+
+/* Rail sits below the countdown; selected = teal, not black */
+.competing .shotrail{top:20px!important;transform:none!important}
+@media (max-width:900px){.competing.c-live .court-box{min-height:424px}}
+@media (min-width:901px){.competing.c-live .court-box{min-height:500px}}
+.shotrail button[aria-pressed="true"],.shotrail button:disabled[aria-pressed="true"]{background:#E3F8F6!important;box-shadow:0 0 0 3px #00C2B8,0 4px 12px rgba(0,194,184,.35)!important;transform:scale(1.06)}
+.shotrail button[aria-pressed="true"] small{color:#00675F!important;font-weight:800}
+
+@media (max-width:900px){.competing.c-live .score{margin-left:96px}}
+@media (min-width:901px){.competing.c-live .score{margin-left:28px}}
+@media (min-width:901px){.competing.c-live .court-box{padding-right:92px!important;justify-content:center!important}.competing.c-live .court-box svg#court{margin:0 auto!important}}
