@@ -835,7 +835,9 @@ function renderList(){var list=$("list"),l2=$("list2");list.innerHTML="";l2.inne
 /* Technique video for each shot. Official clips are uploaded by the admin */
 var SHOT_VIDEOS={};
 function renderVideo(id){var v=$("shotvid");if(!v)return;if(!id){v.hidden=true;v.innerHTML="";return}v.hidden=false;var url=SHOT_VIDEOS[id];
-  v.innerHTML=url?'<video controls playsinline preload="metadata" src="'+esc(url)+'"></video>':'<div class="vidph"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".12"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg><span>'+SHOTS[id].name+' video coming soon</span></div>'}
+  v.innerHTML=(url?'<video controls playsinline preload="metadata" src="'+esc(url)+'"></video>':'<div class="vidph"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".12"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg><span>'+SHOTS[id].name+' video coming soon</span></div>')+
+    (typeof NETS!=="undefined"&&NETS.prof&&NETS.prof.is_admin?'<label class="vidup btn soft">'+(url?"Replace":"Upload")+' '+SHOTS[id].name.toLowerCase()+' video<input type="file" accept="video/*" hidden></label>':'');
+  var inp=v.querySelector(".vidup input");if(inp)inp.onchange=function(){if(inp.files[0])netUpload(id,inp.files[0])}}
 function select(id){stop();state.id=id;save("id-"+state.tab,id);
   scene=SHOTS[id]?shotScene(id):SCENES[id];state.step=0;state.branch=null;
   [].forEach.call(document.querySelectorAll(".item"),function(b){b.setAttribute("aria-current",String(b.id==="item-"+id))});
@@ -929,24 +931,97 @@ function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);i
   renderList();select(state.id)}
 [].forEach.call(document.querySelectorAll(".tabs button"),function(b,i,all){b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(!d)return;var n=all[(i+d+all.length)%all.length];n.focus();n.click()})});
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".tabs button,.btn,.seg button,.rhead");if(b)sfx("tap")},true);
+(function(){try{var q=new URLSearchParams(location.search).get("join");if(q){save("pending-join",q.toUpperCase());save("play-sub","friends");history.replaceState(null,"",location.pathname);setTimeout(function(){setTab("friends")},50)}}catch(e){}setTimeout(netInit,300)})();
 $("tab-home").onclick=function(){setTab("home")};$("tab-learn").onclick=function(){setTab("learn")};$("tab-play").onclick=function(){setTab("play")};
 $("tab-shots").onclick=function(){setTab("shots")};$("tab-pick").onclick=function(){setTab("pick")};$("tab-compete").onclick=function(){setTab("compete")};
 /* Online play. NET is set once a Supabase project is connected (see config) */
 var NET=null;
 function ratingStart(){return {beginner:2.0,intermediate:3.5,advanced:4.75,pro:5.75}[state.level]||3.5}
 function myRating(){var r=+load("rating","");return r?r:ratingStart()}
-function renderFriends(){var f=$("friends"),fr=[];try{fr=JSON.parse(load("friends","[]"))||[]}catch(e){}
-  f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone, all on court at once.</p>'+
-    '<div class="pbtns"><button class="btn primary big" id="fr-new"'+(NET?'':' disabled')+'>Create a game</button><button class="btn soft" id="fr-join"'+(NET?'':' disabled')+'>Join with a code</button></div>'+
-    (NET?'':'<p class="pnote">Online play switches on once the game server is connected.</p>')+'</div>'+
-    '<div class="pcard"><h3>Friends</h3><form class="fradd" id="fr-form"><input id="fr-in" placeholder="Name or email" maxlength="60" autocomplete="off"><button class="btn soft" type="submit">Add</button></form>'+
-    (fr.length?'<ul class="frlist">'+fr.map(function(x,i){return '<li><span class="fav">'+esc(x.n[0]||"?").toUpperCase()+'</span><b>'+esc(x.n)+'</b><small>'+(NET?"Invite":"Invite when online")+'</small><button class="lnk" data-del="'+i+'" aria-label="Remove '+esc(x.n)+'">&#10005;</button></li>'}).join("")+'</ul>':'<p class="pmuted">Add the people you play with. You can invite them to a game with one tap.</p>')+'</div>';
-  $("fr-form").onsubmit=function(e){e.preventDefault();var v=$("fr-in").value.trim();if(!v)return;fr.push({n:v,t:Date.now()});save("friends",JSON.stringify(fr));track("friend_added",{});renderFriends()};
-  [].forEach.call(f.querySelectorAll("[data-del]"),function(b){b.onclick=function(){fr.splice(+b.dataset.del,1);save("friends",JSON.stringify(fr));renderFriends()}})}
-function renderLadder(){var f=$("ladder"),r=myRating(),nm2=state.name?esc(state.name):"You";
-  f.innerHTML='<div class="pcard rate"><span class="pmuted">Your rating</span><b>'+r.toFixed(2)+'</b><small>Scale 2.0 to 8.0 · +0.1 for a win · daily loss capped at 0.3</small></div>'+
-    '<div class="pcard"><h3>Ladder</h3><ol class="ladder"><li class="me"><span>1</span><b>'+nm2+'</b><em>'+r.toFixed(2)+'</em></li></ol>'+
-    '<p class="pnote">'+(NET?"Ranked matches against friends move you up the ladder.":"The ladder fills in once online play is connected. Ranked games are against real players, not the computer.")+'</p></div>';}
+/* ===== Online: accounts, friends, game rooms, ladder, shot videos (Supabase) ===== */
+var SB_URL="https://xteycbuidxjndouuhjcw.supabase.co",SB_KEY="sb_publishable_qBMaKhNFY4md60Q--koQog_wDns3IKe";
+var NETS={sb:null,user:null,prof:null,err:"",room:null,poll:0};
+function netReady(){return !!(NETS.sb&&NETS.user)}
+function netInit(){if(NETS.sb||NETS.loading)return;NETS.loading=true;var s=document.createElement("script");
+  s.src=document.querySelector('script[src="app.js"]')?"vendor/supabase.js":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";
+  s.onload=function(){try{NETS.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:true,flowType:"implicit"}});NET=NETS;
+      NETS.sb.auth.onAuthStateChange(function(ev,ses){NETS.user=ses&&ses.user||null;if(NETS.user)netProfile();else{NETS.prof=null;netRefresh()}});
+      NETS.sb.auth.getSession().then(function(r){NETS.user=r.data&&r.data.session&&r.data.session.user||null;if(NETS.user)netProfile();else netRefresh()});
+      netVideos()}catch(e){NETS.err="Online play couldn't start."}};
+  s.onerror=function(){if(!s.dataset.cdn){var c=document.createElement("script");c.dataset.cdn="1";c.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";c.onload=s.onload;c.onerror=function(){NETS.loading=false;NETS.err="Couldn't load online play.";if(state.tab==="friends")renderFriends()};document.head.appendChild(c)}};document.head.appendChild(s)}
+function netRefresh(){if(state.tab==="friends")renderFriends();if(state.tab==="ladder")renderLadder();if(state.tab==="shots"&&state.id&&SHOTS[state.id])renderVideo(state.id);var pj=load("pending-join","");if(pj&&netReady()){save("pending-join","");netJoin(pj)}}
+function netErr(m){NETS.err=m||"Something went wrong. Check your connection and try again.";netRefresh()}
+function netProfile(){var sb=NETS.sb,u=NETS.user;sb.from("profiles").select("*").eq("id",u.id).maybeSingle().then(function(r){
+    if(r.error)return netErr("Couldn't load your profile. Has schema.sql been run in Supabase?");
+    if(r.data){NETS.prof=r.data;save("rating",String(r.data.rating));netRefresh();return}
+    var nm=state.name||(u.email||"Player").split("@")[0];sb.from("profiles").insert({id:u.id,name:nm.slice(0,40),avatar:state.emoji||"a01",side:state.side,level:state.level,rating:ratingStart()}).select().single().then(function(r2){
+      if(r2.error)return netErr("Couldn't create your profile.");NETS.prof=r2.data;netRefresh()})})}
+function netSignIn(email){NETS.err="";return NETS.sb.auth.signInWithOtp({email:email,options:{emailRedirectTo:location.origin+location.pathname}}).then(function(r){if(r.error)netErr(r.error.message);else{NETS.sent=email;netRefresh()}})}
+function netSignOut(){NETS.sb.auth.signOut().then(function(){NETS.room=null;netRefresh()})}
+function joinLink(code){return location.origin+location.pathname+"?join="+code}
+function shareLink(code){var url=joinLink(code),txt="Join my beach tennis game on Beach Tennis University. Code "+code;
+  if(navigator.share){navigator.share({title:"Beach Tennis University",text:txt,url:url}).catch(function(){})}
+  else if(navigator.clipboard){navigator.clipboard.writeText(url).then(function(){toast("Link copied")},function(){prompt("Copy this link",url)})}}
+/* Game rooms */
+function netCreate(){var sb=NETS.sb;sb.from("games").insert({host:NETS.user.id}).select().single().then(function(r){if(r.error)return netErr("Couldn't create a game.");
+  sb.from("game_players").insert({game_id:r.data.id,user_id:NETS.user.id,team:1,side:state.side}).then(function(r2){if(r2.error)return netErr("Couldn't take your seat.");NETS.room=r.data;netRoomWatch();track("online_game_created",{})})})}
+function netJoin(code){code=String(code||"").trim().toUpperCase();if(!code)return;var sb=NETS.sb;
+  sb.from("games").select("*").eq("code",code).maybeSingle().then(function(r){if(r.error||!r.data)return netErr("No game with code "+code+".");var g=r.data;
+    sb.from("game_players").select("*").eq("game_id",g.id).then(function(r2){var ps=r2.data||[];if(ps.some(function(x){return x.user_id===NETS.user.id})){NETS.room=g;netRoomWatch();return}
+      var seat=[[1,"L"],[1,"R"],[2,"L"],[2,"R"]].filter(function(s){return !ps.some(function(x){return x.team===s[0]&&x.side===s[1]})})[0];if(!seat)return netErr("That game is full.");
+      sb.from("game_players").insert({game_id:g.id,user_id:NETS.user.id,team:seat[0],side:seat[1]}).then(function(r3){if(r3.error)return netErr("Couldn't join that game.");NETS.room=g;netRoomWatch();track("online_game_joined",{})})})})}
+function netRoomWatch(){clearInterval(NETS.poll);netRoomLoad();NETS.poll=setInterval(function(){if(state.tab!=="friends"||!NETS.room){clearInterval(NETS.poll);return}netRoomLoad()},3000)}
+function netRoomLoad(){var sb=NETS.sb,g=NETS.room;if(!g)return;sb.from("game_players").select("team,side,user_id,profiles(name,rating,avatar)").eq("game_id",g.id).then(function(r){
+  if(r.error)return;NETS.seats=r.data||[];sb.from("games").select("*").eq("id",g.id).single().then(function(r2){if(r2.data)NETS.room=r2.data;if(state.tab==="friends")renderFriends()})})}
+function netSeat(team,side){var sb=NETS.sb,g=NETS.room;if(!g)return;if((NETS.seats||[]).some(function(x){return x.team===team&&x.side===side}))return;
+  sb.from("game_players").update({team:team,side:side}).eq("game_id",g.id).eq("user_id",NETS.user.id).then(function(){netRoomLoad()})}
+function netLeave(){var sb=NETS.sb,g=NETS.room;if(!g)return;sb.from("game_players").delete().eq("game_id",g.id).eq("user_id",NETS.user.id).then(function(){NETS.room=null;NETS.seats=null;renderFriends()})}
+function netRecord(t1,t2){NETS.sb.rpc("record_result",{p_game:NETS.room.id,p_t1:t1,p_t2:t2}).then(function(r){if(r.error)return netErr(r.error.message);toast("Result saved. Ratings updated.");track("ranked_result",{t1:t1,t2:t2});NETS.room=null;netProfile();setTab("ladder")})}
+/* Friends */
+function netFriends(cb){var sb=NETS.sb,me=NETS.user.id;sb.from("friendships").select("user_id,friend_id,status").or("user_id.eq."+me+",friend_id.eq."+me).then(function(r){
+  var rows=r.data||[],ids=rows.map(function(x){return x.user_id===me?x.friend_id:x.user_id});if(!ids.length)return cb([]);
+  sb.from("profiles").select("id,name,rating,avatar").in("id",ids).then(function(r2){var P={};(r2.data||[]).forEach(function(p){P[p.id]=p});
+    cb(rows.map(function(x){var other=x.user_id===me?x.friend_id:x.user_id;return {p:P[other]||{id:other,name:"Player"},status:x.status,incoming:x.friend_id===me,row:x}}))})})}
+function netFindPlayers(q,cb){NETS.sb.from("profiles").select("id,name,rating,avatar").ilike("name","%"+q.replace(/[%_]/g,"")+"%").neq("id",NETS.user.id).limit(8).then(function(r){cb(r.data||[])})}
+function netAddFriend(id){NETS.sb.from("friendships").insert({user_id:NETS.user.id,friend_id:id}).then(function(r){if(r.error&&!/duplicate/.test(r.error.message))return netErr("Couldn't send the request.");toast("Request sent");renderFriends()})}
+function netAccept(row){NETS.sb.from("friendships").update({status:"accepted"}).eq("user_id",row.user_id).eq("friend_id",row.friend_id).then(function(){renderFriends()})}
+/* Videos: anyone can watch, only the admin uploads */
+function netVideos(){NETS.sb.from("shot_videos").select("shot,path").then(function(r){(r.data||[]).forEach(function(v){SHOT_VIDEOS[v.shot]=NETS.sb.storage.from("shot-videos").getPublicUrl(v.path).data.publicUrl+"?v="+Date.parse(v.updated_at||0)});if(state.tab==="shots"&&state.id&&SHOTS[state.id])renderVideo(state.id)})}
+function netUpload(shot,file){var sb=NETS.sb,ext=(file.name.split(".").pop()||"mp4").toLowerCase(),path=shot+"."+ext;toast("Uploading…");
+  sb.storage.from("shot-videos").upload(path,file,{upsert:true,contentType:file.type||"video/mp4"}).then(function(r){if(r.error)return toast("Upload failed: "+r.error.message);
+    sb.from("shot_videos").upsert({shot:shot,path:path,updated_at:new Date().toISOString()}).then(function(r2){if(r2.error)return toast("Saved the file but not the link: "+r2.error.message);toast("Video saved");netVideos()})})}
+function esc2(t){return esc(String(t==null?"":t))}
+function renderFriends(){var f=$("friends");
+  if(!NETS.sb){f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone.</p><p class="pnote">'+(NETS.loading?"Connecting…":"Online play works on the live website. Open Beach Tennis University in your phone\'s browser to sign in.")+'</p></div>';return}
+  var err=NETS.err?'<p class="perr" role="alert">'+esc2(NETS.err)+'</p>':'';NETS.err="";
+  if(!NETS.user){f.innerHTML='<div class="pcard"><h2>Sign in to play</h2><p class="pmuted">We\'ll email you a link. No password.</p>'+
+      (NETS.sent?'<p class="pnote">Check '+esc2(NETS.sent)+' for your sign-in link, then come back here.</p>':'<form class="fradd" id="si-form"><input id="si-email" type="email" required placeholder="Your email" autocomplete="email"><button class="btn primary" type="submit">Email me</button></form>')+err+'</div>';
+    var fm=$("si-form");if(fm)fm.onsubmit=function(e){e.preventDefault();netSignIn($("si-email").value.trim())};return}
+  var me=NETS.prof||{name:"…",rating:myRating()};
+  if(NETS.room){var g=NETS.room,seats=NETS.seats||[],host=g.host===NETS.user.id,seatHtml=function(team,side){var x=seats.filter(function(s){return s.team===team&&s.side===side})[0],mine=x&&x.user_id===NETS.user.id;
+      return '<button class="seat'+(x?" taken":"")+(mine?" mine":"")+'" data-team="'+team+'" data-side="'+side+'"><span>'+(side==="L"?"Left":"Right")+'</span><b>'+(x?esc2(x.profiles&&x.profiles.name||"Player"):"Computer")+'</b><small>'+(x&&x.profiles?(+x.profiles.rating).toFixed(2):"tap to sit here")+'</small></button>'};
+    f.innerHTML='<div class="pcard"><div class="rmhead"><h2>Game '+esc2(g.code)+'</h2><button class="btn soft" id="rm-share">Invite</button></div><p class="pmuted">Send the link. Friends who open it join this game.</p>'+err+
+      '<div class="teams"><div><h3>Your team</h3>'+seatHtml(1,"L")+seatHtml(1,"R")+'</div><div><h3>Opponents</h3>'+seatHtml(2,"L")+seatHtml(2,"R")+'</div></div>'+
+      '<p class="pnote">Live online matches arrive in the next update. For now, play it on the sand and record the score to move up the ladder.</p>'+
+      (host?'<div class="recres"><label>Your team <input id="rs-1" type="number" min="0" max="99" inputmode="numeric"></label><label>Opponents <input id="rs-2" type="number" min="0" max="99" inputmode="numeric"></label><button class="btn primary" id="rs-go">Record ranked result</button></div>':'<p class="pmuted">The host records the result.</p>')+
+      '<button class="lnk" id="rm-leave">Leave game</button></div>';
+    $("rm-share").onclick=function(){shareLink(g.code)};$("rm-leave").onclick=netLeave;
+    [].forEach.call(f.querySelectorAll(".seat:not(.taken)"),function(b){b.onclick=function(){netSeat(+b.dataset.team,b.dataset.side)}});
+    if($("rs-go"))$("rs-go").onclick=function(){var a=+$("rs-1").value,b2=+$("rs-2").value;if(isNaN(a)||isNaN(b2)||a===b2){toast("Enter both scores");return}netRecord(a,b2)};return}
+  f.innerHTML='<div class="pcard"><div class="rmhead"><h2>Play with friends</h2><button class="lnk" id="so">Sign out</button></div><p class="pmuted">'+esc2(me.name)+' · rating '+(+me.rating).toFixed(2)+'</p>'+err+
+    '<div class="pbtns"><button class="btn primary big" id="fr-new">Create a game</button><form class="fradd" id="jn-form"><input id="jn-code" placeholder="Game code" maxlength="6" autocapitalize="characters" autocomplete="off"><button class="btn soft" type="submit">Join</button></form></div></div>'+
+    '<div class="pcard"><h3>Friends</h3><form class="fradd" id="fs-form"><input id="fs-q" placeholder="Find players by name" autocomplete="off"><button class="btn soft" type="submit">Find</button></form><ul class="frlist" id="fs-res"></ul><ul class="frlist" id="fr-list"><li class="pmuted">Loading…</li></ul></div>';
+  $("so").onclick=netSignOut;$("fr-new").onclick=netCreate;$("jn-form").onsubmit=function(e){e.preventDefault();netJoin($("jn-code").value)};
+  $("fs-form").onsubmit=function(e){e.preventDefault();var q=$("fs-q").value.trim();if(q.length<2)return;netFindPlayers(q,function(rs){$("fs-res").innerHTML=rs.length?rs.map(function(p){return '<li><span class="fav">'+esc2((p.name||"?")[0]).toUpperCase()+'</span><b>'+esc2(p.name)+'</b><small>'+(+p.rating).toFixed(2)+'</small><button class="btn soft" data-add="'+p.id+'">Add</button></li>'}).join(""):'<li class="pmuted">No players found. Invite them with a game link.</li>';
+    [].forEach.call($("fs-res").querySelectorAll("[data-add]"),function(b){b.onclick=function(){netAddFriend(b.dataset.add)}})})};
+  netFriends(function(list){var el2=$("fr-list");if(!el2)return;el2.innerHTML=list.length?list.map(function(x,i){return '<li><span class="fav">'+esc2((x.p.name||"?")[0]).toUpperCase()+'</span><b>'+esc2(x.p.name)+'</b><small>'+(x.status==="accepted"?(+x.p.rating||0).toFixed(2):x.incoming?"wants to be friends":"request sent")+'</small>'+(x.status!=="accepted"&&x.incoming?'<button class="btn soft" data-acc="'+i+'">Accept</button>':'<span></span>')+'</li>'}).join(""):'<li class="pmuted">No friends yet. Find them above, or create a game and send the link.</li>';
+    [].forEach.call(el2.querySelectorAll("[data-acc]"),function(b){b.onclick=function(){netAccept(list[+b.dataset.acc].row)}})})}
+function renderLadder(){var f=$("ladder"),r=myRating();
+  var head='<div class="pcard rate"><span class="pmuted">Your rating</span><b>'+(NETS.prof?(+NETS.prof.rating).toFixed(2):r.toFixed(2))+'</b><small>Scale 2.0 to 8.0 · +0.1 for a win · daily loss capped at 0.3</small></div>';
+  if(!netReady()){f.innerHTML=head+'<div class="pcard"><h3>Ladder</h3><p class="pnote">'+(NETS.sb?"Sign in under Friends to join the ladder.":"The ladder lives on the live website.")+'</p></div>';return}
+  f.innerHTML=head+'<div class="pcard"><h3>Ladder</h3><ol class="ladder" id="ld"><li class="pmuted">Loading…</li></ol></div>';
+  NETS.sb.from("ladder").select("*").order("place").limit(100).then(function(res){var l=$("ld");if(!l)return;if(res.error){l.innerHTML='<li class="pmuted">Couldn\'t load the ladder.</li>';return}
+    l.innerHTML=(res.data||[]).map(function(x){return '<li class="'+(x.id===NETS.user.id?"me":"")+'"><span>'+x.place+'</span><b>'+esc2(x.name)+'</b><em>'+(+x.rating).toFixed(2)+'</em></li>'}).join("")||'<li class="pmuted">No players yet.</li>'})}
 function renderSubnav(grp,t){var n=$("subnav");if(grp==="home"){n.hidden=true;return}n.hidden=false;
   var items=grp==="learn"?[["shots","Shots"],["pick","Train"]]:[["compete","Computer"],["friends","Friends"],["ladder","Ladder"]];
   n.innerHTML=items.map(function(x){return '<button role="tab" data-t="'+x[0]+'" aria-pressed="'+(x[0]===t)+'">'+x[1]+'</button>'}).join("");
