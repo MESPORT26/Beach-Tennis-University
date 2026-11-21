@@ -1,4 +1,6 @@
 
+var AUTH_HASH=/access_token=|error_description=/.test(location.hash)?location.hash.replace(/^#/,""):"";if(AUTH_HASH){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
+
 /* Court geometry in metres: x 0..16 (net at 8, your side 0..8), y 0..8 (your left side at the top). */
 var NS="http://www.w3.org/2000/svg";
 function X(m){return 60+m*40}
@@ -931,7 +933,7 @@ function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);i
   renderList();select(state.id)}
 [].forEach.call(document.querySelectorAll(".tabs button"),function(b,i,all){b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(!d)return;var n=all[(i+d+all.length)%all.length];n.focus();n.click()})});
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".tabs button,.btn,.seg button,.rhead");if(b)sfx("tap")},true);
-(function(){try{var q=new URLSearchParams(location.search).get("join");if(q){save("pending-join",q.toUpperCase());save("play-sub","friends");history.replaceState(null,"",location.pathname);setTimeout(function(){setTab("friends")},50)}}catch(e){}setTimeout(netInit,300)})();
+(function(){try{if(AUTH_HASH){save("play-sub","friends");setTimeout(function(){setTab("friends")},50)}var q=new URLSearchParams(location.search).get("join");if(q){save("pending-join",q.toUpperCase());save("play-sub","friends");history.replaceState(null,"",location.pathname);setTimeout(function(){setTab("friends")},50)}}catch(e){}setTimeout(netInit,300)})();
 $("tab-home").onclick=function(){setTab("home")};$("tab-learn").onclick=function(){setTab("learn")};$("tab-play").onclick=function(){setTab("play")};
 $("tab-shots").onclick=function(){setTab("shots")};$("tab-pick").onclick=function(){setTab("pick")};$("tab-compete").onclick=function(){setTab("compete")};
 /* Online play. NET is set once a Supabase project is connected (see config) */
@@ -944,8 +946,11 @@ var NETS={sb:null,user:null,prof:null,err:"",room:null,poll:0};
 function netReady(){return !!(NETS.sb&&NETS.user)}
 function netInit(){if(NETS.sb||NETS.loading)return;NETS.loading=true;var s=document.createElement("script");
   s.src=document.querySelector('script[src="app.js"]')?"vendor/supabase.js":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";
-  s.onload=function(){try{NETS.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:true,flowType:"implicit"}});NET=NETS;
+  s.onload=function(){try{NETS.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:false,flowType:"implicit"}});NET=NETS;
       NETS.sb.auth.onAuthStateChange(function(ev,ses){NETS.user=ses&&ses.user||null;if(NETS.user)netProfile();else{NETS.prof=null;netRefresh()}});
+      if(AUTH_HASH){var hp2=new URLSearchParams(AUTH_HASH);AUTH_HASH="";
+        if(hp2.get("access_token"))NETS.sb.auth.setSession({access_token:hp2.get("access_token"),refresh_token:hp2.get("refresh_token")||""}).then(function(r){if(r.error)netErr("That sign-in link didn't work: "+r.error.message+". Try the 6-digit code instead.")});
+        else if(hp2.get("error_description"))NETS.err="Sign-in link problem: "+hp2.get("error_description").replace(/\+/g," ")+". Ask for a new email and use the 6-digit code."}
       NETS.sb.auth.getSession().then(function(r){NETS.user=r.data&&r.data.session&&r.data.session.user||null;if(NETS.user)netProfile();else netRefresh()});
       netVideos()}catch(e){NETS.err="Online play couldn't start."}};
   s.onerror=function(){if(!s.dataset.cdn){var c=document.createElement("script");c.dataset.cdn="1";c.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";c.onload=s.onload;c.onerror=function(){NETS.loading=false;NETS.err="Couldn't load online play.";if(state.tab==="friends")renderFriends()};document.head.appendChild(c)}};document.head.appendChild(s)}
@@ -995,8 +1000,11 @@ function renderFriends(){var f=$("friends");
   if(!NETS.sb){f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone.</p><p class="pnote">'+(NETS.loading?"Connecting…":"Online play works on the live website. Open Beach Tennis University in your phone\'s browser to sign in.")+'</p></div>';return}
   var err=NETS.err?'<p class="perr" role="alert">'+esc2(NETS.err)+'</p>':'';NETS.err="";
   if(!NETS.user){f.innerHTML='<div class="pcard"><h2>Sign in to play</h2><p class="pmuted">We\'ll email you a link. No password.</p>'+
-      (NETS.sent?'<p class="pnote">Check '+esc2(NETS.sent)+' for your sign-in link, then come back here.</p>':'<form class="fradd" id="si-form"><input id="si-email" type="email" required placeholder="Your email" autocomplete="email"><button class="btn primary" type="submit">Email me</button></form>')+err+'</div>';
-    var fm=$("si-form");if(fm)fm.onsubmit=function(e){e.preventDefault();netSignIn($("si-email").value.trim())};return}
+      (NETS.sent?'<p class="pnote">We emailed '+esc2(NETS.sent)+'. Tap the link in it, or type the 6-digit code here.</p><form class="fradd" id="otp-form"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="6-digit code"><button class="btn primary" type="submit">Sign in</button></form><button class="lnk" id="si-again">Use a different email</button>':'<form class="fradd" id="si-form"><input id="si-email" type="email" required placeholder="Your email" autocomplete="email"><button class="btn primary" type="submit">Email me</button></form>')+err+'</div>';
+    var fm=$("si-form");if(fm)fm.onsubmit=function(e){e.preventDefault();netSignIn($("si-email").value.trim())};
+    var of=$("otp-form");if(of)of.onsubmit=function(e){e.preventDefault();var code=$("otp").value.replace(/\D/g,"");if(code.length<6){toast("Enter the code from the email");return}
+      NETS.sb.auth.verifyOtp({email:NETS.sent,token:code,type:"email"}).then(function(r){if(r.error)netErr("That code didn't work: "+r.error.message)})};
+    if($("si-again"))$("si-again").onclick=function(){NETS.sent=null;renderFriends()};return}
   var me=NETS.prof||{name:"…",rating:myRating()};
   if(NETS.room){var g=NETS.room,seats=NETS.seats||[],host=g.host===NETS.user.id,seatHtml=function(team,side){var x=seats.filter(function(s){return s.team===team&&s.side===side})[0],mine=x&&x.user_id===NETS.user.id;
       return '<button class="seat'+(x?" taken":"")+(mine?" mine":"")+'" data-team="'+team+'" data-side="'+side+'"><span>'+(side==="L"?"Left":"Right")+'</span><b>'+(x?esc2(x.profiles&&x.profiles.name||"Player"):"Computer")+'</b><small>'+(x&&x.profiles?(+x.profiles.rating).toFixed(2):"tap to sit here")+'</small></button>'};
