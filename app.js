@@ -999,8 +999,16 @@ function esc2(t){return esc(String(t==null?"":t))}
 function renderFriends(){var f=$("friends");
   if(!NETS.sb){f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone.</p><p class="pnote">'+(NETS.loading?"Connecting…":"Online play works on the live website. Open Beach Tennis University in your phone\'s browser to sign in.")+'</p></div>';return}
   var err=NETS.err?'<p class="perr" role="alert">'+esc2(NETS.err)+'</p>':'';NETS.err="";
-  if(!NETS.user){f.innerHTML='<div class="pcard"><h2>Sign in to play</h2><p class="pmuted">We\'ll email you a link. No password.</p>'+
-      (NETS.sent?'<p class="pnote">We emailed '+esc2(NETS.sent)+'. Tap the link in it, or type the 6-digit code here.</p><form class="fradd" id="otp-form"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="6-digit code"><button class="btn primary" type="submit">Sign in</button></form><button class="lnk" id="si-again">Use a different email</button>':'<form class="fradd" id="si-form"><input id="si-email" type="email" required placeholder="Your email" autocomplete="email"><button class="btn primary" type="submit">Email me</button></form>')+err+'</div>';
+  if(!NETS.user){f.innerHTML='<div class="pcard"><h2>Sign in to play</h2>'+
+      '<form class="pwform" id="pw-form"><input id="pw-email" type="email" required placeholder="Email" autocomplete="email"><input id="pw-pass" type="password" required minlength="6" placeholder="Password (6+ characters)" autocomplete="current-password">'+
+      '<div class="pbtns two"><button class="btn primary" type="submit" data-m="in">Sign in</button><button class="btn soft" type="submit" data-m="up">Create account</button></div></form>'+err+
+      '<details class="orlink"><summary>Or get an email link</summary>'+
+      (NETS.sent?'<p class="pnote">We emailed '+esc2(NETS.sent)+'. Tap the link in it, or type the 6-digit code here.</p><form class="fradd" id="otp-form"><input id="otp" inputmode="numeric" autocomplete="one-time-code" maxlength="10" placeholder="6-digit code"><button class="btn primary" type="submit">Sign in</button></form><button class="lnk" id="si-again">Use a different email</button>':'<form class="fradd" id="si-form"><input id="si-email" type="email" required placeholder="Your email" autocomplete="email"><button class="btn soft" type="submit">Email me</button></form>')+'</details></div>';
+    var pf=$("pw-form"),mode="in";if(pf){[].forEach.call(pf.querySelectorAll("button[data-m]"),function(b){b.onclick=function(){mode=b.dataset.m}});
+      pf.onsubmit=function(e){e.preventDefault();var em=$("pw-email").value.trim(),pw=$("pw-pass").value;NETS.err="";
+        (mode==="up"?NETS.sb.auth.signUp({email:em,password:pw}):NETS.sb.auth.signInWithPassword({email:em,password:pw})).then(function(r){
+          if(r.error)return netErr(r.error.message==="Invalid login credentials"?"Email or password not right. New here? Tap Create account.":r.error.message);
+          if(mode==="up"&&!r.data.session)netErr("Account made. Check your email to confirm it, then sign in.")})}}
     var fm=$("si-form");if(fm)fm.onsubmit=function(e){e.preventDefault();netSignIn($("si-email").value.trim())};
     var of=$("otp-form");if(of)of.onsubmit=function(e){e.preventDefault();var code=$("otp").value.replace(/\D/g,"");if(code.length<6){toast("Enter the code from the email");return}
       NETS.sb.auth.verifyOtp({email:NETS.sent,token:code,type:"email"}).then(function(r){if(r.error)netErr("That code didn't work: "+r.error.message)})};

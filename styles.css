@@ -944,3 +944,7 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .recres{display:grid;grid-template-columns:1fr 1fr;gap:8px}.recres label{display:grid;gap:4px;font-size:12px;font-weight:700;color:var(--muted)}
 .recres input{border:1px solid var(--line);border-radius:12px;padding:10px;font:800 20px var(--font);text-align:center;background:var(--bg);color:var(--fg)}.recres .btn{grid-column:1/-1}
 .vidup{display:flex;justify-content:center;margin:8px;cursor:pointer}
+
+.pwform{display:grid;gap:8px}.pwform input{border:1px solid var(--line);border-radius:12px;padding:12px;font:600 16px var(--font);background:var(--bg);color:var(--fg)}
+.pbtns.two{grid-template-columns:1fr 1fr}
+.orlink summary{cursor:pointer;color:var(--muted);font-weight:700;font-size:13px;padding:6px 0}.orlink[open]{display:grid;gap:8px}
