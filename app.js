@@ -1,4 +1,5 @@
 
+var SB_URL="https://xteycbuidxjndouuhjcw.supabase.co",SB_KEY="sb_publishable_qBMaKhNFY4md60Q--koQog_wDns3IKe",NETS={sb:null,user:null,prof:null,err:"",room:null,poll:0};
 var AUTH_HASH=/access_token=|error_description=/.test(location.hash)?location.hash.replace(/^#/,""):"";if(AUTH_HASH){try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}}
 
 /* Court geometry in metres: x 0..16 (net at 8, your side 0..8), y 0..8 (your left side at the top). */
@@ -933,7 +934,7 @@ function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);i
   renderList();select(state.id)}
 [].forEach.call(document.querySelectorAll(".tabs button"),function(b,i,all){b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(!d)return;var n=all[(i+d+all.length)%all.length];n.focus();n.click()})});
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".tabs button,.btn,.seg button,.rhead");if(b)sfx("tap")},true);
-(function(){try{if(AUTH_HASH){save("play-sub","friends");setTimeout(function(){setTab("friends")},50)}var q=new URLSearchParams(location.search).get("join");if(q){save("pending-join",q.toUpperCase());save("play-sub","friends");history.replaceState(null,"",location.pathname);setTimeout(function(){setTab("friends")},50)}}catch(e){}setTimeout(netInit,300)})();
+(function(){try{if(AUTH_HASH){save("play-sub","friends");setTimeout(function(){setTab("friends")},50)}var q=new URLSearchParams(location.search).get("join");if(q){save("pending-join",q.toUpperCase());save("play-sub","friends");history.replaceState(null,"",location.pathname);setTimeout(function(){setTab("friends")},50)}}catch(e){}netInit()})();
 $("tab-home").onclick=function(){setTab("home")};$("tab-learn").onclick=function(){setTab("learn")};$("tab-play").onclick=function(){setTab("play")};
 $("tab-shots").onclick=function(){setTab("shots")};$("tab-pick").onclick=function(){setTab("pick")};$("tab-compete").onclick=function(){setTab("compete")};
 /* Online play. NET is set once a Supabase project is connected (see config) */
@@ -941,19 +942,20 @@ var NET=null;
 function ratingStart(){return {beginner:2.0,intermediate:3.5,advanced:4.75,pro:5.75}[state.level]||3.5}
 function myRating(){var r=+load("rating","");return r?r:ratingStart()}
 /* ===== Online: accounts, friends, game rooms, ladder, shot videos (Supabase) ===== */
-var SB_URL="https://xteycbuidxjndouuhjcw.supabase.co",SB_KEY="sb_publishable_qBMaKhNFY4md60Q--koQog_wDns3IKe";
-var NETS={sb:null,user:null,prof:null,err:"",room:null,poll:0};
+
 function netReady(){return !!(NETS.sb&&NETS.user)}
-function netInit(){if(NETS.sb||NETS.loading)return;NETS.loading=true;var s=document.createElement("script");
-  s.src=document.querySelector('script[src="app.js"]')?"vendor/supabase.js":"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";
-  s.onload=function(){try{NETS.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:false,flowType:"implicit"}});NET=NETS;
+function netInit(){if(NETS.sb||NETS.loading)return;NETS.loading=true;NETS.failed=false;
+  var srcs=[document.querySelector('script[src="app.js"]')?"vendor/supabase.js":null,"https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js","https://unpkg.com/@supabase/supabase-js@2.49.4/dist/umd/supabase.js"].filter(Boolean),k=0;
+  function start(){try{NETS.sb=window.supabase.createClient(SB_URL,SB_KEY,{auth:{persistSession:true,detectSessionInUrl:false,flowType:"implicit"}});NET=NETS;NETS.loading=false;
       NETS.sb.auth.onAuthStateChange(function(ev,ses){NETS.user=ses&&ses.user||null;if(NETS.user)netProfile();else{NETS.prof=null;netRefresh()}});
       if(AUTH_HASH){var hp2=new URLSearchParams(AUTH_HASH);AUTH_HASH="";
-        if(hp2.get("access_token"))NETS.sb.auth.setSession({access_token:hp2.get("access_token"),refresh_token:hp2.get("refresh_token")||""}).then(function(r){if(r.error)netErr("That sign-in link didn't work: "+r.error.message+". Try the 6-digit code instead.")});
-        else if(hp2.get("error_description"))NETS.err="Sign-in link problem: "+hp2.get("error_description").replace(/\+/g," ")+". Ask for a new email and use the 6-digit code."}
-      NETS.sb.auth.getSession().then(function(r){NETS.user=r.data&&r.data.session&&r.data.session.user||null;if(NETS.user)netProfile();else netRefresh()});
-      netVideos()}catch(e){NETS.err="Online play couldn't start."}};
-  s.onerror=function(){if(!s.dataset.cdn){var c=document.createElement("script");c.dataset.cdn="1";c.src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js";c.onload=s.onload;c.onerror=function(){NETS.loading=false;NETS.err="Couldn't load online play.";if(state.tab==="friends")renderFriends()};document.head.appendChild(c)}};document.head.appendChild(s)}
+        if(hp2.get("access_token"))NETS.sb.auth.setSession({access_token:hp2.get("access_token"),refresh_token:hp2.get("refresh_token")||""}).then(function(r){if(r.error)netErr("That sign-in link didn't work: "+r.error.message+".")});
+        else if(hp2.get("error_description"))NETS.err="Sign-in link problem: "+hp2.get("error_description").replace(/\+/g," ")+"."}
+      NETS.sb.auth.getSession().then(function(r){NETS.user=r.data&&r.data.session&&r.data.session.user||null;if(NETS.user)netProfile();else netRefresh()},function(e){netErr("Couldn't reach the online service ("+(e&&e.message||"network")+").")});
+      netVideos();netRefresh()}catch(e){NETS.sb=null;NETS.loading=false;NETS.failed=true;NETS.why="start: "+(e&&e.message);netRefresh()}}
+  function next(){if(k>=srcs.length){NETS.loading=false;NETS.failed=true;NETS.why=NETS.why||"couldn't download the online code";netRefresh();return}
+    var sc=document.createElement("script");sc.src=srcs[k++];sc.onload=function(){if(window.supabase&&window.supabase.createClient)start();else next()};sc.onerror=next;document.head.appendChild(sc)}
+  next()}
 function netRefresh(){if(state.tab==="friends")renderFriends();if(state.tab==="ladder")renderLadder();if(state.tab==="shots"&&state.id&&SHOTS[state.id])renderVideo(state.id);var pj=load("pending-join","");if(pj&&netReady()){save("pending-join","");netJoin(pj)}}
 function netErr(m){NETS.err=m||"Something went wrong. Check your connection and try again.";netRefresh()}
 function netProfile(){var sb=NETS.sb,u=NETS.user;sb.from("profiles").select("*").eq("id",u.id).maybeSingle().then(function(r){
@@ -997,7 +999,9 @@ function netUpload(shot,file){var sb=NETS.sb,ext=(file.name.split(".").pop()||"m
     sb.from("shot_videos").upsert({shot:shot,path:path,updated_at:new Date().toISOString()}).then(function(r2){if(r2.error)return toast("Saved the file but not the link: "+r2.error.message);toast("Video saved");netVideos()})})}
 function esc2(t){return esc(String(t==null?"":t))}
 function renderFriends(){var f=$("friends");
-  if(!NETS.sb){f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone.</p><p class="pnote">'+(NETS.loading?"Connecting…":"Online play works on the live website. Open Beach Tennis University in your phone\'s browser to sign in.")+'</p></div>';return}
+  if(!NETS.sb){f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone.</p>'+
+      (NETS.failed?'<p class="perr">Online play couldn\'t start'+(NETS.why?' ('+esc2(NETS.why)+')':'')+'.</p><p class="pnote">Open mebt-app-q38a.vercel.app in Safari or Chrome. It won\'t work inside the Claude app or an email app.</p><button class="btn soft" id="net-retry">Try again</button>':'<p class="pnote">Connecting…</p>')+'</div>';
+    if($("net-retry"))$("net-retry").onclick=function(){NETS.failed=false;netInit();renderFriends()};if(!NETS.loading&&!NETS.failed)netInit();return}
   var err=NETS.err?'<p class="perr" role="alert">'+esc2(NETS.err)+'</p>':'';NETS.err="";
   if(!NETS.user){f.innerHTML='<div class="pcard"><h2>Sign in to play</h2>'+
       '<form class="pwform" id="pw-form"><input id="pw-email" type="email" required placeholder="Email" autocomplete="email"><input id="pw-pass" type="password" required minlength="6" placeholder="Password (6+ characters)" autocomplete="current-password">'+
