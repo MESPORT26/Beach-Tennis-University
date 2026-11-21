@@ -1,5 +1,5 @@
 -- Beach Tennis University: online play, friends, ladder and shot videos
--- Run once in Supabase: Dashboard > SQL editor > New query > paste > Run.
+-- Safe to run more than once. Run in Supabase: Dashboard > SQL editor > New query > paste > Run.
 
 -- Players (one row per signed-in account)
 create table if not exists public.profiles (
@@ -13,9 +13,12 @@ create table if not exists public.profiles (
   created_at timestamptz not null default now()
 );
 alter table public.profiles enable row level security;
+drop policy if exists "profiles readable by signed-in players" on public.profiles;
 create policy "profiles readable by signed-in players" on public.profiles for select to authenticated using (true);
+drop policy if exists "players edit their own profile" on public.profiles;
 create policy "players edit their own profile" on public.profiles for update to authenticated using (id = auth.uid())
   with check (id = auth.uid() and is_admin = (select is_admin from public.profiles where id = auth.uid()) and rating = (select rating from public.profiles where id = auth.uid()));
+drop policy if exists "players create their own profile" on public.profiles;
 create policy "players create their own profile" on public.profiles for insert to authenticated with check (id = auth.uid() and is_admin = false);
 
 -- Friends box
@@ -27,9 +30,13 @@ create table if not exists public.friendships (
   primary key (user_id, friend_id)
 );
 alter table public.friendships enable row level security;
+drop policy if exists "see your friendships" on public.friendships;
 create policy "see your friendships" on public.friendships for select to authenticated using (auth.uid() in (user_id, friend_id));
+drop policy if exists "send a friend request" on public.friendships;
 create policy "send a friend request" on public.friendships for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "accept or remove" on public.friendships;
 create policy "accept or remove" on public.friendships for update to authenticated using (auth.uid() in (user_id, friend_id));
+drop policy if exists "remove a friend" on public.friendships;
 create policy "remove a friend" on public.friendships for delete to authenticated using (auth.uid() in (user_id, friend_id));
 
 -- A game room. The invite link is https://<site>/?join=<code>
@@ -51,12 +58,19 @@ create table if not exists public.game_players (
 );
 alter table public.games enable row level security;
 alter table public.game_players enable row level security;
+drop policy if exists "games visible to signed-in players" on public.games;
 create policy "games visible to signed-in players" on public.games for select to authenticated using (true);
+drop policy if exists "create a game you host" on public.games;
 create policy "create a game you host" on public.games for insert to authenticated with check (host = auth.uid());
+drop policy if exists "host updates the game" on public.games;
 create policy "host updates the game" on public.games for update to authenticated using (host = auth.uid());
+drop policy if exists "players visible" on public.game_players;
 create policy "players visible" on public.game_players for select to authenticated using (true);
+drop policy if exists "join as yourself" on public.game_players;
 create policy "join as yourself" on public.game_players for insert to authenticated with check (user_id = auth.uid());
+drop policy if exists "leave or switch seat" on public.game_players;
 create policy "leave or switch seat" on public.game_players for update to authenticated using (user_id = auth.uid());
+drop policy if exists "leave a game" on public.game_players;
 create policy "leave a game" on public.game_players for delete to authenticated using (user_id = auth.uid());
 
 -- Results and rating history. Ratings change only through record_result()
@@ -76,7 +90,9 @@ create table if not exists public.rating_events (
 );
 alter table public.results enable row level security;
 alter table public.rating_events enable row level security;
+drop policy if exists "results readable" on public.results;
 create policy "results readable" on public.results for select to authenticated using (true);
+drop policy if exists "rating history readable" on public.rating_events;
 create policy "rating history readable" on public.rating_events for select to authenticated using (true);
 
 -- Colin's 2.0-8.0 scale: +0.1 per win, -0.1 per loss, but a player's net loss for the day can't go below -0.3
@@ -111,11 +127,14 @@ create table if not exists public.shot_videos (
   updated_at timestamptz not null default now()
 );
 alter table public.shot_videos enable row level security;
+drop policy if exists "anyone can watch" on public.shot_videos;
 create policy "anyone can watch" on public.shot_videos for select using (true);
+drop policy if exists "admin uploads" on public.shot_videos;
 create policy "admin uploads" on public.shot_videos for all to authenticated
   using ((select is_admin from public.profiles where id = auth.uid()))
   with check ((select is_admin from public.profiles where id = auth.uid()));
 insert into storage.buckets (id, name, public) values ('shot-videos','shot-videos', true) on conflict do nothing;
+drop policy if exists "admin writes videos" on storage.objects;
 create policy "admin writes videos" on storage.objects for all to authenticated
   using (bucket_id = 'shot-videos' and (select is_admin from public.profiles where id = auth.uid()))
   with check (bucket_id = 'shot-videos' and (select is_admin from public.profiles where id = auth.uid()));

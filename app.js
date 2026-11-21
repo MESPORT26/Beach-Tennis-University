@@ -957,10 +957,10 @@ function netInit(){if(NETS.sb||NETS.loading)return;NETS.loading=true;var s=docum
 function netRefresh(){if(state.tab==="friends")renderFriends();if(state.tab==="ladder")renderLadder();if(state.tab==="shots"&&state.id&&SHOTS[state.id])renderVideo(state.id);var pj=load("pending-join","");if(pj&&netReady()){save("pending-join","");netJoin(pj)}}
 function netErr(m){NETS.err=m||"Something went wrong. Check your connection and try again.";netRefresh()}
 function netProfile(){var sb=NETS.sb,u=NETS.user;sb.from("profiles").select("*").eq("id",u.id).maybeSingle().then(function(r){
-    if(r.error)return netErr("Couldn't load your profile. Has schema.sql been run in Supabase?");
+    if(r.error)return netErr("Couldn't load your profile ("+(r.error.message||r.error.code||"unknown")+"). Run supabase/schema.sql in Supabase, then reload.");
     if(r.data){NETS.prof=r.data;save("rating",String(r.data.rating));netRefresh();return}
     var nm=state.name||(u.email||"Player").split("@")[0];sb.from("profiles").insert({id:u.id,name:nm.slice(0,40),avatar:state.emoji||"a01",side:state.side,level:state.level,rating:ratingStart()}).select().single().then(function(r2){
-      if(r2.error)return netErr("Couldn't create your profile.");NETS.prof=r2.data;netRefresh()})})}
+      if(r2.error)return netErr("Couldn't create your profile ("+(r2.error.message||r2.error.code)+").");NETS.prof=r2.data;netRefresh()})})}
 function netSignIn(email){NETS.err="";return NETS.sb.auth.signInWithOtp({email:email,options:{emailRedirectTo:location.origin+location.pathname}}).then(function(r){if(r.error)netErr(r.error.message);else{NETS.sent=email;netRefresh()}})}
 function netSignOut(){NETS.sb.auth.signOut().then(function(){NETS.room=null;netRefresh()})}
 function joinLink(code){return location.origin+location.pathname+"?join="+code}
