@@ -832,13 +832,17 @@ function renderList(){var list=$("list"),l2=$("list2");list.innerHTML="";l2.inne
     VISIBLE.filter(function(v){return v!=="serve"}).forEach(function(id){var b=iconBtn(id,SHOTS[id].name,function(){pickShot(id)});b.setAttribute("aria-current",String(id===PK.pickShot));list.appendChild(b)});
     $("sel2-title").hidden=true;l2.hidden=true}
   else{$("sel-title").textContent="Sand Series";$("sel2-title").hidden=true;l2.hidden=true;list.className="list";renderLobby(list)}}
+/* Technique video for each shot. Official clips are uploaded by the admin */
+var SHOT_VIDEOS={};
+function renderVideo(id){var v=$("shotvid");if(!v)return;if(!id){v.hidden=true;v.innerHTML="";return}v.hidden=false;var url=SHOT_VIDEOS[id];
+  v.innerHTML=url?'<video controls playsinline preload="metadata" src="'+esc(url)+'"></video>':'<div class="vidph"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="11" fill="currentColor" opacity=".12"/><path d="M10 8l6 4-6 4z" fill="currentColor"/></svg><span>'+SHOTS[id].name+' video coming soon</span></div>'}
 function select(id){stop();state.id=id;save("id-"+state.tab,id);
   scene=SHOTS[id]?shotScene(id):SCENES[id];state.step=0;state.branch=null;
   [].forEach.call(document.querySelectorAll(".item"),function(b){b.setAttribute("aria-current",String(b.id==="item-"+id))});
   $("title").textContent=scene.name;var cat=$("cat");cat.textContent=scene.cat;cat.style.background=CATCOL[scene.cat]||"var(--turq)";
   renderOptions();
   var isShot=!!SHOTS[id];if(isShot&&ICON[id])document.documentElement.style.setProperty("--shotc",ICON[id].c);$("cards").hidden=!isShot;$("cards-m").hidden=!isShot;
-  if(isShot)fillTips(lvTips(id));
+  if(isShot)fillTips(lvTips(id));renderVideo(isShot?id:null);
   var lc=$("lvl-chip");lc.hidden=!isShot;lc.textContent=LVN[state.level];lc.setAttribute("aria-label","Level "+LVN[state.level]+". Change in your profile");
   if(scene.note){$("note").hidden=false;$("note").textContent=scene.note}else{$("note").hidden=true}
   var ip=initPos();["A","B","L","R"].forEach(function(k){place(k,ip[k],true)});
@@ -903,8 +907,13 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
     timer=setTimeout(function(){if(!state.playing)return;if(state.step>=stepsOf().length-1){stop();return}state.step++;go()},d+2600)};go()}
 
 /* ---------------- Controls ---------------- */
-function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);if(t!=="compete"&&typeof resBar==="function"){resBar(null);document.body.classList.remove("hasres")}if(typeof gTag!=="undefined"&&gTag){gTag.innerHTML="";ballTag=null;oppPill=null}if(typeof fbToastOff==="function")fbToastOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="play")t="shots";if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
+function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);if(t!=="compete"&&typeof resBar==="function"){resBar(null);document.body.classList.remove("hasres")}if(typeof gTag!=="undefined"&&gTag){gTag.innerHTML="";ballTag=null;oppPill=null}if(typeof fbToastOff==="function")fbToastOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="learn")t=load("learn-sub","shots")==="pick"?"pick":"shots";if(t==="play")t=["compete","friends","ladder"].indexOf(load("play-sub","compete"))>=0?load("play-sub","compete"):"compete";
+  if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
   ["home","shots","pick","compete"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
+  var grp=t==="home"?"home":/shots|pick/.test(t)?"learn":"play";if(grp==="learn")save("learn-sub",t);if(grp==="play")save("play-sub",t);
+  ["home","learn","play"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===grp))});renderSubnav(grp,t);
+  ["friends","ladder"].forEach(function(k){$(k).hidden=k!==t});
+  if(t==="friends"||t==="ladder"){document.body.classList.add("homing");document.body.classList.remove("sheet-open","trsu","picking","competing","c-live");$("home").hidden=true;$("trtray").hidden=true;hideShotUI();hideServeUI();if(t==="friends")renderFriends();else renderLadder();return}
   var home=t==="home";document.body.classList.toggle("homing",home);$("home").hidden=!home;if(home){$("trtray").hidden=true;document.body.classList.remove("sheet-open","trsu","picking","competing","c-live");hideShotUI();hideServeUI();renderHome();return}
   var pick=t==="pick",comp=t==="compete";$("picker").hidden=!pick;$("ctrls").hidden=pick||comp;$("stepbox").hidden=pick||comp;$("result").hidden=!pick;
   document.body.classList.toggle("picking",pick);document.body.classList.toggle("competing",comp);if(typeof orient==="function"&&SVGC.dataset.o)orient();$("mcap").style.display=pick||comp?"none":"";
@@ -920,7 +929,28 @@ function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);i
   renderList();select(state.id)}
 [].forEach.call(document.querySelectorAll(".tabs button"),function(b,i,all){b.addEventListener("keydown",function(e){var d=e.key==="ArrowRight"?1:e.key==="ArrowLeft"?-1:0;if(!d)return;var n=all[(i+d+all.length)%all.length];n.focus();n.click()})});
 document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".tabs button,.btn,.seg button,.rhead");if(b)sfx("tap")},true);
-$("tab-home").onclick=function(){setTab("home")};$("tab-shots").onclick=function(){setTab("shots")};$("tab-pick").onclick=function(){setTab("pick")};$("tab-compete").onclick=function(){setTab("compete")};
+$("tab-home").onclick=function(){setTab("home")};$("tab-learn").onclick=function(){setTab("learn")};$("tab-play").onclick=function(){setTab("play")};
+$("tab-shots").onclick=function(){setTab("shots")};$("tab-pick").onclick=function(){setTab("pick")};$("tab-compete").onclick=function(){setTab("compete")};
+/* Online play. NET is set once a Supabase project is connected (see config) */
+var NET=null;
+function ratingStart(){return {beginner:2.0,intermediate:3.5,advanced:4.75,pro:5.75}[state.level]||3.5}
+function myRating(){var r=+load("rating","");return r?r:ratingStart()}
+function renderFriends(){var f=$("friends"),fr=[];try{fr=JSON.parse(load("friends","[]"))||[]}catch(e){}
+  f.innerHTML='<div class="pcard"><h2>Play with friends</h2><p class="pmuted">Up to four players, each on their own phone, all on court at once.</p>'+
+    '<div class="pbtns"><button class="btn primary big" id="fr-new"'+(NET?'':' disabled')+'>Create a game</button><button class="btn soft" id="fr-join"'+(NET?'':' disabled')+'>Join with a code</button></div>'+
+    (NET?'':'<p class="pnote">Online play switches on once the game server is connected.</p>')+'</div>'+
+    '<div class="pcard"><h3>Friends</h3><form class="fradd" id="fr-form"><input id="fr-in" placeholder="Name or email" maxlength="60" autocomplete="off"><button class="btn soft" type="submit">Add</button></form>'+
+    (fr.length?'<ul class="frlist">'+fr.map(function(x,i){return '<li><span class="fav">'+esc(x.n[0]||"?").toUpperCase()+'</span><b>'+esc(x.n)+'</b><small>'+(NET?"Invite":"Invite when online")+'</small><button class="lnk" data-del="'+i+'" aria-label="Remove '+esc(x.n)+'">&#10005;</button></li>'}).join("")+'</ul>':'<p class="pmuted">Add the people you play with. You can invite them to a game with one tap.</p>')+'</div>';
+  $("fr-form").onsubmit=function(e){e.preventDefault();var v=$("fr-in").value.trim();if(!v)return;fr.push({n:v,t:Date.now()});save("friends",JSON.stringify(fr));track("friend_added",{});renderFriends()};
+  [].forEach.call(f.querySelectorAll("[data-del]"),function(b){b.onclick=function(){fr.splice(+b.dataset.del,1);save("friends",JSON.stringify(fr));renderFriends()}})}
+function renderLadder(){var f=$("ladder"),r=myRating(),nm2=state.name?esc(state.name):"You";
+  f.innerHTML='<div class="pcard rate"><span class="pmuted">Your rating</span><b>'+r.toFixed(2)+'</b><small>Scale 2.0 to 8.0 · +0.1 for a win · daily loss capped at 0.3</small></div>'+
+    '<div class="pcard"><h3>Ladder</h3><ol class="ladder"><li class="me"><span>1</span><b>'+nm2+'</b><em>'+r.toFixed(2)+'</em></li></ol>'+
+    '<p class="pnote">'+(NET?"Ranked matches against friends move you up the ladder.":"The ladder fills in once online play is connected. Ranked games are against real players, not the computer.")+'</p></div>';}
+function renderSubnav(grp,t){var n=$("subnav");if(grp==="home"){n.hidden=true;return}n.hidden=false;
+  var items=grp==="learn"?[["shots","Shots"],["pick","Train"]]:[["compete","Computer"],["friends","Friends"],["ladder","Ladder"]];
+  n.innerHTML=items.map(function(x){return '<button role="tab" data-t="'+x[0]+'" aria-pressed="'+(x[0]===t)+'">'+x[1]+'</button>'}).join("");
+  [].forEach.call(n.children,function(b){b.onclick=function(){if(b.dataset.t!==state.tab)setTab(b.dataset.t)}})}
 function seg(id,key){var box=$(id);[].forEach.call(box.children,function(b){b.setAttribute("aria-pressed",String(b.dataset.v===state[key]));
   b.onclick=function(){track("setting_changed",{setting:key,from:state[key],to:b.dataset.v,tab:state.tab,lesson:state.id});state[key]=b.dataset.v;save(key,b.dataset.v);setSum();[].forEach.call(box.children,function(x){x.setAttribute("aria-pressed",String(x===b))});
     if(key==="level"||key==="hand"){refreshView();return}
@@ -1380,7 +1410,8 @@ function lvTick(now){LV.raf=requestAnimationFrame(lvTick);var rdt=Math.min(0.05,
   b.t+=dt;var e=Math.min(1,b.t/b.T),B=[b.src[0]+(b.to[0]-b.src[0])*e,b.src[1]+(b.to[1]-b.src[1])*e],h=b.H(e);b.e=e;b.B=B;b.h=h;lvBallDraw(b,B,h);
   var rk=b.mate?lvPt():lvMe(),P=LV.pos[rk],d=dst(P,B),inr=d<=REACH&&h<=3.4&&h>=0.12;
   if(b.mate){if(inr&&e>0.25){lvMateHit(b);return}}
-  else{if(inr!==b.win){b.win=inr;document.body.classList.toggle("inwin",inr);if(inr){setPrompt("Swing: hold, then flick");buzz(8)}}
+  else{if(inr!==b.win){b.win=inr;document.body.classList.toggle("inwin",inr);if(inr){setPrompt(h<NET_H?"Below the net: lift it":"Above the net: attack");buzz(8)}}
+    if(inr){var below=h<NET_H;if(below!==b.below){b.below=below;lvRail(b)}}
     if(inr&&LV.swing&&now<=LV.swing.exp){var sw=LV.swing;LV.swing=null;lvHit(b,sw);return}}
   if(e>=1){b.hit=true;document.body.classList.remove("inwin");lvLand(b)}}
 /* Ball drawing for the live flight */
@@ -1409,22 +1440,24 @@ function lvIncoming(){var m=MATCH,cur=m.cur,sit=cur.sit,osv=cur.srv==="opp",me=l
   shotRail(LV.lock,function(id){LV.lock=id;var c=$("lp-hint");lvChipShow()},b.mate?"idle":null);
   $("c-sr").textContent=(b.mate?"Your partner's ball. ":"Your ball. ")+describe(sit)}
 /* Their ball lands in our court */
+function lvRail(b){var r=$("shotrail");if(!r)return;var h=b.h||1.4;[].forEach.call(r.children,function(x){var v=x.dataset.v;if(v==="serve")return;var ok=v!=="dig"||incomingAttack(b.cur.sit);x.disabled=!ok;if(!ok&&LV.lock===v){LV.lock=null;x.setAttribute("aria-pressed","false")}})}
 function lvLand(b){var cur=b.cur,m=MATCH;if(!m||m.cur!==cur||cur.done)return;land.setAttribute("cx",X(b.to[0]));land.setAttribute("cy",Y(b.to[1]));land.setAttribute("opacity",1);sfx("sand");
   var who=b.mate?lvPt():lvMe(),gap=dst(LV.pos[who],b.to);lvEnd(cur,false,"sand",{gap:gap,mate:b.mate,to:b.to})}
 /* Your partner plays automatically */
-function lvMateHit(b){var cur=b.cur;b.hit=true;var pt=lvPt(),a=cur.ans,from=LV.pos[pt].slice(),ch=b.h,sh=a.shot,cell=a.cell5;
+function lvMateHit(b){var cur=b.cur;b.hit=true;var pt=lvPt(),a=cur.ans,from=LV.pos[pt].slice(),ch=b.h,sh=a.shot,cell=a.cell5;if(!shotLegal(sh,ch,cur.sit)){sh=ch>=NET_H?"push":incomingAttack(cur.sit)?"dig":"neutral";cell=sh==="push"?[1,2]:[2,2]}
   POSE[pt]=POSE_MAP[sh]||null;updImg(pt);var out=shotOutcome({shot:sh,speed:MATE_SPD[sh]==="fast"?"fast":MATE_SPD[sh]==="slow"?"slow":"neutral",cell:cell,tier:2,aimT:aimTier(cell,sh,cur.sit,"neutral"),from:from,sit:cur.sit,ch:ch,ct:"ontime"});
   cur.hist=(cur.hist||[]);cur.hist.push({shot:sh,cell:cell,Q:out.Q,by:"mate"});lvAfterShot(cur,out,sh,cell,from,"mate")}
 /* Your swing. Contact height is wherever the ball is when you hit it */
 function lvHit(b,sw){var cur=b.cur;b.hit=true;document.body.classList.remove("inwin");lvChip(null);
   var e=b.e,rs=b.rings,ct=e<rs[0].e+(rs[1].e-rs[0].e)/2?"early":e>rs[1].e+(rs[2].e-rs[1].e)/2?"late":"ontime",ch=b.h,from=b.B.slice();
   cur.from=from;cur.ch=ch;cur.ctype=ct;cur.spare=0.3;cur.atBall=true;
-  var shot=LV.lock||inferShot(ch,sw);LV.lock=null;var p=cur.pick={shot:shot,cell:sw.cell,speed:sw.pace,spin:sw.spin,move:"hold"};
+  var shot=LV.lock&&(LV.lock!=="dig"||incomingAttack(cur.sit))?LV.lock:inferShot(ch,sw,cur.sit);LV.lock=null;var p=cur.pick={shot:shot,cell:sw.cell,speed:sw.pace,spin:sw.spin,move:"hold"};
   POSE[lvMe()]=POSE_MAP[shot]||null;updImg(lvMe());buzz(sw.pace==="fast"?25:sw.pace==="slow"?10:15);
   var sitC=Object.assign({},cur.sit,{height:ch>=2.2?"high":ch>=1.0?"med":"low"}),curC=Object.assign({},cur,{sit:sitC,ans:solveSit(sitC)}),
     t=shotTiers(sitC,curC.ans.shot)[shot];if(t==null)t=1;
-  var out=shotOutcome({shot:shot,speed:p.speed,cell:p.cell,tier:t,aimT:aimTier(p.cell,shot,sitC,p.speed),from:from,sit:cur.sit,ch:ch,ct:ct,spare:0.3});
-  cur.G=gradeChoice(curC,p);cur.hist=(cur.hist||[]);cur.hist.push({shot:shot,cell:p.cell,Q:out.Q,by:"me"});
+  var intoNet=!!ATTACK3[aimShot(shot)]&&ch<NET_H,
+    out=intoNet?{end:"miss",net:true,why:"Below the net you can't hit down. It went into the net."}:shotOutcome({shot:shot,speed:p.speed,cell:p.cell,tier:t,aimT:aimTier(p.cell,shot,sitC,p.speed),from:from,sit:cur.sit,ch:ch,ct:ct,spare:0.3});
+  cur.G=gradeChoice(curC,p);if(intoNet){cur.G.mine=-1;cur.G.d=cur.G.best.v+1;cur.G.lab="Blunder";cur.netRule=true}cur.hist=(cur.hist||[]);cur.hist.push({shot:shot,cell:p.cell,Q:out.Q,by:"me"});
   var m=MATCH;m.shots=m.shots||[];m.shots.push({pt:m.points,lab:cur.G.lab,d:+cur.G.d.toFixed(2),ct:ct,ch:+ch.toFixed(2),dec:null,open:!!cur.wasOpening,sit:JSON.parse(JSON.stringify(cur.sit)),pick:{shot:shot,cell:p.cell,speed:p.speed,spin:p.spin},best:{shot:cur.G.best.shot,cell:cur.G.best.cell},end:out.end||null});
   if(cur.G&&LABSC[cur.G.lab]===2)m.right++;
   lvAfterShot(cur,out,shot,p.cell,from,"me")}
@@ -1432,7 +1465,7 @@ function lvHit(b,sw){var cur=b.cur;b.hit=true;document.body.classList.remove("in
 function lvAfterShot(cur,out,shot,cell,from,by){var m=MATCH,sc=lvScale(),dest=out.rc?out.rc.land:svTarget(cell);setPrompt(by==="me"?"Move into position":"");
   var travel=out.rc?out.rc.tBall:0.6,ms=Math.max(250,travel/sc*1000),pr=PROF[shot]||PROF.neutral;PROF._me={d:ms/1.3,h:pr.h};
   if(LV.ball&&LV.ball.rings)LV.ball.rings.forEach(function(r){if(r.g)r.g.remove()});
-  if(out.end==="miss"){errBall(from,dest[1],Math.random()<0.5)}else runBall({f:from,to:dest,shot:"_me",land:true},true);
+  if(out.end==="miss"){errBall(from,dest[1],out.net!=null?out.net:Math.random()<0.5)}else runBall({f:from,to:dest,shot:"_me",land:true},true);
   if(out.end){setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;var won=out.end==="winner"||out.end==="forced"||out.end==="theymiss";if(out.rc)reachRing(out.rc,rv());lvEnd(cur,won,out.end,{out:out,by:by})},ms+150);return}
   /* Pressure builds over shots */
   var hm=[11.5,out.rc.who==="A"?2.5:5.5],disp=dst(out.rc[out.rc.who],hm)>1.5,pz=0.5*(cur.press||0)+Math.max(0,Math.min(1,(0.6-out.rc.m)/0.6))+(cur.ctype==="early"&&cur.ch>=NET_H&&by==="me"?0.25:0)+(disp?0.2:0)+(out.arrH<1?0.15:0);
@@ -1454,8 +1487,8 @@ function lvAfterShot(cur,out,shot,cell,from,by){var m=MATCH,sc=lvScale(),dest=ou
 /* Point over */
 function lvEnd(cur,won,kind,info){var m=MATCH;if(!m||m.cur!==cur||cur.done)return;cur.done=true;if(LV.ball)LV.ball.hit=true;document.body.classList.remove("inwin");lvChip(null);lvHold(null);
   pointEnd(m,won,kind==="sand"?"sand":kind);renderScore();var G=cur.G,E=ENDTXT[kind],over=(m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2;
-  var head=kind==="sand"?(info.mate?"Your partner couldn't reach it.":info.gap>3?"Too far.":"Too slow."):E?E[1]:"Point over.",
-    sub=kind==="sand"?(info.mate?"":"You were "+info.gap.toFixed(1)+" m from where it landed."):kind==="gap"?"":(E&&E[2]||"");
+  var head=cur.netRule&&kind==="miss"?"Into the net.":kind==="sand"?(info.mate?"Your partner couldn't reach it.":info.gap>3?"Too far.":"Too slow."):E?E[1]:"Point over.",
+    sub=cur.netRule&&kind==="miss"?"You met it at "+cur.ch.toFixed(1)+" m, below the net. A "+SHOTS[cur.pick.shot].name.toLowerCase()+" from there can't clear it. Lift it instead.":kind==="sand"?(info.mate?"":"You were "+info.gap.toFixed(1)+" m from where it landed."):kind==="gap"?"":(E&&E[2]||"");
   if(!won)saveLost({sit:cur.sit,pick:cur.pick||{},ans:{shot:(G?G.best.shot:cur.ans.shot),cell5:(G?G.best.cell:cur.ans.cell5)},kind:kind==="sand"?"far":kind,tier:G?(LABSC[G.lab]===2?2:0):1,aimT:0,moveOk:kind!=="sand",why:"",rival:m.r.pair,gap:info.gap?+info.gap.toFixed(1):null});
   var R=rv(),o=info.out,html='<div class="ptres '+(won?"w":"l")+'"><b>'+head+'</b> '+sub+'</div>'+
     (G&&info.by==="me"?'<div class="fbbest"><b>Best play</b><p>'+SHOTS[G.best.shot].name+" to the "+cellName5(G.best.cell).toLowerCase()+'.</p></div>':'')+'<!--more-->'+
@@ -1475,11 +1508,16 @@ function lvWorld(e){var q=SVGC.createSVGPoint();q.x=e.clientX;q.y=e.clientY;var 
 function lvActive(){var c=MATCH&&MATCH.cur;return LV.on&&state.tab==="compete"&&c&&!c.done&&!(c.srv==="me"&&!c.served)}
 function bandOf(ms){return ms<200?"low":ms<550?"mid":"high"}
 function cellAt(w){var d=0,l=0;for(var i=0;i<3;i++)if(w[0]>=AX[i][0])d=i;for(var j=0;j<5;j++)if(w[1]>=AY[j][0])l=j;return [Math.max(0,Math.min(2,d)),Math.max(0,Math.min(4,l))]}
-function inferShot(ch,sw){if(sw.tap)return "dig";var hb=sw.band,pc=sw.pace;
+/* Rules: no smash, push or hook from below the net. Block only against a smash, push or hook */
+var ATTACK3={push:1,flatsmash:1,hook:1};
+function incomingAttack(sit){return !!ATTACK3[aimShot(sit.shot||oppPose(sit))]}
+function shotLegal(sh,ch,sit){sh=aimShot(sh);if(ATTACK3[sh]&&ch<NET_H)return false;if(sh==="dig"&&!incomingAttack(sit))return false;return true}
+function inferShot(ch,sw,sit){var att=sit?incomingAttack(sit):true;if(sw.tap)return att?"dig":(ch>=NET_H?"push":"neutral");var hb=sw.band,pc=sw.pace;
+  if(ch<NET_H){if(hb==="high")return "lob";if(pc==="slow")return "drop";return (pc==="neutral"&&att&&hb==="low")?"dig":"neutral"}
   if(hb==="high")return "lob";if(hb==="mid")return "neutral";
   if(ch>=NET_H){if(pc==="slow")return "drop";if(pc==="fast")return sw.curve?"hook":"flatsmash";return "push"}
   if(ch>=1.0)return pc==="slow"?"drop":"push";
-  return pc==="fast"?"push":pc==="slow"?"drop":"dig"}
+  return pc==="slow"?"drop":"neutral"}
 function lvReadSwing(g,now){var pts=g.pts,n=pts.length,last=pts[n-1],first=pts[0],hold=(g.holdEnd||now)-g.t0,
     k=n-1;while(k>0&&last[2]-pts[k][2]<80)k--;var vdt=Math.max(16,last[2]-pts[k][2]),v=Math.hypot(last[0]-pts[k][0],last[1]-pts[k][1])/vdt,
     L=Math.hypot(last[0]-first[0],last[1]-first[1]),pace=v>1.3?"fast":v>0.55?"neutral":"slow",
@@ -1503,7 +1541,7 @@ SVGC.addEventListener("pointerdown",function(e){if(!lvActive())return;e.preventD
   if(lvSwingPossible())lvHold({b:"low"})},true);
 SVGC.addEventListener("pointermove",function(e){var g=LV.g;if(!g||!lvActive())return;e.preventDefault();var now=performance.now();g.pts.push([e.clientX,e.clientY,now]);if(g.pts.length>40)g.pts.shift();
   if(!g.moved){var s0=g.first||(g.first=[g.pts[0][0],g.pts[0][1]]);if(Math.hypot(e.clientX-s0[0],e.clientY-s0[1])>10){g.moved=true;g.holdEnd=now}}
-  if(lvSwingPossible()&&g.moved){var sw=lvReadSwing(g,now),sh=LV.lock||inferShot(LV.ball.h||1.4,sw),ic=ICON[sh];
+  if(lvSwingPossible()&&g.moved){var sw=lvReadSwing(g,now),sh=LV.lock&&(LV.lock!=="dig"||incomingAttack(LV.ball.cur.sit))?LV.lock:inferShot(LV.ball.h||1.4,sw,LV.ball.cur.sit),ic=ICON[sh];
     lvChip({x:e.clientX,y:e.clientY,html:'<span class="si" style="background:'+ic.c+'"><svg viewBox="0 0 24 24" fill="none" stroke="'+ic.f+'" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">'+ic.d+'</svg></span><b>'+SHOTS[sh].name+'</b><small>'+cellName5(sw.cell)+'</small>'})}},true);
 function lvUp(e){var g=LV.g;LV.g=null;lvChip(null);if(!g||!lvActive()){lvHold(null);return}e.preventDefault();var now=performance.now();g.pts.push([e.clientX,e.clientY,now]);
   var sw=lvReadSwing(g,now),b=LV.ball;lvHold(null);
@@ -1698,7 +1736,7 @@ function evOne(cur,shot,cell,speed,N){var sit=cur.sit,t=shotTiers(sit,cur.ans.sh
     v+=o.end==="winner"||o.end==="forced"||o.end==="theymiss"?1:o.end?-1:o.Q<0.35?0.35:o.Q>0.7?-0.15*Math.min(1,(o.Q-0.7)/0.3):0.1*(0.7-o.Q)/0.35}
   return v/N}
 function gradeChoice(cur,p){var cells=[];for(var d=0;d<3;d++)for(var l=0;l<5;l++)cells.push([d,l]);var best=null,mineCells={};
-  SHOTSET.filter(function(sh){return !((sh==="flatsmash"&&cur.ch<1.5)||(sh==="hook"&&cur.ch<1.2))}).forEach(function(sh){var sc=cells.map(function(c){return {c:c,v:evOne(cur,sh,c,p.speed,8)}}).sort(function(a,b){return b.v-a.v}).slice(0,3);
+  SHOTSET.filter(function(sh){return shotLegal(sh,cur.ch,cur.sit)}).forEach(function(sh){var sc=cells.map(function(c){return {c:c,v:evOne(cur,sh,c,p.speed,8)}}).sort(function(a,b){return b.v-a.v}).slice(0,3);
     sc.forEach(function(x){x.v=evOne(cur,sh,x.c,p.speed,30);if(!best||x.v>best.v)best={shot:sh,cell:x.c,v:x.v}})});
   best.v=evOne(cur,best.shot,best.cell,p.speed,60);
   cells.forEach(function(c){mineCells[c.join(",")]=evOne(cur,p.shot,c,p.speed,14)});
@@ -2111,7 +2149,8 @@ function rallyReply(cur,ctx,out,team,meKey){var R=rv(),Q=out.Q,rc=out.rc,pick=nu
   if(!pick){var rows=replyRows(ctx);pick=wpick(rows.map(function(x){return [x,x.w]}));cur.rows=rows}
   /* The ball reached them low: they must lift it. It reached them high: they can attack you */
   var aH=out.arrH!=null?out.arrH:1.3,lifted=false;
-  if(!opening&&aH<1.0&&/push|flatsmash|hook/.test(pick.k)){pick=Math.random()<0.55?{k:"dig",why:"It reached them low, so they had to lift it.",to:pick.to}:{k:"lob",why:"It reached them low, so they lobbed.",to:pick.to};lifted=true}
+  if(pick.k==="dig"&&!ATTACK3[aimShot(ctx.shot||"neutral")])pick={k:"neutral",why:"A soft ball can't be blocked, so they played it back.",to:pick.to};
+  if(!opening&&aH<NET_H&&/push|flatsmash|hook/.test(pick.k)){pick=Math.random()<0.55?{k:"dig",why:"It reached them low, so they had to lift it.",to:pick.to}:{k:"lob",why:"It reached them low, so they lobbed.",to:pick.to};lifted=true}
   else if(!opening&&aH>1.7&&/dig|neutral|drop/.test(pick.k)&&Math.random()<0.5){pick={k:"push",why:"It reached them high, so they attacked.",to:pick.to}}
   var b=REPLY_BALL[pick.k],sit={shot:pick.k,depth:b.depth,height:b.height,speed:b.speed,side:pick.k==="neutral"?"body":wpick([["fh",4],["body",2],["bh",3]])};
   if(pick.short){sit.depth="mid";sit.height="high";sit.speed="slow"}

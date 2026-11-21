@@ -51,10 +51,13 @@
 
   <nav class="tabs" role="tablist">
     <button id="tab-home" role="tab" aria-selected="false" data-tab="home">Home</button>
-    <button id="tab-shots" role="tab" aria-selected="true" data-tab="shots">Shots</button>
-    <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Train</button>
-    <button id="tab-compete" role="tab" aria-selected="false" data-tab="compete">Compete</button>
+    <button id="tab-learn" role="tab" aria-selected="true" data-tab="learn">Learn</button>
+    <button id="tab-play" role="tab" aria-selected="false" data-tab="play">Play</button>
+    <button id="tab-shots" hidden data-tab="shots">Shots</button><button id="tab-pick" hidden data-tab="pick">Train</button><button id="tab-compete" hidden data-tab="compete">Computer</button>
   </nav>
+  <div class="seg subnav" id="subnav" role="tablist" hidden></div>
+  <section id="friends" class="pane" hidden></section>
+  <section id="ladder" class="pane" hidden></section>
 
   <section id="home" hidden></section>
   <section id="selector">
@@ -172,6 +175,7 @@
     <aside class="card-w panel"><div class="trtray" id="trtray" hidden></div>
       <div class="cpanel" id="cpanel" hidden></div>
       <div class="step" id="stepbox">
+        <div class="shotvid" id="shotvid" hidden></div>
         <span class="kicker" id="step-k"></span>
         <h3 id="step-title"></h3>
         <div class="iara"><span class="av" aria-hidden="true">G</span><div class="iara-b"><b>Coach Guto</b><p class="say" id="say"></p></div></div>

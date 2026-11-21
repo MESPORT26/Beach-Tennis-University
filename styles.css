@@ -918,3 +918,19 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .swchip .si{width:26px;height:26px;border-radius:50%;display:grid;place-items:center}.swchip .si svg{width:15px;height:15px}.swchip small{font-weight:700;color:var(--muted);font-size:11px}
 .inwin #court{filter:saturate(1.15)}
 .competing.c-live #court{touch-action:none;-webkit-user-select:none;user-select:none}
+
+.tabs{grid-template-columns:repeat(3,1fr)!important}.tabs button[hidden]{display:none}
+.subnav{display:flex;gap:4px;margin:-8px 0 0;background:var(--surface);border-radius:99px;padding:4px;box-shadow:var(--shadow)}
+.subnav button{flex:1;min-height:40px;border-radius:99px}
+.pane{display:grid;gap:12px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;display:grid;gap:10px}
+.pcard h2,.pcard h3{margin:0;font-weight:800;text-transform:uppercase;letter-spacing:.03em}.pcard h2{font-size:20px}.pcard h3{font-size:14px;color:var(--muted)}
+.pmuted{margin:0;color:var(--muted);font-size:14px}.pnote{margin:0;font-size:13px;color:var(--muted);background:var(--surface-2);border-radius:12px;padding:8px 12px}
+.pbtns{display:grid;gap:8px}.pbtns .btn:disabled{opacity:.45;cursor:default}
+.fradd{display:flex;gap:8px}.fradd input{flex:1;min-width:0;border:1px solid var(--line);border-radius:12px;padding:10px 12px;font:600 15px var(--font);background:var(--bg);color:var(--fg)}
+.frlist{list-style:none;margin:0;padding:0;display:grid;gap:6px}.frlist li{display:grid;grid-template-columns:auto 1fr auto auto;gap:10px;align-items:center;padding:6px 0}
+.fav{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--turq);color:#fff;font-weight:800}.frlist small{color:var(--muted)}
+.pcard.rate{justify-items:center;text-align:center}.pcard.rate b{font:800 48px/1 var(--font)}.pcard.rate small{color:var(--muted)}
+.ladder{list-style:none;margin:0;padding:0}.ladder li{display:grid;grid-template-columns:28px 1fr auto;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line)}.ladder li.me{font-weight:800}.ladder em{font-style:normal;font-variant-numeric:tabular-nums}
+.shotvid{border-radius:16px;overflow:hidden;background:var(--surface-2)}.shotvid video{width:100%;display:block;max-height:46vh;background:#000}
+.vidph{display:flex;align-items:center;gap:10px;padding:14px;color:var(--muted);font-weight:700;font-size:14px}.vidph svg{width:36px;height:36px;color:var(--turq)}
