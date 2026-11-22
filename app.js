@@ -1662,10 +1662,16 @@ function bName(s){return SHOTS[BOLD[s]]?SHOTS[BOLD[s]].name:s}
 function bGauss(){var u=Math.random()||1e-9,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
 function bP(skill){return {react:0.30-0.10*skill,run:4.0+1.2*skill,back:0.62+0.1*skill,reach:1.35+0.15*skill,sdm:1.35-0.6*skill,errBase:0.022-0.014*skill,read:skill,iq:skill}}
 function bHcon(shot,k,lx){var b=BHCON[shot][k];if(shot==="smash"||shot==="push")return b;if(shot==="lob")return lx<5.5?b+0.35*(5.5-lx):b-0.25*(lx-5.5);return b+(lx<4?0.15*(4-lx):-0.18*(lx-4))}
-function bCovPt(c,i){return [BHOMEX[c.d],i===0?Math.min(3.6,[1.4,2.6,3.4][c.l]):Math.max(4.4,[4.6,5.4,6.6][c.l])]}
+function bCovPt(c,i){return [({net:1.9,mid:4.3,deep:6.4})[c.d],i===0?[1.1,2.6,3.0][c.l]:[5.0,5.4,6.9][c.l]]}
+/* Court zones drawn flush on the court lines: 0-3 m, 3-6 m, 6-8 m from the net */
+var BBAND={short:[0,3],mid:[3,6],deep:[6,8]},BBNM={short:"0–3 m",mid:"3–6 m",deep:"6–8 m"};
+function bZone(xa,xb,ya,yb,col,label,aria,cls,fn){var x0=Math.min(X(xa),X(xb)),x1=Math.max(X(xa),X(xb)),y0=Y(ya),y1=Y(yb),g=el("g",{"class":"ac bt "+(cls||""),role:"button","aria-label":aria},gA);
+  el("rect",{x:x0,y:y0,width:x1-x0,height:y1-y0,fill:col,"fill-opacity":0.13,stroke:col,"stroke-width":1.5},g);
+  if(label){var t=el("text",{x:(x0+x1)/2,y:(y0+y1)/2+6,"text-anchor":"middle",fill:col,"pointer-events":"none",style:"font:800 15px Montserrat,sans-serif"},g);t.textContent=label;orientText(t)}
+  g.addEventListener("click",fn);return g}
 /* Error before the ball is struck: hitting down from below the net, risk, balance. Shown to the player */
 function bErr(st,hp,c){var S=BSHOT[c.shot],below=Math.max(0,S.hmin-st.h);return {net:Math.min(0.95,S.netK*below)+(c.shot==="drop"&&st.h>2.2?0.05:0),frame:hp.errBase*BRISK[c.risk].err*(1+9*(1-st.B)*(1-st.B))}}
-function bAim(c){var R=BRISK[c.risk],tx=BDEPTH[c.d],ty=BLANES[c.l];if(c.d==="deep")tx=8-R.margin;if(c.d==="short")tx=Math.max(0.8,R.margin+0.6);if(c.l===0)ty=R.margin;if(c.l===2)ty=8-R.margin;return [tx,ty]}
+function bAim(c){var R=BRISK[c.risk],tx=BDEPTH[c.d],ty=c.y!=null?c.y:BLANES[c.l];if(c.d==="deep")tx=8-R.margin;if(c.d==="short")tx=Math.max(0.8,R.margin+0.6);if(c.y==null){if(c.l===0)ty=R.margin;if(c.l===2)ty=8-R.margin}else ty=Math.max(R.margin*0.6,Math.min(8-R.margin*0.6,ty));return [tx,ty]}
 function bResolve(st,hp,c,defs,dps,covers){var S=BSHOT[c.shot],R=BRISK[c.risk],E=bErr(st,hp,c);
   if(Math.random()<E.net)return {end:"err",why:"net"};if(Math.random()<E.frame)return {end:"err",why:"frame"};
   var a=bAim(c),sd=0.85*S.sd*R.sdm*hp.sdm*(1+1.2*(1-st.B)),land=[a[0]+bGauss()*sd,a[1]+bGauss()*sd];
@@ -1758,14 +1764,13 @@ function bAskShot(){var st=BT.st,hp=BT.teams[0].p[bMeI()],opts=bOptions(BT.inSho
   bClock(function(){if(BT.pick.shot&&BT.pick.tg)return;var c=BT.pick.shot?{shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":"mid",l:1,risk:BT.pick.risk}:{shot:"neutral",d:"mid",l:1,risk:"safe"};bCommit(c)})}
 function bErrPct(st,hp,c){var E=bErr(st,hp,c),S=BSHOT[c.shot],a=bAim(c),sd=0.85*S.sd*BRISK[c.risk].sdm*hp.sdm*(1+1.2*(1-st.B)),out=0;
   for(var n=0;n<300;n++){var x=a[0]+bGauss()*sd,y=a[1]+bGauss()*sd;if(x<0.15||x>8||y<0||y>8)out++}var pn=Math.min(0.95,E.net),pf=E.frame;return Math.round(Math.min(0.99,pn+(1-pn)*pf+(1-pn)*(1-pf)*out/300)*100)}
-function bRiskSeg(fn){var p=BT.pick,st=BT.st,hp=BT.teams[0].p[bMeI()];return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){var e=p.shot?bErrPct(st,hp,{shot:p.shot,d:p.shot==="drop"?"short":p.shot==="serve"?"deep":p.shot==="lob"?"deep":"mid",l:1,risk:r}):null;
-  return '<button data-r="'+r+'" aria-pressed="'+(p.risk===r)+'"><b>'+r[0].toUpperCase()+r.slice(1)+'</b>'+(e!=null?'<small class="'+(e>=25?"hi":"")+'">'+e+'% error</small>':'')+'</button>'}).join("")+'</div>'}
+function bRiskSeg(fn){var p=BT.pick,st=BT.st,hp=BT.teams[0].p[bMeI()];return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){var e=null;if(p.shot){var lo=99,hi=0;bRows(p.shot).forEach(function(d){[0,1,2].forEach(function(l){var v=bErrPct(st,hp,{shot:p.shot,d:d,l:l,y:p.shot==="serve"?[0.8,4,7.2][l]:null,risk:r});lo=Math.min(lo,v);hi=Math.max(hi,v)})});e=lo===hi?lo+"%":lo+"–"+hi+"%"}
+  return '<button data-r="'+r+'" aria-pressed="'+(p.risk===r)+'"><b>'+r[0].toUpperCase()+r.slice(1)+'</b>'+(e!=null?'<small class="'+(hi>=25?"hi":"")+'">'+e+' error</small>':'')+'</button>'}).join("")+'</div>'}
 function bWire(fn){[].forEach.call($("btdock").querySelectorAll("[data-r]"),function(b){b.onclick=function(){BT.pick.risk=b.dataset.r;fn()}})}
-function bDockShot(){var p=BT.pick;bDock(bRiskSeg()+'<p class="bthint">'+(p.shot?bName(p.shot)+": tap a target on their side":"Pick your shot on the left")+'</p>');bWire(bDockShot)}
-function bTargets(){gA.innerHTML="";var p=BT.pick,rows=p.shot==="drop"?["short"]:p.shot==="lob"?["mid","deep"]:p.shot==="block"?["short","mid"]:["short","mid","deep"],X0={short:[0.4,3.1],mid:[3.1,5.3],deep:[5.3,7.9]},Y0=[[0.1,2.67],[2.67,5.33],[5.33,7.9]];
-  rows.forEach(function(d){[0,1,2].forEach(function(l){var x0=X(8+X0[d][0]),x1=X(8+X0[d][1]),y0=Y(Y0[l][0]),y1=Y(Y0[l][1]),g=el("g",{"class":"ac bt",role:"button","aria-label":d+" "+["left","middle","right"][l]},gA);
-    el("rect",{x:x0+2,y:y0+2,width:x1-x0-4,height:y1-y0-4,rx:6,fill:"#00C2B8","fill-opacity":0.14,stroke:"#00C2B8","stroke-width":2},g);
-    g.addEventListener("click",function(){p.tg=[d,l];bCommit({shot:p.shot,d:d,l:l,risk:p.risk})})})});cue("aim")}
+function bDockShot(){var p=BT.pick;if(p.shot&&$("g-aim")&&gA.querySelector(".bt"))bTargets();bDock(bRiskSeg()+'<p class="bthint">'+(p.shot?bName(p.shot)+": each target shows its error chance":"Pick your shot on the left")+'</p>');bWire(bDockShot)}
+function bRows(s){return s==="serve"?["deep"]:s==="drop"?["short"]:s==="lob"?["mid","deep"]:s==="block"?["short","mid"]:["short","mid","deep"]}
+function bTargets(){gA.innerHTML="";var p=BT.pick,rows=bRows(p.shot),hp=BT.teams[0].p[bMeI()],Y0=[[0,8/3],[8/3,16/3],[16/3,8]];
+  rows.forEach(function(d){[0,1,2].forEach(function(l){var ep=bErrPct(BT.st,hp,{shot:p.shot,d:d,l:l,risk:p.risk});bZone(8+BBAND[d][0],8+BBAND[d][1],Y0[l][0],Y0[l][1],ep>=25?"#C2334A":"#00A39A",ep+"%",d+" "+["left","middle","right"][l]+", "+ep+"% error","",function(){p.tg=[d,l];bCommit({shot:p.shot,d:d,l:l,risk:p.risk})})})});cue("aim")}
 function bCommit(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDock("");railOff();
   /* Grade your choice against the best option, given how they usually cover */
   var st=BT.st,hp=BT.teams[0].p[bMeI()],D=BT.teams[1],g=bGuessCovers(D,{read:0.7},bBand(st.h)),opts=bOptions(BT.inShot),best=null,bv=-9,mine=bEval(st,hp,c,BT.pos[1],D.p,g,40);
@@ -1775,19 +1780,16 @@ function bCommit(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDo
     pick:{shot:BOLD[c.shot],cell:[["short","mid","deep"].indexOf(c.d),c.l*2]},best:{shot:BOLD[best.shot],cell:[["short","mid","deep"].indexOf(best.d),best.l*2]},end:null});
   if(LABSC[lab]===2)m.right++;bDefend(c)}
 function bAskServe(){BT.pick={shot:"serve",risk:"normal"};var pm={};pm[state.side]="serve";setPoses(pm);railOff();
-  setPrompt("Your serve: pick a risk, tap a zone");gA.innerHTML="";[["mid",[3.1,5.3]],["deep",[5.3,7.9]]].forEach(function(dd){[0,1,2].forEach(function(l){var Y0=[[0.1,2.67],[2.67,5.33],[5.33,7.9]][l],x0=X(8+dd[1][0]),x1=X(8+dd[1][1]),y0=Y(Y0[0]),y1=Y(Y0[1]),g=el("g",{"class":"ac bt",role:"button","aria-label":"Serve "+dd[0]+" "+["left","middle","right"][l]},gA);
-    el("rect",{x:x0+2,y:y0+2,width:x1-x0-4,height:y1-y0-4,rx:6,fill:"#FFD23F","fill-opacity":0.18,stroke:"#E0A800","stroke-width":2},g);g.addEventListener("click",function(){bCommitServe({shot:"serve",d:dd[0],l:l,risk:BT.pick.risk})})})});
+  setPrompt("Your serve: pick a risk, tap a zone");gA.innerHTML="";for(var b=0;b<5;b++)(function(b){var n=state.side==="L"?b+1:5-b;bZone(8,16,b*1.6,b*1.6+1.6,"#D98E00",String(n),"Serve zone "+n,"",function(){bCommitServe({shot:"serve",d:"deep",l:b<2?0:b>2?2:1,y:b*1.6+0.8,risk:BT.pick.risk})})})(b);
   var dock=function(){bDock(bRiskSeg()+'<p class="bthint">One serve. Bolder serves miss more but force weaker returns</p>');bWire(dock)};dock();cue("aim");
-  bClock(function(){bCommitServe({shot:"serve",d:"deep",l:1,risk:"safe"})})}
+  bClock(function(){bCommitServe({shot:"serve",d:"deep",l:1,y:4,risk:"safe"})})}
 function bCommitServe(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";bDock("");cue(null);bDefend(c)}
 function bAskCover(choice){BT.cur=MATCH.cur;BT.pendingChoice=choice;var meI=bMeI(),hb=BT.st.h;railOff();gA.innerHTML="";
-  var LN=meI===0?[["line",0,[0.1,2.0]],["middle",2,[2.0,3.95]]]:[["middle",0,[4.05,6.0]],["line",2,[6.0,7.9]]],D=[["net",[1.0,3.1]],["mid",[3.1,4.7]],["deep",[4.7,7.6]]];
-  D.forEach(function(dd){LN.forEach(function(yy){var x0=X(8-dd[1][1]),x1=X(8-dd[1][0]),y0=Y(yy[2][0]),y1=Y(yy[2][1]),g=el("g",{"class":"ac bt cov",role:"button","aria-label":"Cover "+dd[0]+" "+yy[0]},gA);
-    el("rect",{x:Math.min(x0,x1)+2,y:y0+2,width:Math.abs(x1-x0)-4,height:y1-y0-4,rx:6,fill:"#0077B6","fill-opacity":0.12,stroke:"#0077B6","stroke-width":2},g);
-    g.addEventListener("click",function(){bCommitCover({d:dd[0],l:yy[1]})})})});
+  var LN=meI===0?[["line",0,[0,2]],["middle",2,[2,4]]]:[["middle",0,[4,6]],["line",2,[6,8]]],D=[["net","Net",[0,3]],["mid","Mid",[3,6]],["deep","Back",[6,8]]];
+  D.forEach(function(dd){LN.forEach(function(yy){bZone(8-dd[2][0],8-dd[2][1],yy[2][0],yy[2][1],"#0077B6",yy[0]==="middle"?dd[1]:"","Cover "+dd[1]+" "+yy[0],"cov",function(){bCommitCover({d:dd[0],l:yy[1]})})})});
   var hk=bKey(BT.hit[0],BT.hit[1]);setPrompt("They're hitting from "+hb.toFixed(1)+" m · where do you cover?");bHabits(true);
   bDock('<p class="bthint">'+(hb>=2.1?"High ball: expect a smash. Back off or cover the middle.":hb<1.3?"They must lift it. Close the net, watch for the lob.":"Neutral ball. Hold, and read their habit.")+'</p>');
-  bClock(function(){bCommitCover({d:"mid",l:1})})}
+  bClock(function(){bCommitCover({d:"mid",l:meI===0?2:0})})}
 function bCommitCover(cv){clearTimeout(BT.clk);stopBar();gA.innerHTML="";bDock("");var meI=bMeI(),T=BT.teams,bk=bBand(BT.st.h),pc=bAIcover(T[1],T[0].p[1-meI],bk),covers=[];covers[meI]=cv;covers[1-meI]=pc;
   bReveal(BT.pendingChoice,covers)}
 /* What they tend to do: shown while you decide */

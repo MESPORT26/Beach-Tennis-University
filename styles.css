@@ -950,7 +950,7 @@ svg#court{display:block;width:100%;height:auto;color:var(--muted)}
 .orlink summary{cursor:pointer;color:var(--muted);font-weight:700;font-size:13px;padding:6px 0}.orlink[open]{display:grid;gap:8px}
 
 /* Tactics mode */
-.pmode{margin:0 0 12px}.pmode .seg{width:100%;box-sizing:border-box}body.btdocked #cpanel{visibility:hidden}@media(min-width:900px){body.btdocked #cpanel{display:none}.btdock.inl{position:static;transform:none;width:auto;box-shadow:none;border:1px solid #E6E0D3}}.bttitle{margin:4px 6px 8px;font:800 16px Montserrat,system-ui,sans-serif;color:#0D1B2A;text-align:center}.pmode .seg,.btrisk{display:flex;gap:6px;background:#F1ECE1;border-radius:14px;padding:4px}
+.pmode{margin:0 0 12px}.pmode .seg{width:100%;box-sizing:border-box}body.btdocked #cpanel,body.btdocked #resbar{visibility:hidden}@media(min-width:900px){body.btdocked #cpanel{display:none}.btdock.inl{position:static;transform:none;width:auto;box-shadow:none;border:1px solid #E6E0D3}}.bttitle{margin:4px 6px 8px;font:800 16px Montserrat,system-ui,sans-serif;color:#0D1B2A;text-align:center}.pmode .seg,.btrisk{display:flex;gap:6px;background:#F1ECE1;border-radius:14px;padding:4px}
 .pmode .seg button,.btrisk button{flex:1;border:0;background:transparent;border-radius:10px;padding:8px 6px;font:inherit;color:#0D1B2A;display:grid;gap:1px;cursor:pointer;min-height:44px}
 .pmode .seg button b,.btrisk button b{font:800 14px Montserrat,system-ui,sans-serif}.pmode .seg small,.btrisk small{font-size:11px;color:#5B6670}
 .pmode .seg button[aria-pressed="true"],.btrisk button[aria-pressed="true"]{background:#fff;box-shadow:0 1px 3px rgba(13,27,42,.18),inset 0 0 0 2px #00C2B8}
