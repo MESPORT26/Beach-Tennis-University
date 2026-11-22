@@ -1362,7 +1362,7 @@ function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clea
   ["A","B","L","R"].forEach(function(k){place(k,{A:[12.5,2.7],B:[12.5,5.3],L:[4.5,2.7],R:[4.5,5.3]}[k],true)});runBall(null)}
 var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breezy",4],["gusty",2]],breeze:[["calm",2],["breezy",4],["gusty",3]],feather:[["calm",2],["breezy",4],["gusty",3]],champs:[["calm",2],["breezy",3],["gusty",4]]};
 function startMatchLP(){LASTPT=""}
-function startMatch(r){LASTPT="";document.body.classList.remove("beat");MATCH={mode:state.pmode==="arcade"?"arcade":"beat",r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
+function startMatch(r){LASTPT="";document.body.classList.remove("beat");var bh=$("bthab");if(bh)bh.hidden=true;MATCH={mode:state.pmode==="arcade"?"arcade":"beat",r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
   state.wind=wpick(MWIND[r.id]||[["calm",1]]);state.windA=90*Math.floor(Math.random()*4);MATCH.wind=state.wind;drawWind();renderLegend();$("selector").hidden=true;$("score").hidden=false;track("match_started",{rival:r.id});
   document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});document.body.classList.remove("lobby-on");newPoint();setTimeout(function(){if(MATCH&&MATCH.r===r)banter("hello",true)},900)}
 function leaveMatch(){lvStop();if(typeof BT!=="undefined"){clearTimeout(BT.clk);bDock("")}document.body.classList.remove("beat");railOff(true);fbToastOff();resBar(null);document.body.classList.remove("hasres");var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;railOff(true);$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
@@ -1530,7 +1530,7 @@ function lvIncoming(){var m=MATCH,cur=m.cur,sit=cur.sit,osv=cur.srv==="opp",me=l
   /* Ring guides: where to stand to meet it early, on time or late */
   if(!b.mate)cur.rings.forEach(function(r){var col=r.h>=NET_H?"#00C2B8":r.h>=1.0?"#FF9F1C":"#9AA6B1",g=el("g",{"class":"cring c-"+r.k,"pointer-events":"none"},gM);
     el("circle",{cx:X(r.P[0]),cy:Y(r.P[1]),r:18,fill:"#FFFFFF","fill-opacity":0.85,stroke:col,"stroke-width":4},g);
-    var t=el("text",{x:X(r.P[0]),y:Y(r.P[1])+4,"text-anchor":"middle",fill:"#0D1B2A",style:"font:800 12px Montserrat,system-ui,sans-serif"},g);t.textContent=r.h.toFixed(1);orientText(t);r.g=g});
+    var t=el("text",{x:X(r.P[0]),y:Y(r.P[1])+4,"text-anchor":"middle",fill:"#0D1B2A",style:"font:800 12px Montserrat,system-ui,sans-serif"},g);t.textContent="";if(r.k!=="ontime")g.setAttribute("display","none");orientText(t);r.g=g});
   LV.ball=b;sfx("hit");
   if(b.mate){lvGo(pt,[to[0]-0.3,to[1]]);setPrompt("Partner's ball · get into position")}else{lvGo(pt,[4.3,laneY(pt)]);setPrompt("Get to the ball")}
   shotRail(LV.lock,function(id){LV.lock=id;var c=$("lp-hint");lvChipShow()},b.mate?"idle":null);
@@ -1655,12 +1655,12 @@ var BSHOT={smash:{v:17,hang:0,sd:0.55,hmin:2.1,netK:0.9},push:{v:12.5,hang:0.05,
   lob:{v:6.5,hang:0.95,sd:0.5,hmin:0,netK:0},drop:{v:6,hang:0.35,sd:0.4,hmin:0,netK:0},block:{v:8.5,hang:0.15,sd:0.45,hmin:0,netK:0},serve:{v:11,hang:0.25,sd:0.6,hmin:0,netK:0}};
 var BHCON={smash:[1.0,0.7,0.35],push:[1.5,1.1,0.6],block:[2.0,1.4,0.8],neutral:[2.1,1.5,0.9],drop:[0.9,0.55,0.25],lob:[3.0,2.3,1.2],serve:[1.7,1.2,0.8]};
 var BTIM={early:{need:0.4,steal:0.18},on:{need:0.12,steal:0},late:{need:-0.15,steal:-0.2}};
-var BRISK={safe:{pace:0.88,margin:1.6,sdm:0.85,err:0.6},normal:{pace:1,margin:1.1,sdm:1,err:1},bold:{pace:1.12,margin:0.6,sdm:1.15,err:1.8}};
+var BRISK={safe:{pace:0.88,margin:1.4,sdm:0.85,err:0.6},normal:{pace:1,margin:1.0,sdm:1,err:1},bold:{pace:1.12,margin:0.45,sdm:1.15,err:1.8}};
 var BDEPTH={short:1.8,mid:4.2,deep:6.6},BLANES=[1.2,4,6.8],BHOMEX={net:2.4,mid:3.8,deep:5.2},BCOV=[];["net","mid","deep"].forEach(function(d){[0,1,2].forEach(function(l){BCOV.push({d:d,l:l})})});
 var BOLD={smash:"flatsmash",block:"dig",serve:"serve",push:"push",neutral:"neutral",lob:"lob",drop:"drop"},BNEW={flatsmash:"smash",dig:"block"};
 function bName(s){return SHOTS[BOLD[s]]?SHOTS[BOLD[s]].name:s}
 function bGauss(){var u=Math.random()||1e-9,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
-function bP(skill){return {react:0.30-0.10*skill,run:4.0+1.2*skill,back:0.62+0.1*skill,reach:1.35+0.15*skill,sdm:1.35-0.6*skill,errBase:0.022-0.014*skill,read:skill,iq:skill}}
+function bP(skill){return {react:0.30-0.10*skill,run:4.0+1.2*skill,back:0.62+0.1*skill,reach:1.35+0.15*skill,sdm:1.35-0.6*skill,errBase:0.028-0.016*skill,read:skill,iq:skill}}
 function bHcon(shot,k,lx){var b=BHCON[shot][k];if(shot==="smash"||shot==="push")return b;if(shot==="lob")return lx<5.5?b+0.35*(5.5-lx):b-0.25*(lx-5.5);return b+(lx<4?0.15*(4-lx):-0.18*(lx-4))}
 function bCovPt(c,i){return [({net:1.9,mid:4.3,deep:6.4})[c.d],i===0?[1.1,2.6,3.0][c.l]:[5.0,5.4,6.9][c.l]]}
 /* Court zones drawn flush on the court lines: 0-3 m, 3-6 m, 6-8 m from the net */
@@ -1670,11 +1670,13 @@ function bZone(xa,xb,ya,yb,col,label,aria,cls,fn){var x0=Math.min(X(xa),X(xb)),x
   if(label){var t=el("text",{x:(x0+x1)/2,y:(y0+y1)/2+6,"text-anchor":"middle",fill:col,"pointer-events":"none",style:"font:800 15px Montserrat,sans-serif"},g);t.textContent=label;orientText(t)}
   g.addEventListener("click",fn);return g}
 /* Error before the ball is struck: hitting down from below the net, risk, balance. Shown to the player */
-function bErr(st,hp,c){var S=BSHOT[c.shot],below=Math.max(0,S.hmin-st.h);return {net:Math.min(0.95,S.netK*below)+(c.shot==="drop"&&st.h>2.2?0.05:0),frame:hp.errBase*BRISK[c.risk].err*(1+9*(1-st.B)*(1-st.B))}}
+/* Harder from low, from deep, and drops from far back */
+function bHard(st,c){return c.shot==="serve"?1:(1+0.5*Math.max(0,NET_H-st.h))*(0.8+0.05*st.pos[0])*(c.shot==="drop"?1+0.08*st.pos[0]:1)}
+function bErr(st,hp,c){var S=BSHOT[c.shot],below=Math.max(0,S.hmin-st.h);return {net:Math.min(0.95,S.netK*below)+(c.shot==="drop"&&st.h>2.2?0.05:0),frame:hp.errBase*BRISK[c.risk].err*(1+9*(1-st.B)*(1-st.B))*bHard(st,c)}}
 function bAim(c){var R=BRISK[c.risk],tx=BDEPTH[c.d],ty=c.y!=null?c.y:BLANES[c.l];if(c.d==="deep")tx=8-R.margin;if(c.d==="short")tx=Math.max(0.8,R.margin+0.6);if(c.y==null){if(c.l===0)ty=R.margin;if(c.l===2)ty=8-R.margin}else ty=Math.max(R.margin*0.6,Math.min(8-R.margin*0.6,ty));return [tx,ty]}
 function bResolve(st,hp,c,defs,dps,covers){var S=BSHOT[c.shot],R=BRISK[c.risk],E=bErr(st,hp,c);
   if(Math.random()<E.net)return {end:"err",why:"net"};if(Math.random()<E.frame)return {end:"err",why:"frame"};
-  var a=bAim(c),sd=0.85*S.sd*R.sdm*hp.sdm*(1+1.2*(1-st.B)),land=[a[0]+bGauss()*sd,a[1]+bGauss()*sd];
+  var a=bAim(c),sd=0.85*S.sd*R.sdm*hp.sdm*(1+1.2*(1-st.B))*bHard(st,c),land=[a[0]+bGauss()*sd,a[1]+bGauss()*sd];
   if(land[0]<0.15||land[0]>8||land[1]<0||land[1]>8)return {end:"err",why:"out",land:land};
   var v=S.v*R.pace;if(c.shot==="smash"||c.shot==="push")v*=Math.max(0.75,Math.min(1.25,1+0.25*(st.h-2)))*Math.max(0.6,Math.min(1.1,1.15-0.08*st.pos[0]));
   var tBall=Math.hypot(st.pos[0]+land[0],st.pos[1]-land[1])/v+S.hang,best=null;
@@ -1719,10 +1721,11 @@ function beatNewPoint(){clearPosture();setPips(0);lvStop();var m=MATCH,srv=serve
   if(serveTeam===0&&serverI===meI)bAskServe();else{var pm={};pm[bKey(serveTeam,serverI)]="serve";setPoses(pm);bDefend({shot:"serve",d:Math.random()<0.7?"deep":"mid",l:(Math.random()*3)|0,risk:wpick([["safe",3],["normal",5],["bold",2]])})}}
 /* The hitter's choice is made; the other side commits covers at the same moment */
 function bDefend(choice){var hT=BT.hit[0],D=1-hT,bk=bBand(BT.st.h),T=BT.teams;
-  if(D===0){/* we defend: you pick your cover, your partner picks theirs */bAskCover(choice)}
+  if(D===0){/* we defend: you pick your cover, your partner picks theirs. On the serve you just return it */if(choice.shot==="serve"){var cv=[];cv[bMeI()]={d:"deep",l:1};cv[1-bMeI()]={d:"net",l:1};BT.pendingChoice=choice;bReveal(choice,cv)}else bAskCover(choice)}
   else bReveal(choice,[bAIcover(T[0].landMem?T[0]:T[0],T[1].p[0],bk),bAIcover(T[0],T[1].p[1],bk)])}
 function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,hp=T[hT].p[hI],bk=bBand(BT.st.h);
   bRemember(T[D].covMem,bk,bCovIdx(covers[0]),9);bRemember(T[D].covMem,bk,bCovIdx(covers[1]),9);
+  var odds=null;if(hT===0&&hI===bMeI()){var o={err:0,win:0,n:400};for(var k=0;k<o.n;k++){var q=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);if(q.end==="err")o.err++;else if(q.end==="winner")o.win++}odds={err:Math.round(o.err/o.n*100),win:Math.round(o.win/o.n*100)};odds.play=100-odds.err-odds.win;BT.odds=odds}
   var r=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:hT===0?(hI===bMeI()?"me":"mate"):"opp",shot:BOLD[choice.shot]});
   if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[hT].landMem,bk,ci,9)}
   var mine=hT===0&&hI===bMeI();BT.last={choice:choice,covers:covers,r:r,mine:mine,hT:hT,st:BT.st};
@@ -1747,30 +1750,31 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
     if(D===0&&rI===bMeI())setTimeout(bAskShot,650);
     else{var g=bGuessCovers(T[1-D],T[D].p[rI],bBand(BT.st.h)),c=bAIshot(BT.st,T[D].p[rI],BT.pos[1-D],T[1-D].p,BT.inShot,g);setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bDefend(c)},D===0?650:450)}},ms+120)}
 /* What both sides chose, shown when the shot is struck */
-var BCOVNM={net:"Net",mid:"Hold",deep:"Back"};
+var BCOVNM={net:"Net",mid:"Mid",deep:"Back"};
 function bCovLabel(c,i){var mid=(i===0&&c.l===2)||(i===1&&c.l===0);return BCOVNM[c.d]+" · "+(c.l===1?"centre":mid?"middle":"line")}
 function bRevealChip(choice,covers,r,hT){var hd=(hT===0?"You: ":"Them: ")+bName(choice.shot)+" "+({short:"short",mid:"mid",deep:"deep"})[choice.d]+" "+["left","middle","right"][choice.l];
   var cv=(hT===0?"They covered ":"You covered ")+bCovLabel(covers[hT===0?r.i||0:bMeI()],hT===0?(r.i||0):bMeI());
-  setPrompt(hd+(r.readOK?" · READ!":""));$("c-sr").textContent=hd+". "+cv}
+  var od=BT.odds&&hT===0&&BT.last&&BT.last.mine?BT.odds:null;setPrompt(od?"That shot: "+od.win+"% winner · "+od.err+"% error":hd+(r.readOK?" · READ!":""));if(!od)BT.odds=null;$("c-sr").textContent=hd+". "+cv}
 /* ---------- Your decisions ---------- */
 var BCLOCK={beginner:10,intermediate:10,advanced:8,pro:6};
 function bClock(fn){clearTimeout(BT.clk);var s=BCLOCK[state.level]||10;startBar(s,0);BT.clk=setTimeout(fn,s*1000)}
 function bDock(html){var d=$("btdock");if(!d){d=document.createElement("div");d.id="btdock";d.className="btdock"}var cp=$("cpanel"),wide=window.innerWidth>=900;if(wide&&cp){if(d.previousSibling!==cp)cp.parentNode.insertBefore(d,cp.nextSibling)}else if(d.parentNode!==document.body)document.body.appendChild(d);d.classList.toggle("inl",wide);var pr=$("cs-prompt");d.hidden=!html;document.body.classList.toggle("btdocked",!!html);d.innerHTML=html?'<p class="bttitle">'+(pr?pr.textContent:"")+'</p>'+html:""}
-function bAskShot(){var st=BT.st,hp=BT.teams[0].p[bMeI()],opts=bOptions(BT.inShot),legal={};opts.forEach(function(o){legal[o.shot]=1});
-  BT.pick={shot:null,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H;
-  shotRail(null,function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
+function bDefault(h,inShot){if(inShot==="smash"||inShot==="push")return h<1.3?"block":"neutral";return h>=2.1?"smash":h>=NET_H?"push":h<1.0?"lob":"neutral"}
+function bAskShot(){var st=BT.st,opts=bOptions(BT.inShot),legal={};opts.forEach(function(o){legal[o.shot]=1});
+  var def=bDefault(st.h,BT.inShot);if(!legal[def])def="neutral";BT.pick={shot:def,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H,ret=BT.inShot==="serve";
+  shotRail(BOLD[def],function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
   var r=$("shotrail");if(r)[].forEach.call(r.children,function(x){var s=BNEW[x.dataset.v]||x.dataset.v;x.disabled=x.dataset.v==="serve"||!legal[s]});
-  setPrompt("Your shot · ball at "+st.h.toFixed(1)+" m, "+(hb?"above":"below")+" the net");bHabits();bDockShot();cue("rail");
-  bClock(function(){if(BT.pick.shot&&BT.pick.tg)return;var c=BT.pick.shot?{shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":"mid",l:1,risk:BT.pick.risk}:{shot:"neutral",d:"mid",l:1,risk:"safe"};bCommit(c)})}
-function bErrPct(st,hp,c){var E=bErr(st,hp,c),S=BSHOT[c.shot],a=bAim(c),sd=0.85*S.sd*BRISK[c.risk].sdm*hp.sdm*(1+1.2*(1-st.B)),out=0;
+  setPrompt((ret?"Return it":"Your shot")+" · ball at "+st.h.toFixed(1)+" m, "+(hb?"above":"below")+" the net");bHabits();bTargets();bDockShot();
+  bClock(function(){if(BT.pick.tg)return;bCommit({shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":BT.pick.shot==="lob"?"deep":"mid",l:(Math.random()*3)|0,risk:"safe"})})}
+function bErrPct(st,hp,c){var E=bErr(st,hp,c),S=BSHOT[c.shot],a=bAim(c),sd=0.85*S.sd*BRISK[c.risk].sdm*hp.sdm*(1+1.2*(1-st.B))*bHard(st,c),out=0;
   for(var n=0;n<300;n++){var x=a[0]+bGauss()*sd,y=a[1]+bGauss()*sd;if(x<0.15||x>8||y<0||y>8)out++}var pn=Math.min(0.95,E.net),pf=E.frame;return Math.round(Math.min(0.99,pn+(1-pn)*pf+(1-pn)*(1-pf)*out/300)*100)}
-function bRiskSeg(fn){var p=BT.pick,st=BT.st,hp=BT.teams[0].p[bMeI()];return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){var e=null;if(p.shot){var lo=99,hi=0;bRows(p.shot).forEach(function(d){[0,1,2].forEach(function(l){var v=bErrPct(st,hp,{shot:p.shot,d:d,l:l,y:p.shot==="serve"?[0.8,4,7.2][l]:null,risk:r});lo=Math.min(lo,v);hi=Math.max(hi,v)})});e=lo===hi?lo+"%":lo+"–"+hi+"%"}
-  return '<button data-r="'+r+'" aria-pressed="'+(p.risk===r)+'"><b>'+r[0].toUpperCase()+r.slice(1)+'</b>'+(e!=null?'<small class="'+(hi>=25?"hi":"")+'">'+e+' error</small>':'')+'</button>'}).join("")+'</div>'}
+function bRiskSeg(){var p=BT.pick,D={safe:"Fewer errors",normal:"Balanced",bold:"More pace, more errors"};return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){
+  return '<button data-r="'+r+'" aria-pressed="'+(p.risk===r)+'"><b>'+r[0].toUpperCase()+r.slice(1)+'</b><small>'+D[r]+'</small></button>'}).join("")+'</div>'}
 function bWire(fn){[].forEach.call($("btdock").querySelectorAll("[data-r]"),function(b){b.onclick=function(){BT.pick.risk=b.dataset.r;fn()}})}
-function bDockShot(){var p=BT.pick;if(p.shot&&$("g-aim")&&gA.querySelector(".bt"))bTargets();bDock(bRiskSeg()+'<p class="bthint">'+(p.shot?bName(p.shot)+": each target shows its error chance":"Pick your shot on the left")+'</p>');bWire(bDockShot)}
+function bDockShot(){var p=BT.pick;if(p.shot&&$("g-aim")&&gA.querySelector(".bt"))bTargets();bDock(bRiskSeg()+'<p class="bthint">'+(p.shot?"Tap a target to hit "+bName(p.shot).toLowerCase()+". See the odds after":"Pick your shot on the left")+'</p>');bWire(bDockShot)}
 function bRows(s){return s==="serve"?["deep"]:s==="drop"?["short"]:s==="lob"?["mid","deep"]:s==="block"?["short","mid"]:["short","mid","deep"]}
 function bTargets(){gA.innerHTML="";var p=BT.pick,rows=bRows(p.shot),hp=BT.teams[0].p[bMeI()],Y0=[[0,8/3],[8/3,16/3],[16/3,8]];
-  rows.forEach(function(d){[0,1,2].forEach(function(l){var ep=bErrPct(BT.st,hp,{shot:p.shot,d:d,l:l,risk:p.risk});bZone(8+BBAND[d][0],8+BBAND[d][1],Y0[l][0],Y0[l][1],ep>=25?"#C2334A":"#00A39A",ep+"%",d+" "+["left","middle","right"][l]+", "+ep+"% error","",function(){p.tg=[d,l];bCommit({shot:p.shot,d:d,l:l,risk:p.risk})})})});cue("aim")}
+  rows.forEach(function(d){[0,1,2].forEach(function(l){bZone(8+BBAND[d][0],8+BBAND[d][1],Y0[l][0],Y0[l][1],"#00A39A",l===1?BBNM[d]:"",d+" "+["left","middle","right"][l],"",function(){p.tg=[d,l];bCommit({shot:p.shot,d:d,l:l,risk:p.risk})})})});cue("aim")}
 function bCommit(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDock("");railOff();
   /* Grade your choice against the best option, given how they usually cover */
   var st=BT.st,hp=BT.teams[0].p[bMeI()],D=BT.teams[1],g=bGuessCovers(D,{read:0.7},bBand(st.h)),opts=bOptions(BT.inShot),best=null,bv=-9,mine=bEval(st,hp,c,BT.pos[1],D.p,g,40);
@@ -1798,17 +1802,17 @@ function bHabits(def){var T=BT.teams[1],bk=bBand(BT.st.h),M=def?(T.landMem&&T.la
   var top=arr[0],pc=Math.round(top[1]/tot*100),lab=def?["short","mid","deep"][(top[0]/3)|0]+" "+["left","middle","right"][top[0]%3]:BCOVNM[BCOV[top[0]].d]+" "+["","",""][0];
   e.hidden=false;e.textContent=(def?"They usually hit ":"They usually cover ")+(def?lab:BCOVNM[BCOV[top[0]].d].toLowerCase())+" · "+pc+"%"}
 /* ---------- Point over ---------- */
-function bPointEnd(won,r,choice,covers,hT){var m=MATCH,cur=m.cur;if(!cur||cur.done)return;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();var e=$("bthab");if(e)e.hidden=true;
+function bPointEnd(won,r,choice,covers,hT){var m=MATCH,cur=m.cur;if(!cur||cur.done)return;var OD=BT.odds;BT.odds=null;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();var e=$("bthab");if(e)e.hidden=true;
   if(r.end==="err"&&choice&&choice.shot==="serve")r.why="fault";var kind=r.end==="winner"?(won?"winner":"gap"):(won?"theymiss":"miss");pointEnd(m,won,kind);renderScore();
-  var you=hT===0,head=r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?"Into the net.":"They netted it."):r.why==="out"?(you?"Out.":"They hit it out."):(you?"You missed.":"They missed.");
+  var you=hT===0,mh=you&&BT.hit&&BT.hit[1]===bMeI(),head=r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?(mh?"Into the net.":"Your partner netted it."):"They netted it."):r.why==="out"?(you?(mh?"Out.":"Your partner hit it out."):"They hit it out."):(you?(mh?"You missed.":"Your partner missed."):"They missed.");
   var why=r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
     r.why==="net"?"Hitting down from "+BT.st.h.toFixed(1)+" m, below the net, mostly finds the net. Lift it instead.":r.why==="out"?"Bold aims near the lines miss more often.":"Off balance, the error chance goes up.";
   var G=BT.grade||null,o=over();function over(){return (m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2}
   var html='<div class="ptres '+(won?"w":"l")+'"><b>'+head+'</b> '+why+'</div>'+(G?'<div class="fbbest"><b>Best play</b><p>'+bName(G.best.shot)+' '+G.best.d+' '+["left","middle","right"][G.best.l]+', '+G.best.risk+'.</p></div>':'')+'<!--more-->'+
     (covers&&r.end!=="err"?fbSec("The read",(you?"They covered ":"You covered ")+bCovLabel(covers[r.i||0],r.i||0)+". "+(r.readOK?"That was the right spot.":"That left the space open.")):"")+
-    (G?fbSec("Your last choice",G.lab+". From "+G.h.toFixed(1)+" m the best option was "+bName(G.best.shot).toLowerCase()+" "+G.best.d+" "+["left","middle","right"][G.best.l]+", "+G.best.risk+"."):"")+fbSec("How points are won","Earn a high ball, hit where they aren't covering, and keep your own choices mixed. They learn your habits.");
+    (OD?fbSec("The odds of that shot","Against where they stood: "+OD.win+"% winner, "+OD.err+"% error, "+OD.play+"% in play."):"")+(G?fbSec("Your last choice",G.lab+". From "+G.h.toFixed(1)+" m the best option was "+bName(G.best.shot).toLowerCase()+" "+G.best.d+" "+["left","middle","right"][G.best.l]+", "+G.best.risk+"."):"")+fbSec("How points are won","Earn a high ball, hit where they aren't covering, and keep your own choices mixed. They learn your habits.");
   if(!won&&G)saveLost({sit:{height:G.h>=2.1?"high":G.h>=1?"med":"low",depth:"mid",speed:"med",side:"body",A:[1,0],B:[1,2]},pick:{shot:BOLD[G.c.shot],cell:[["short","mid","deep"].indexOf(G.c.d),G.c.l*2]},ans:{shot:BOLD[G.best.shot],cell5:[["short","mid","deep"].indexOf(G.best.d),G.best.l*2]},kind:kind,tier:LABSC[G.lab]===2?2:0,aimT:0,moveOk:true,why:"",rival:m.r.pair});
-  FBTICKS=G?[[G.lab,LABSC[G.lab],true],[G.h.toFixed(1)+" m",G.h>=NET_H?2:G.h>=1?1:0,true]]:null;FBRACE=r.tBall?{b:r.tBall,n:r.tNeed,who:"Them"}:null;BT.grade=null;
+  FBTICKS=(G?[[G.lab,LABSC[G.lab],true],[G.h.toFixed(1)+" m",G.h>=NET_H?2:G.h>=1?1:0,true]]:[]).concat(OD?[[OD.win+"% winner",OD.win>=30?2:1,true],[OD.err+"% error",OD.err>=20?0:OD.err>=10?1:2,true]]:[]);if(!FBTICKS.length)FBTICKS=null;FBRACE=r.tBall?{b:r.tBall,n:r.tNeed,who:"Them"}:null;BT.grade=null;
   buzz(won?[30,40,30]:[60]);track("point_played",{rival:m.r.id,mode:"beat",won:won,end:kind,touches:BT.touch,lab:G?G.lab:null});
   setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;fbShow(html,o?"See the result":"Next point",function(){playOn(o)})},700)}
 
@@ -2028,7 +2032,7 @@ function ringsFor(cur){var f=cur.flight,src=f.src,to=f.to,dx=src[0]-to[0],e0=dx>
 function drawRings(cur){cur.rings=ringsFor(cur);var f=cur.flight;
   cur.rings.forEach(function(r){var col=r.h>=NET_H?"#00C2B8":r.h>=1.0?"#FF9F1C":"#9AA6B1",g=el("g",{"class":"cring c-"+r.k,"pointer-events":"none"},gM);
     el("circle",{cx:X(r.P[0]),cy:Y(r.P[1]),r:18,fill:"#FFFFFF","fill-opacity":0.85,stroke:col,"stroke-width":4},g);
-    var t=el("text",{x:X(r.P[0])+(PORT?0:0),y:Y(r.P[1])+4,"text-anchor":"middle",fill:"#0D1B2A",style:"font:800 12px Montserrat,system-ui,sans-serif"},g);t.textContent=r.h.toFixed(1);orientText(t);
+    var t=el("text",{x:X(r.P[0])+(PORT?0:0),y:Y(r.P[1])+4,"text-anchor":"middle",fill:"#0D1B2A",style:"font:800 12px Montserrat,system-ui,sans-serif"},g);t.textContent="";if(r.k!=="ontime")g.setAttribute("display","none");orientText(t);
     r.g=g;setTimeout(function(){if(cur.cring!==r)g.classList.add("gone")},Math.max(0,r.t-60))})}
 /* The ball falls towards its shadow. Get there before it lands */
 
