@@ -1317,7 +1317,7 @@ function eb(e){return '<span class="eb" aria-hidden="true">'+avImg(e)+'</span>'}
 function pairSvg(r){return '<span class="av-pair">'+eb(rAv(r,0))+eb(rAv(r,1))+'</span>'}
 /* Decision clock. Short, like the real thing. Set by your level, the ball coming at you and the pair you play. Practice mode has no clock */
 var LVT={beginner:12,intermediate:9,advanced:6,pro:4},BALLT={push:.6,flatsmash:.55,hook:.75,dig:.85,neutral:1,drop:.9,lob:1.2};
-state.clock=load("clock","match");
+state.clock=load("clock","match");state.pmode=load("pmode","beat");
 function decideSecs(r,kind){if(state.clock==="practice")return 0;var b=LVT[state.level]||9,cur=MATCH&&MATCH.cur,f=1;
   if(kind==="serve")f=1.6;else if(cur&&cur.mate)f=0.9;else if(cur&&cur.srv==="opp"&&!cur.rally)f=0.8;else if(cur&&cur.sit)f=BALLT[cur.sit.shot||oppPose(cur.sit)]||1;
   return Math.max(kind==="serve"?5:3,Math.round(b*f*(1-((r.level||1)-1)*0.08)*10)/10)}
@@ -1325,7 +1325,8 @@ function decideSecs(r,kind){if(state.clock==="practice")return 0;var b=LVT[state
 var lobSel=null;
 function rivalOpen(i){var bt=beaten();return i===0||!!bt[RIVALS[i-1].id]||!!bt[RIVALS[i].id]}
 function sayLine(r,key){var t=(r.talk&&r.talk[key])||[];return t.length?t[Math.floor(Math.random()*t.length)]:""}
-function renderLobby(list){var bt=beaten(),w=document.createElement("div");w.className="lobby";
+function renderLobby(list){var bt=beaten(),w=document.createElement("div");w.className="lobby";var md=document.createElement("div");md.className="pmode";md.innerHTML='<div class="seg" role="group" aria-label="Game type"><button data-m="beat" aria-pressed="'+(state.pmode!=="arcade")+'"><b>Tactics</b><small>Both sides choose at once</small></button><button data-m="arcade" aria-pressed="'+(state.pmode==="arcade")+'"><b>Arcade</b><small>Real-time, unranked</small></button></div>';
+  list.appendChild(md);[].forEach.call(md.querySelectorAll("[data-m]"),function(b){b.onclick=function(){state.pmode=b.dataset.m;save("pmode",state.pmode);[].forEach.call(md.querySelectorAll("[data-m]"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});
   if(lobSel==null){lobSel=0;for(var j=0;j<RIVALS.length;j++){if(rivalOpen(j)&&!bt[RIVALS[j].id]){lobSel=j;break}lobSel=j}}
   w.innerHTML=RIVALS.map(function(x,i){var op=rivalOpen(i),b2=bt[x.id],on=i===lobSel&&op,who=Math.random()<.5?0:1;
     return '<div class="rung'+(on?" on":"")+(op?"":" lock")+'" data-i="'+i+'"><button class="rhead" aria-expanded="'+on+'"><span class="rav">'+avImg(rAv(x,0))+avImg(rAv(x,1))+'</span><span class="rt"><b>'+x.pair+'</b></span><span class="rs">'+(b2?'<i class="tick">&#10003;</i>':op?'':'<i class="lk" aria-label="Locked">&#128274;</i>')+'</span></button>'+
@@ -1361,10 +1362,10 @@ function lobbyPanel(){if(oppPill){oppPill.remove();oppPill=null}gauge(null);clea
   ["A","B","L","R"].forEach(function(k){place(k,{A:[12.5,2.7],B:[12.5,5.3],L:[4.5,2.7],R:[4.5,5.3]}[k],true)});runBall(null)}
 var MWIND={baloes:[["calm",5],["breezy",3],["gusty",1]],wall:[["calm",3],["breezy",4],["gusty",2]],breeze:[["calm",2],["breezy",4],["gusty",3]],feather:[["calm",2],["breezy",4],["gusty",3]],champs:[["calm",2],["breezy",3],["gusty",4]]};
 function startMatchLP(){LASTPT=""}
-function startMatch(r){LASTPT="";MATCH={r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
+function startMatch(r){LASTPT="";document.body.classList.remove("beat");MATCH={mode:state.pmode==="arcade"?"arcade":"beat",r:r,me:0,them:0,log:[],right:0,points:0,cur:null,st:{w:0,fe:0,tue:0,ue:0,gap:0,open:0,conv:0,combo:0}};
   state.wind=wpick(MWIND[r.id]||[["calm",1]]);state.windA=90*Math.floor(Math.random()*4);MATCH.wind=state.wind;drawWind();renderLegend();$("selector").hidden=true;$("score").hidden=false;track("match_started",{rival:r.id});
   document.querySelector(".court-card").scrollIntoView({behavior:RM?"auto":"smooth",block:"start"});document.body.classList.remove("lobby-on");newPoint();setTimeout(function(){if(MATCH&&MATCH.r===r)banter("hello",true)},900)}
-function leaveMatch(){lvStop();railOff(true);fbToastOff();resBar(null);document.body.classList.remove("hasres");var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;railOff(true);$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
+function leaveMatch(){lvStop();if(typeof BT!=="undefined"){clearTimeout(BT.clk);bDock("")}document.body.classList.remove("beat");railOff(true);fbToastOff();resBar(null);document.body.classList.remove("hasres");var bn=$("banter");if(bn)bn.classList.remove("go");if(oppPill){oppPill.remove();oppPill=null}gauge(null);hideServeUI();hideShotUI();$("ctimer").hidden=true;$("cwind").hidden=true;clearTimeout(cTimer);clearInterval(cTick);MATCH=null;railOff(true);$("score").hidden=true;$("csit").hidden=true;$("selector").hidden=false;clearAim();document.body.classList.remove("c-live")}
 /* On-court aim. Nine squares on the opponents' side */
 var gA=el("g",{id:"g-aim"},WORLD),gTag=el("g",{id:"g-tag","pointer-events":"none"},WORLD);
 function clearAim(){if(gA)gA.innerHTML="";if(typeof ballTag!=="undefined"&&ballTag&&!(MATCH&&MATCH.cur&&!MATCH.cur.done)){ballTag.remove();ballTag=null}}
@@ -1647,7 +1648,169 @@ function lvUp(e){var g=LV.g;LV.g=null;lvChip(null);if(!g||!lvActive()){lvHold(nu
   lvGo(lvMe(),w);sfx("run")}
 SVGC.addEventListener("pointerup",lvUp,true);SVGC.addEventListener("pointercancel",function(){LV.g=null;lvChip(null);lvHold(null)},true);
 
-function newPoint(){clearPosture();setPips(0);lvStop();var m=MATCH,g=m.r.gen,srv=serverFor(m.points),os=(Math.floor(m.points/2)%4)===1?"A":"B",men=state.rules==="men";
+/* ===== Beat Model: every shot is a read. Both sides choose at once, then it plays out =====
+   Own-frame coordinates per team: x = metres from the net (0..8), y = 0..8 across (same as the court). */
+var BT={};
+var BSHOT={smash:{v:17,hang:0,sd:0.55,hmin:2.1,netK:0.9},push:{v:12.5,hang:0.05,sd:0.5,hmin:1.5,netK:0.6},neutral:{v:9,hang:0.3,sd:0.45,hmin:0,netK:0},
+  lob:{v:6.5,hang:0.95,sd:0.5,hmin:0,netK:0},drop:{v:6,hang:0.35,sd:0.4,hmin:0,netK:0},block:{v:8.5,hang:0.15,sd:0.45,hmin:0,netK:0},serve:{v:11,hang:0.25,sd:0.6,hmin:0,netK:0}};
+var BHCON={smash:[1.0,0.7,0.35],push:[1.5,1.1,0.6],block:[2.0,1.4,0.8],neutral:[2.1,1.5,0.9],drop:[0.9,0.55,0.25],lob:[3.0,2.3,1.2],serve:[1.7,1.2,0.8]};
+var BTIM={early:{need:0.4,steal:0.18},on:{need:0.12,steal:0},late:{need:-0.15,steal:-0.2}};
+var BRISK={safe:{pace:0.88,margin:1.6,sdm:0.85,err:0.6},normal:{pace:1,margin:1.1,sdm:1,err:1},bold:{pace:1.12,margin:0.6,sdm:1.15,err:1.8}};
+var BDEPTH={short:1.8,mid:4.2,deep:6.6},BLANES=[1.2,4,6.8],BHOMEX={net:2.4,mid:3.8,deep:5.2},BCOV=[];["net","mid","deep"].forEach(function(d){[0,1,2].forEach(function(l){BCOV.push({d:d,l:l})})});
+var BOLD={smash:"flatsmash",block:"dig",serve:"serve",push:"push",neutral:"neutral",lob:"lob",drop:"drop"},BNEW={flatsmash:"smash",dig:"block"};
+function bName(s){return SHOTS[BOLD[s]]?SHOTS[BOLD[s]].name:s}
+function bGauss(){var u=Math.random()||1e-9,v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v)}
+function bP(skill){return {react:0.30-0.10*skill,run:4.0+1.2*skill,back:0.62+0.1*skill,reach:1.35+0.15*skill,sdm:1.35-0.6*skill,errBase:0.022-0.014*skill,read:skill,iq:skill}}
+function bHcon(shot,k,lx){var b=BHCON[shot][k];if(shot==="smash"||shot==="push")return b;if(shot==="lob")return lx<5.5?b+0.35*(5.5-lx):b-0.25*(lx-5.5);return b+(lx<4?0.15*(4-lx):-0.18*(lx-4))}
+function bCovPt(c,i){return [BHOMEX[c.d],i===0?Math.min(3.6,[1.4,2.6,3.4][c.l]):Math.max(4.4,[4.6,5.4,6.6][c.l])]}
+/* Error before the ball is struck: hitting down from below the net, risk, balance. Shown to the player */
+function bErr(st,hp,c){var S=BSHOT[c.shot],below=Math.max(0,S.hmin-st.h);return {net:Math.min(0.95,S.netK*below)+(c.shot==="drop"&&st.h>2.2?0.05:0),frame:hp.errBase*BRISK[c.risk].err*(1+9*(1-st.B)*(1-st.B))}}
+function bAim(c){var R=BRISK[c.risk],tx=BDEPTH[c.d],ty=BLANES[c.l];if(c.d==="deep")tx=8-R.margin;if(c.d==="short")tx=Math.max(0.8,R.margin+0.6);if(c.l===0)ty=R.margin;if(c.l===2)ty=8-R.margin;return [tx,ty]}
+function bResolve(st,hp,c,defs,dps,covers){var S=BSHOT[c.shot],R=BRISK[c.risk],E=bErr(st,hp,c);
+  if(Math.random()<E.net)return {end:"err",why:"net"};if(Math.random()<E.frame)return {end:"err",why:"frame"};
+  var a=bAim(c),sd=0.85*S.sd*R.sdm*hp.sdm*(1+1.2*(1-st.B)),land=[a[0]+bGauss()*sd,a[1]+bGauss()*sd];
+  if(land[0]<0.15||land[0]>8||land[1]<0||land[1]>8)return {end:"err",why:"out",land:land};
+  var v=S.v*R.pace;if(c.shot==="smash"||c.shot==="push")v*=Math.max(0.75,Math.min(1.25,1+0.25*(st.h-2)))*Math.max(0.6,Math.min(1.1,1.15-0.08*st.pos[0]));
+  var tBall=Math.hypot(st.pos[0]+land[0],st.pos[1]-land[1])/v+S.hang,best=null;
+  defs.forEach(function(p,i){var dp=dps[i],cp=bCovPt(covers[i],i),pre=toward(p,cp,1.6),readOK=Math.hypot(cp[0]-land[0],cp[1]-land[1])<2.2,
+      d=Math.max(0,Math.hypot(pre[0]-land[0],pre[1]-land[1])-dp.reach),bw=land[0]>pre[0]+0.5,tNeed=d>0?(readOK?dp.react*0.5:dp.react+0.12)+d/(dp.run*(bw?dp.back:1)):0.05,m=tBall-tNeed;
+    if(!best||m>best.m)best={i:i,m:m,tNeed:tNeed,readOK:readOK,pre:pre}});
+  var m=best.m,base={land:land,m:m,i:best.i,tBall:tBall,tNeed:best.tNeed,readOK:best.readOK,pre:best.pre};
+  if(m<-0.25||(m<0&&Math.random()<-m/0.25))return Object.assign(base,{end:"winner"});
+  var B=Math.max(0,Math.min(1,m/0.6)),tim=["early","on","late"].filter(function(k){return m>=BTIM[k].need});if(!tim.length)tim=["late"];
+  if(c.shot==="lob"&&land[0]-best.pre[0]>(best.readOK?3:1.5)){tim=["late"];B*=0.6}
+  return Object.assign(base,{end:null,B:B,tim:tim})}
+function bOptions(inShot){var o=[];["smash","push","neutral","lob","drop","block"].forEach(function(s){if(s==="block"&&!(inShot==="smash"||inShot==="push"))return;
+  ["short","mid","deep"].forEach(function(d){if(s==="drop"&&d!=="short")return;if(s==="lob"&&d==="short")return;if(s==="block"&&d==="deep")return;
+    [0,1,2].forEach(function(l){["safe","normal","bold"].forEach(function(r){o.push({shot:s,d:d,l:l,risk:r})})})})});return o}
+function bVal(r,inShot){if(r.end==="winner")return 1;if(r.end==="err")return -1;var hb=Math.max.apply(null,r.tim.map(function(k){return bHcon(inShot,["early","on","late"].indexOf(k),r.land[0])}));
+  return 0.55*(0.6-r.B)-0.45*Math.max(0,Math.min(1.2,hb-1.9))+0.15*Math.max(0,Math.min(1,1.6-hb))}
+function bEval(st,hp,c,defs,dps,guess,N){var v=0;for(var n=0;n<N;n++){var g=guess[(Math.random()*guess.length)|0];v+=bVal(bResolve(st,hp,c,defs,dps,g),c.shot)}return v/N}
+/* Habits: what each side tends to do, by ball-height band. The computer reads yours */
+function bBand(h){return h<1.3?0:h<2.1?1:2}
+function bRemember(store,bk,idx,n){store[bk]=store[bk]||[];store[bk][idx]=(store[bk][idx]||0)*0.9+1}
+function bPickHabit(store,bk,read,n){var M=store&&store[bk];if(!M||Math.random()>read)return (Math.random()*n)|0;var tot=0,w=[];for(var i=0;i<n;i++){w[i]=Math.pow(M[i]||0,2);tot+=w[i]}
+  if(!tot)return (Math.random()*n)|0;var x=Math.random()*tot;for(i=0;i<n;i++){x-=w[i];if(x<=0)return i}return n-1}
+function bCovIdx(c){for(var i=0;i<9;i++)if(BCOV[i].d===c.d&&BCOV[i].l===c.l)return i;return 4}
+function bAIcover(T,defP,bk){/* defenders read where your balls go from this height */var i=bPickHabit(T.landMem,bk,defP.read*0.9,9);return BCOV[i]}
+function bGuessCovers(opp,readerP,bk){var g=[];for(var k=0;k<6;k++){var i0=bPickHabit(opp.covMem,bk,readerP.read,9),i1=bPickHabit(opp.covMem,bk,readerP.read,9);g.push([BCOV[i0],BCOV[i1]])}return g}
+function bAIshot(st,hp,defs,dps,inShot,guess){var opts=bOptions(inShot),N=hp.iq>0.7?10:hp.iq>0.3?6:3,best=null,bv=-9;
+  opts.forEach(function(c){var v=bEval(st,hp,c,defs,dps,guess,N)+bGauss()*0.35*(1-hp.iq);if(v>bv){bv=v;best=c}});return best}
+/* ---------- Court mapping ---------- */
+function bCourt(team,p){return team===0?[8-p[0],p[1]]:[8+p[0],p[1]]}
+function bKey(team,i){if(team===1)return i===0?"A":"B";var meI=state.side==="L"?0:1;return i===meI?state.side:(state.side==="L"?"R":"L")}
+function bMeI(){return state.side==="L"?0:1}
+function bPlace(ms){for(var t=0;t<2;t++)for(var i=0;i<2;i++){var k=bKey(t,i);PL[k].g.style.transitionDuration=(ms||600)+"ms";place(k,bCourt(t,BT.pos[t][i]),!ms)}}
+/* ---------- A point ---------- */
+function beatNewPoint(){clearPosture();setPips(0);lvStop();var m=MATCH,srv=serverFor(m.points),lv=m.r.level||1,sk=[0.3,0.42,0.55,0.68,0.82][Math.min(4,lv-1)];
+  BT={teams:[{p:[bP(0.6),bP(0.6)],landMem:m.bt0L||(m.bt0L=[]),covMem:m.bt0C||(m.bt0C=[])},{p:[bP(sk),bP(sk)],landMem:m.bt1L||(m.bt1L=[]),covMem:m.bt1C||(m.bt1C=[])}],touch:0,log:[]};m.cur={beat:true,rally:0,hist:[],srv:srv,sit:{},pick:{}};BT.cur=m.cur;
+  var meI=bMeI();BT.teams[0].p[meI]=bP(({beginner:0.45,intermediate:0.6,advanced:0.72,pro:0.85})[state.level]||0.6);BT.teams[0].p[meI].human=true;
+  var serveTeam=srv==="opp"?1:0,serverI=srv==="me"?meI:srv==="mate"?1-meI:((Math.floor(m.points/2)%4)===1?0:1);
+  BT.pos=[[[3.6,2.5],[3.6,5.5]],[[3.6,2.5],[3.6,5.5]]];BT.pos[serveTeam][serverI]=[7.6,serverI===0?2.5:5.5];BT.pos[serveTeam][1-serverI]=[3.4,serverI===0?5.5:2.5];
+  gG.innerHTML="";gM.innerHTML="";drawZones(false);clearAim();runBall(null);hideServeUI();hideShotUI();document.body.classList.add("c-live","beat");$("csit").hidden=true;setWindBadge();
+  bPlace(0);setPoses({});cpanelLive("");renderScore();
+  BT.st={pos:BT.pos[serveTeam][serverI].slice(),B:1,h:2.6,timing:"on"};BT.hit=[serveTeam,serverI];BT.inShot="serve";
+  if(serveTeam===0&&serverI===meI)bAskServe();else{var pm={};pm[bKey(serveTeam,serverI)]="serve";setPoses(pm);bDefend({shot:"serve",d:Math.random()<0.7?"deep":"mid",l:(Math.random()*3)|0,risk:wpick([["safe",3],["normal",5],["bold",2]])})}}
+/* The hitter's choice is made; the other side commits covers at the same moment */
+function bDefend(choice){var hT=BT.hit[0],D=1-hT,bk=bBand(BT.st.h),T=BT.teams;
+  if(D===0){/* we defend: you pick your cover, your partner picks theirs */bAskCover(choice)}
+  else bReveal(choice,[bAIcover(T[0].landMem?T[0]:T[0],T[1].p[0],bk),bAIcover(T[0],T[1].p[1],bk)])}
+function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,hp=T[hT].p[hI],bk=bBand(BT.st.h);
+  bRemember(T[D].covMem,bk,bCovIdx(covers[0]),9);bRemember(T[D].covMem,bk,bCovIdx(covers[1]),9);
+  var r=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:hT===0?(hI===bMeI()?"me":"mate"):"opp",shot:BOLD[choice.shot]});
+  if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[hT].landMem,bk,ci,9)}
+  var mine=hT===0&&hI===bMeI();BT.last={choice:choice,covers:covers,r:r,mine:mine,hT:hT,st:BT.st};
+  /* Animate: defenders step to their cover, the ball flies */
+  var hk=bKey(hT,hI),pm={};pm[hk]=BOLD[choice.shot];setPoses(pm);sfx(choice.shot==="smash"||choice.shot==="push"?"hitF":"hit");
+  var from=bCourt(hT,BT.st.pos),to=r.land?bCourt(D,r.land):bCourt(D,[0.1,BT.st.pos[1]]),ms=Math.round(Math.max(0.45,(r.tBall||0.8))*1000*1.5);
+  for(var i=0;i<2;i++){var pre=toward(BT.pos[D][i],bCovPt(covers[i],i),r.end==="winner"?1.2:1.6);BT.pos[D][i]=pre;var k=bKey(D,i);PL[k].g.style.transitionDuration=Math.round(ms*0.9)+"ms";place(k,bCourt(D,pre),false)}
+  bRevealChip(choice,covers,r,hT);
+  if(r.end==="err"&&r.why!=="out"){errBall(from,to[1],r.why==="net")}else{var pr=PROF[BOLD[choice.shot]]||PROF.neutral;PROF._bt={d:ms/1.3,h:pr.h};runBall({f:from,to:to,shot:"_bt",land:true},true)}
+  setTimeout(function(){if(!MATCH||MATCH.cur!==BT.cur)return;
+    if(r.end){var won=(r.end==="winner")===(hT===0);bPointEnd(won,r,choice,covers,hT);return}
+    /* Receiver meets it: best height they can get, the hitting side recovers */
+    var rI=r.i,rp=T[D].p[rI],timing=r.tim.indexOf("early")>=0&&bHcon(choice.shot,0,r.land[0])>=1.8?"early":r.tim.indexOf("on")>=0?"on":"late";
+    if(rp.iq<0.3&&Math.random()<0.4)timing=r.tim[r.tim.length-1];
+    var h=bHcon(choice.shot,["early","on","late"].indexOf(timing),r.land[0])*(1+0.06*bGauss()),recT=r.tBall+(timing==="early"?0.05:timing==="on"?0.3:0.5),
+      home=BHOMEX[choice.shot==="lob"||choice.shot==="smash"||choice.shot==="push"?"net":"mid"];
+    BT.pos[hT]=BT.pos[hT].map(function(p,i){return toward(p,[home,i===0?2.5:5.5],T[hT].p[i].run*Math.max(0,recT-0.25))});
+    var contact=[Math.max(0.7,Math.min(8,r.land[0]-(timing==="early"?1.2:timing==="on"?0.5:-0.3))),r.land[1]];BT.pos[D][rI]=contact;
+    BT.pos[D][1-rI]=toward(BT.pos[D][1-rI],[3.8,rI===0?5.5:2.5],2);
+    BT.st={pos:contact,B:r.B*(timing==="early"?0.85:1),h:Math.max(0.2,h),timing:timing};BT.inShot=choice.shot;BT.hit=[D,rI];bPlace(700);
+    var pz=Math.max(0,Math.min(3,Math.round((1-BT.st.B)*3)));setPips(D===0?0:pz/3);
+    if(D===0&&rI===bMeI())setTimeout(bAskShot,650);
+    else{var g=bGuessCovers(T[1-D],T[D].p[rI],bBand(BT.st.h)),c=bAIshot(BT.st,T[D].p[rI],BT.pos[1-D],T[1-D].p,BT.inShot,g);setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bDefend(c)},D===0?650:450)}},ms+120)}
+/* What both sides chose, shown when the shot is struck */
+var BCOVNM={net:"Net",mid:"Hold",deep:"Back"};
+function bCovLabel(c,i){var mid=(i===0&&c.l===2)||(i===1&&c.l===0);return BCOVNM[c.d]+" · "+(c.l===1?"centre":mid?"middle":"line")}
+function bRevealChip(choice,covers,r,hT){var hd=(hT===0?"You: ":"Them: ")+bName(choice.shot)+" "+({short:"short",mid:"mid",deep:"deep"})[choice.d]+" "+["left","middle","right"][choice.l];
+  var cv=(hT===0?"They covered ":"You covered ")+bCovLabel(covers[hT===0?r.i||0:bMeI()],hT===0?(r.i||0):bMeI());
+  setPrompt(hd+(r.readOK?" · READ!":""));$("c-sr").textContent=hd+". "+cv}
+/* ---------- Your decisions ---------- */
+var BCLOCK={beginner:10,intermediate:10,advanced:8,pro:6};
+function bClock(fn){clearTimeout(BT.clk);var s=BCLOCK[state.level]||10;startBar(s,0);BT.clk=setTimeout(fn,s*1000)}
+function bDock(html){var d=$("btdock");if(!d){d=document.createElement("div");d.id="btdock";d.className="btdock"}var cp=$("cpanel"),wide=window.innerWidth>=900;if(wide&&cp){if(d.previousSibling!==cp)cp.parentNode.insertBefore(d,cp.nextSibling)}else if(d.parentNode!==document.body)document.body.appendChild(d);d.classList.toggle("inl",wide);var pr=$("cs-prompt");d.hidden=!html;document.body.classList.toggle("btdocked",!!html);d.innerHTML=html?'<p class="bttitle">'+(pr?pr.textContent:"")+'</p>'+html:""}
+function bAskShot(){var st=BT.st,hp=BT.teams[0].p[bMeI()],opts=bOptions(BT.inShot),legal={};opts.forEach(function(o){legal[o.shot]=1});
+  BT.pick={shot:null,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H;
+  shotRail(null,function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
+  var r=$("shotrail");if(r)[].forEach.call(r.children,function(x){var s=BNEW[x.dataset.v]||x.dataset.v;x.disabled=x.dataset.v==="serve"||!legal[s]});
+  setPrompt("Your shot · ball at "+st.h.toFixed(1)+" m, "+(hb?"above":"below")+" the net");bHabits();bDockShot();cue("rail");
+  bClock(function(){if(BT.pick.shot&&BT.pick.tg)return;var c=BT.pick.shot?{shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":"mid",l:1,risk:BT.pick.risk}:{shot:"neutral",d:"mid",l:1,risk:"safe"};bCommit(c)})}
+function bErrPct(st,hp,c){var E=bErr(st,hp,c),S=BSHOT[c.shot],a=bAim(c),sd=0.85*S.sd*BRISK[c.risk].sdm*hp.sdm*(1+1.2*(1-st.B)),out=0;
+  for(var n=0;n<300;n++){var x=a[0]+bGauss()*sd,y=a[1]+bGauss()*sd;if(x<0.15||x>8||y<0||y>8)out++}var pn=Math.min(0.95,E.net),pf=E.frame;return Math.round(Math.min(0.99,pn+(1-pn)*pf+(1-pn)*(1-pf)*out/300)*100)}
+function bRiskSeg(fn){var p=BT.pick,st=BT.st,hp=BT.teams[0].p[bMeI()];return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){var e=p.shot?bErrPct(st,hp,{shot:p.shot,d:p.shot==="drop"?"short":p.shot==="serve"?"deep":p.shot==="lob"?"deep":"mid",l:1,risk:r}):null;
+  return '<button data-r="'+r+'" aria-pressed="'+(p.risk===r)+'"><b>'+r[0].toUpperCase()+r.slice(1)+'</b>'+(e!=null?'<small class="'+(e>=25?"hi":"")+'">'+e+'% error</small>':'')+'</button>'}).join("")+'</div>'}
+function bWire(fn){[].forEach.call($("btdock").querySelectorAll("[data-r]"),function(b){b.onclick=function(){BT.pick.risk=b.dataset.r;fn()}})}
+function bDockShot(){var p=BT.pick;bDock(bRiskSeg()+'<p class="bthint">'+(p.shot?bName(p.shot)+": tap a target on their side":"Pick your shot on the left")+'</p>');bWire(bDockShot)}
+function bTargets(){gA.innerHTML="";var p=BT.pick,rows=p.shot==="drop"?["short"]:p.shot==="lob"?["mid","deep"]:p.shot==="block"?["short","mid"]:["short","mid","deep"],X0={short:[0.4,3.1],mid:[3.1,5.3],deep:[5.3,7.9]},Y0=[[0.1,2.67],[2.67,5.33],[5.33,7.9]];
+  rows.forEach(function(d){[0,1,2].forEach(function(l){var x0=X(8+X0[d][0]),x1=X(8+X0[d][1]),y0=Y(Y0[l][0]),y1=Y(Y0[l][1]),g=el("g",{"class":"ac bt",role:"button","aria-label":d+" "+["left","middle","right"][l]},gA);
+    el("rect",{x:x0+2,y:y0+2,width:x1-x0-4,height:y1-y0-4,rx:6,fill:"#00C2B8","fill-opacity":0.14,stroke:"#00C2B8","stroke-width":2},g);
+    g.addEventListener("click",function(){p.tg=[d,l];bCommit({shot:p.shot,d:d,l:l,risk:p.risk})})})});cue("aim")}
+function bCommit(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDock("");railOff();
+  /* Grade your choice against the best option, given how they usually cover */
+  var st=BT.st,hp=BT.teams[0].p[bMeI()],D=BT.teams[1],g=bGuessCovers(D,{read:0.7},bBand(st.h)),opts=bOptions(BT.inShot),best=null,bv=-9,mine=bEval(st,hp,c,BT.pos[1],D.p,g,40);
+  opts.forEach(function(o){var v=bEval(st,hp,o,BT.pos[1],D.p,g,5);if(v>bv){bv=v;best=o}});bv=bEval(st,hp,best,BT.pos[1],D.p,g,40);if(mine>bv){bv=mine;best=c}
+  var dl=bv-mine,lab=dl<=0.06?"Best":dl<0.15?"Good":dl<0.3?"Inaccuracy":dl<0.5?"Mistake":"Blunder";BT.grade={lab:lab,best:best,d:dl,c:c,h:st.h};
+  var m=MATCH;m.shots=m.shots||[];m.shots.push({pt:m.points,lab:lab,d:+dl.toFixed(2),ct:st.timing==="on"?"ontime":st.timing,ch:+st.h.toFixed(2),dec:null,open:false,sit:{height:st.h>=2.1?"high":st.h>=1.0?"med":"low"},
+    pick:{shot:BOLD[c.shot],cell:[["short","mid","deep"].indexOf(c.d),c.l*2]},best:{shot:BOLD[best.shot],cell:[["short","mid","deep"].indexOf(best.d),best.l*2]},end:null});
+  if(LABSC[lab]===2)m.right++;bDefend(c)}
+function bAskServe(){BT.pick={shot:"serve",risk:"normal"};var pm={};pm[state.side]="serve";setPoses(pm);railOff();
+  setPrompt("Your serve: pick a risk, tap a zone");gA.innerHTML="";[["mid",[3.1,5.3]],["deep",[5.3,7.9]]].forEach(function(dd){[0,1,2].forEach(function(l){var Y0=[[0.1,2.67],[2.67,5.33],[5.33,7.9]][l],x0=X(8+dd[1][0]),x1=X(8+dd[1][1]),y0=Y(Y0[0]),y1=Y(Y0[1]),g=el("g",{"class":"ac bt",role:"button","aria-label":"Serve "+dd[0]+" "+["left","middle","right"][l]},gA);
+    el("rect",{x:x0+2,y:y0+2,width:x1-x0-4,height:y1-y0-4,rx:6,fill:"#FFD23F","fill-opacity":0.18,stroke:"#E0A800","stroke-width":2},g);g.addEventListener("click",function(){bCommitServe({shot:"serve",d:dd[0],l:l,risk:BT.pick.risk})})})});
+  var dock=function(){bDock(bRiskSeg()+'<p class="bthint">One serve. Bolder serves miss more but force weaker returns</p>');bWire(dock)};dock();cue("aim");
+  bClock(function(){bCommitServe({shot:"serve",d:"deep",l:1,risk:"safe"})})}
+function bCommitServe(c){clearTimeout(BT.clk);stopBar();gA.innerHTML="";bDock("");cue(null);bDefend(c)}
+function bAskCover(choice){BT.cur=MATCH.cur;BT.pendingChoice=choice;var meI=bMeI(),hb=BT.st.h;railOff();gA.innerHTML="";
+  var LN=meI===0?[["line",0,[0.1,2.0]],["middle",2,[2.0,3.95]]]:[["middle",0,[4.05,6.0]],["line",2,[6.0,7.9]]],D=[["net",[1.0,3.1]],["mid",[3.1,4.7]],["deep",[4.7,7.6]]];
+  D.forEach(function(dd){LN.forEach(function(yy){var x0=X(8-dd[1][1]),x1=X(8-dd[1][0]),y0=Y(yy[2][0]),y1=Y(yy[2][1]),g=el("g",{"class":"ac bt cov",role:"button","aria-label":"Cover "+dd[0]+" "+yy[0]},gA);
+    el("rect",{x:Math.min(x0,x1)+2,y:y0+2,width:Math.abs(x1-x0)-4,height:y1-y0-4,rx:6,fill:"#0077B6","fill-opacity":0.12,stroke:"#0077B6","stroke-width":2},g);
+    g.addEventListener("click",function(){bCommitCover({d:dd[0],l:yy[1]})})})});
+  var hk=bKey(BT.hit[0],BT.hit[1]);setPrompt("They're hitting from "+hb.toFixed(1)+" m · where do you cover?");bHabits(true);
+  bDock('<p class="bthint">'+(hb>=2.1?"High ball: expect a smash. Back off or cover the middle.":hb<1.3?"They must lift it. Close the net, watch for the lob.":"Neutral ball. Hold, and read their habit.")+'</p>');
+  bClock(function(){bCommitCover({d:"mid",l:1})})}
+function bCommitCover(cv){clearTimeout(BT.clk);stopBar();gA.innerHTML="";bDock("");var meI=bMeI(),T=BT.teams,bk=bBand(BT.st.h),pc=bAIcover(T[1],T[0].p[1-meI],bk),covers=[];covers[meI]=cv;covers[1-meI]=pc;
+  bReveal(BT.pendingChoice,covers)}
+/* What they tend to do: shown while you decide */
+function bHabits(def){var T=BT.teams[1],bk=bBand(BT.st.h),M=def?(T.landMem&&T.landMem[bk]):(T.covMem&&T.covMem[bk]);var e=$("bthab");if(!e){e=document.createElement("div");e.id="bthab";e.className="bthab";var box=$("cmd")&&$("cmd").parentNode;if(box)box.appendChild(e)}
+  if(!M){e.hidden=true;return}var tot=0,arr=[];for(var i=0;i<9;i++){tot+=M[i]||0;arr.push([i,M[i]||0])}arr.sort(function(a,b){return b[1]-a[1]});if(tot<1.5){e.hidden=true;return}
+  var top=arr[0],pc=Math.round(top[1]/tot*100),lab=def?["short","mid","deep"][(top[0]/3)|0]+" "+["left","middle","right"][top[0]%3]:BCOVNM[BCOV[top[0]].d]+" "+["","",""][0];
+  e.hidden=false;e.textContent=(def?"They usually hit ":"They usually cover ")+(def?lab:BCOVNM[BCOV[top[0]].d].toLowerCase())+" · "+pc+"%"}
+/* ---------- Point over ---------- */
+function bPointEnd(won,r,choice,covers,hT){var m=MATCH,cur=m.cur;if(!cur||cur.done)return;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();var e=$("bthab");if(e)e.hidden=true;
+  if(r.end==="err"&&choice&&choice.shot==="serve")r.why="fault";var kind=r.end==="winner"?(won?"winner":"gap"):(won?"theymiss":"miss");pointEnd(m,won,kind);renderScore();
+  var you=hT===0,head=r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?"Into the net.":"They netted it."):r.why==="out"?(you?"Out.":"They hit it out."):(you?"You missed.":"They missed.");
+  var why=r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
+    r.why==="net"?"Hitting down from "+BT.st.h.toFixed(1)+" m, below the net, mostly finds the net. Lift it instead.":r.why==="out"?"Bold aims near the lines miss more often.":"Off balance, the error chance goes up.";
+  var G=BT.grade||null,o=over();function over(){return (m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2}
+  var html='<div class="ptres '+(won?"w":"l")+'"><b>'+head+'</b> '+why+'</div>'+(G?'<div class="fbbest"><b>Best play</b><p>'+bName(G.best.shot)+' '+G.best.d+' '+["left","middle","right"][G.best.l]+', '+G.best.risk+'.</p></div>':'')+'<!--more-->'+
+    (covers&&r.end!=="err"?fbSec("The read",(you?"They covered ":"You covered ")+bCovLabel(covers[r.i||0],r.i||0)+". "+(r.readOK?"That was the right spot.":"That left the space open.")):"")+
+    (G?fbSec("Your last choice",G.lab+". From "+G.h.toFixed(1)+" m the best option was "+bName(G.best.shot).toLowerCase()+" "+G.best.d+" "+["left","middle","right"][G.best.l]+", "+G.best.risk+"."):"")+fbSec("How points are won","Earn a high ball, hit where they aren't covering, and keep your own choices mixed. They learn your habits.");
+  if(!won&&G)saveLost({sit:{height:G.h>=2.1?"high":G.h>=1?"med":"low",depth:"mid",speed:"med",side:"body",A:[1,0],B:[1,2]},pick:{shot:BOLD[G.c.shot],cell:[["short","mid","deep"].indexOf(G.c.d),G.c.l*2]},ans:{shot:BOLD[G.best.shot],cell5:[["short","mid","deep"].indexOf(G.best.d),G.best.l*2]},kind:kind,tier:LABSC[G.lab]===2?2:0,aimT:0,moveOk:true,why:"",rival:m.r.pair});
+  FBTICKS=G?[[G.lab,LABSC[G.lab],true],[G.h.toFixed(1)+" m",G.h>=NET_H?2:G.h>=1?1:0,true]]:null;FBRACE=r.tBall?{b:r.tBall,n:r.tNeed,who:"Them"}:null;BT.grade=null;
+  buzz(won?[30,40,30]:[60]);track("point_played",{rival:m.r.id,mode:"beat",won:won,end:kind,touches:BT.touch,lab:G?G.lab:null});
+  setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;fbShow(html,o?"See the result":"Next point",function(){playOn(o)})},700)}
+
+function newPoint(){if(MATCH&&MATCH.mode==="beat"){beatNewPoint();return}clearPosture();setPips(0);lvStop();var m=MATCH,g=m.r.gen,srv=serverFor(m.points),os=(Math.floor(m.points/2)%4)===1?"A":"B",men=state.rules==="men";
   var og=g.opp[Math.floor(Math.random()*g.opp.length)],sit={side:wpick([["fh",4],["body",2],["bh",3]]),depth:"mid",speed:wpick(g.speed),height:wpick(g.height),A:og[0].slice(),B:og[1].slice()};
   if(srv==="opp"){sit.ret=true;sit.height=wpick([["low",3],["med",4]]);sit.speed=wpick([["fast",3],["med",4],["slow",1]]);
     var sl=os==="A"?0:2,pl=2-sl,o=men?[[1,sl],[1,pl]]:[[1,sl],[0,pl]];sit.A=os==="A"?o[0]:o[1];sit.B=os==="A"?o[1]:o[0]}
@@ -2387,7 +2550,7 @@ function openReview(m,sm){var sh=m.shots||[],ov=document.createElement("div");ov
     saveLost({sit:x.sit,pick:x.pick,ans:{shot:x.best.shot,cell5:x.best.cell},kind:x.end==="miss"?"miss":"review",tier:x.pick.shot===x.best.shot?2:(t==null?0:Math.min(1,t)),aimT:x.pick.cell.join()===x.best.cell.join()?0:2,moveOk:true,why:"",rival:sm.rival});
     ov.remove();var e=document.querySelector(".endov");if(e)e.remove();leaveMatch();TRMODE="replay";save("tr-mode","replay");AU.i=0;AU.ans=null;setTab("pick")}});
   track("game_review_opened",{acc:sm.acc,n:sm.n})}
-function endMatch(){lvStop();railOff(true);resBar(null);document.body.classList.remove("hasres");if(MATCH&&MATCH.me>MATCH.them)setTimeout(function(){sfx("fanfare")},200);hideShotUI();$("ctimer").hidden=true;var m=MATCH,won=m.me>m.them,bt=beaten();if(won&&!bt[m.r.id]){bt[m.r.id]=m.me+"–"+m.them;save("sand-beaten",JSON.stringify(bt))}
+function endMatch(){lvStop();if(typeof BT!=="undefined"){clearTimeout(BT.clk);bDock("")}railOff(true);resBar(null);document.body.classList.remove("hasres");if(MATCH&&MATCH.me>MATCH.them)setTimeout(function(){sfx("fanfare")},200);hideShotUI();$("ctimer").hidden=true;var m=MATCH,won=m.me>m.them,bt=beaten();if(won&&!bt[m.r.id]){bt[m.r.id]=m.me+"–"+m.them;save("sand-beaten",JSON.stringify(bt))}
   var SM=matchSummary(m);saveHist(SM);track("match_completed",{rival:m.r.id,me:m.me,them:m.them,won:won,perfect_decisions:m.right,points:m.points,acc:SM.acc,early:SM.early,shots:SM.n,conv:SM.conv,open:SM.open,dec:SM.dec});
   clearAim();document.body.classList.remove("c-live");$("csit").hidden=true;var idx=RIVALS.indexOf(m.r),nx=RIVALS[idx+1],c=$("cpanel");
   var wq=Math.random()<.5?0:1,av=POSE_AV[state.emoji]||"a01",avm=POSE_AV[state.mate]||"a02",ra=POSE_AV[rAv(m.r,0)]||"a03",rb=POSE_AV[rAv(m.r,1)]||"a04",
