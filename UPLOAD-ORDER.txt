@@ -1,0 +1,11 @@
+Upload to GitHub from the repo's MAIN page (Add file > Upload files), in these batches.
+Every folder sits at the top level, so dragging it keeps the right path.
+
+Batch 1 (21 files): index.html, styles.css, app.js, signal.jpg, favicon.svg, README.md, UPLOAD-ORDER.txt
+                    + folders: avatars, supabase, vendor
+Batch 2 (72 files): folder poses
+Batch 3 (96 files): folders sprites-a01, sprites-a02, sprites-a03, sprites-a04
+Batch 4 (96 files): folders sprites-a05, sprites-a06, sprites-a07, sprites-a08
+Batch 5 (96 files): folders sprites-a09, sprites-a10, sprites-a11, sprites-a12
+
+The old "sprites" folder (or any a01..a12 folders at the top) is no longer used and can be deleted.

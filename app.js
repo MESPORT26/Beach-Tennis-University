@@ -623,7 +623,7 @@ var POSE_MAP={serve:"serve",push:"push",inPush:"push",inLow:"push",flatsmash:"sm
 /* Full-body sprites from the avatar atlas: 12 poses, front and back. Your side of the court shows backs, theirs fronts; a player chasing a lob over them turns round */
 var FLIP={};
 function updImg(id){var im=PL[id].t.img,ps=POSE[id]||"ready",ours=id==="L"||id==="R",view=(ours!==!!FLIP[id])?"back":"front",
-    src="sprites/"+emo(id)+"/"+ps+"-"+view+".webp",w=62,hh=86;
+    src=(window.SPRDIR||"sprites/")+emo(id)+"/"+ps+"-"+view+".webp",w=62,hh=86;
   if(im.getAttribute("href")!==src)im.setAttribute("href",src);im.setAttribute("x",-w/2);im.setAttribute("y",-hh+16);im.setAttribute("width",w);im.setAttribute("height",hh)}
 function bSet(k,p,flip){POSE[k]=POSE_MAP[p]||p;if(flip!=null)FLIP[k]=flip;updImg(k)}
 function bTeamPose(t,p){bSet(bKey(t,0),p);bSet(bKey(t,1),p)}
