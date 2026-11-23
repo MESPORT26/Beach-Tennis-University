@@ -1411,7 +1411,13 @@ function markAim(c,best){[].forEach.call(gA.children,function(g){var k=g.getAttr
 function renderScore(){var m=MATCH,r=m.r;$("score").innerHTML='<div class="team"><span class="av-pair">'+eb(state.emoji,"#FFF3C4")+eb(state.mate,"#DDF6F3")+'</span><span class="names"><b>'+(state.name?esc(state.name):"You")+'</b><small>and your partner</small></span></div>'+
   '<div class="pts"><span>'+m.me+'</span><i>–</i><span>'+m.them+'</span></div><span class="pips" id="pips" role="img" aria-label="Pressure 0 of 3"><i></i><i></i><i></i></span>'+
   '<div class="team them"><span class="names"><b>'+r.pair+'</b><small>'+r.p[0].n+' and '+r.p[1].n+'</small></span>'+pairSvg(r)+'</div>'+
-  '<div class="log">'+m.log.map(function(x){return '<span class="'+x+'"></span>'}).join("")+'</div><button class="cexit" id="c-exit" aria-label="Leave match"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>';
+  '<div class="log">'+m.log.map(function(x){return '<span class="'+x+'"></span>'}).join("")+'</div><button class="cmus ctime" id="c-time" aria-label="Timer: '+(state.btpace||"normal")+'" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 9v4l3 2M9 3h6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><button class="cexit" id="c-exit" aria-label="Leave match"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>';
+  $("c-time").onclick=function(e){e.stopPropagation();var b=this,pp=$("timepop");if(pp){pp.remove();b.setAttribute("aria-expanded","false");return}
+    pp=document.createElement("div");pp.id="timepop";pp.className="timepop";pp.setAttribute("role","menu");
+    pp.innerHTML='<b>Timer</b>'+[["quick","Quick"],["normal","Normal"],["relaxed","Relaxed"],["off","Off"]].map(function(o){return '<button role="menuitemradio" data-pace="'+o[0]+'" aria-checked="'+(state.btpace===o[0])+'">'+o[1]+'</button>'}).join("")+'<small>Applies from your next shot</small>';
+    $("score").appendChild(pp);b.setAttribute("aria-expanded","true");
+    [].forEach.call(pp.querySelectorAll("[data-pace]"),function(x){x.onclick=function(ev){ev.stopPropagation();state.btpace=x.dataset.pace;save("btpace",state.btpace);b.setAttribute("aria-label","Timer: "+state.btpace);pp.remove();b.setAttribute("aria-expanded","false");toast("Timer: "+x.textContent)}});
+    setTimeout(function(){document.addEventListener("click",function cl(){var q=$("timepop");if(q)q.remove();b.setAttribute("aria-expanded","false");document.removeEventListener("click",cl)})},0)};
   $("c-exit").onclick=function(){runBall(null);leaveMatch();if(typeof renderList==="function")renderList();if(typeof lobbyPanel==="function")lobbyPanel()}}
 /* Real-game checks. No smash off a serve. Smash only on a high ball within about 4.5 m, further back it is a hook or soft brush smash */
 function realShot(sit,c){var s=simple(c.shot);
@@ -2189,7 +2195,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="24 Nov · 3";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="24 Nov · 4";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
