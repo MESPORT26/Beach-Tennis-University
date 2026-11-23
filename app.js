@@ -1764,7 +1764,7 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
     if(BT.st.h>=2.1){bSet(bKey(D,rI),"smashsetup");if(contact[0]<=3)bTeamPose(hT,"defsmash")}
     var pz=Math.max(0,Math.min(3,Math.round((1-BT.st.B)*3)));setPips(D===0?0:pz/3);
     if(D===0&&rI===bMeI())setTimeout(bAskShot,650);
-    else{var g=bGuessCovers(T[1-D],T[D].p[rI],bBand(BT.st.h)),c=bAIshot(BT.st,T[D].p[rI],BT.pos[1-D],T[1-D].p,BT.inShot,g);setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bDefend(c)},D===0?650:450)}},ms+120)}
+    else{var g=bGuessCovers(T[1-D],T[D].p[rI],bBand(BT.st.h)),c=bAIshot(BT.st,T[D].p[rI],BT.pos[1-D],T[1-D].p,BT.inShot,g);setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bDefend(c)},D===0?650:120)}},ms+120)}
 /* ---------- Receiving: tap where it lands before it hits the sand ----------
    The window is real flight time slowed for thumbs (a smash is quick, a lob gives you time).
    Tap early and you get there early: you meet it higher. Too far or too slow and it's past you. */
@@ -1797,8 +1797,8 @@ function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBan
     gA.innerHTML="";cue(null);
     if(s<-0.12){bSet(k,"dive");bPop(to,"Too late","#C2334A");setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(false,Object.assign({},r,{end:"winner",tNeed:a*tB,why:"late"}),choice,cv,1)},Math.max(400,W*(1-tt)+200));return}
     var K=[bHcon(choice.shot,0,land[0]),bHcon(choice.shot,1,land[0]),bHcon(choice.shot,2,land[0])],hh;
-    if(s>=0.5)hh=K[0];else if(s>=0.2)hh=K[1]+(K[0]-K[1])*(s-0.2)/0.3;else if(s>=0)hh=K[2]+(K[1]-K[2])*s/0.2;else hh=Math.max(0.25,K[2]*0.6);
-    hh=Math.max(0.2,hh*(1+0.05*bGauss()));if(s<0)bSet(k,"dive");else if(hh>=2.1){bSet(k,"smashsetup");if(land[0]<=3.4)bTeamPose(1,"defsmash")}var timing=s>=0.5?"early":s>=0.15?"on":"late",B=Math.max(0.15,Math.min(1,0.35+s*1.3));
+    if(s>=0.4)hh=K[0];else if(s>=0.15)hh=K[1]+(K[0]-K[1])*(s-0.15)/0.25;else if(s>=0)hh=K[2]+(K[1]-K[2])*s/0.15;else hh=Math.max(0.25,K[2]*0.6);hh*=1.15;
+    hh=Math.max(0.2,hh*(1+0.05*bGauss()));if(s<0)bSet(k,"dive");else if(hh>=2.1){bSet(k,"smashsetup");if(land[0]<=3.4)bTeamPose(1,"defsmash")}var timing=s>=0.4?"early":s>=0.12?"on":"late",B=Math.max(0.15,Math.min(1,0.35+s*1.3));
 
     var contact=[Math.max(0.7,Math.min(8,land[0]-(timing==="early"?1.0:timing==="on"?0.4:-0.2))),land[1]];BT.pos[0][ri]=contact;
     var recT=tB+0.3,home=BHOMEX[choice.shot==="lob"||choice.shot==="smash"||choice.shot==="push"?"net":"mid"];
