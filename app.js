@@ -1688,11 +1688,13 @@ function bTapOpp(w,xa,xb){if(!w)return {};return {x:Math.max(0.3,Math.min(7.85,w
 /* Harder from low, from deep, and drops from far back */
 function bHard(st,c){return c.shot==="serve"?1:(1+0.5*Math.max(0,NET_H-st.h))*(0.8+0.05*st.pos[0])*(c.shot==="drop"?1+0.08*st.pos[0]:1)}
 function bErr(st,hp,c){var S=BSHOT[c.shot],below=Math.max(0,S.hmin-st.h);return {net:Math.min(0.95,S.netK*below)+(c.shot==="drop"&&st.h>2.2?0.05:0),frame:hp.errBase*BRISK[c.risk].err*4*bPress(st)}}
-function bPress(st){var p=0;if(st.timing==="late")p+=0.35;p+=Math.max(0,0.75-st.B)*0.9;if(BT.inShot==="smash"||BT.inShot==="push"||BT.inShot==="hook")p+=0.35;return p}
+function bPress(st){var p=0.55*(st.stretch||0);if(st.timing==="late")p+=0.35;p+=Math.max(0,0.75-st.B)*0.9;if(BT.inShot==="smash"||BT.inShot==="push"||BT.inShot==="hook")p+=0.35;return p}
 function bSD(st,hp,c){var p=bPress(st);return p<=0?0:p*(BSHOT[c.shot].sd/0.5)*BRISK[c.risk].sdm*hp.sdm}
 /* Wind: metres of drift on the far side, by shot. Lobs hang longest */
-var BWD={lob:0.9,neutral:0.45,drop:0.35,serve:0.35,block:0.2,push:0.2,smash:0.08,hook:0.12};
+var BWD={lob:1.3,neutral:0.55,drop:0.4,serve:0.45,block:0.2,push:0.15,smash:0.05,hook:0.1};
 function bWind(shot){var k=(WINDK[state.wind]||0)*(BWD[shot]||0.3);if(!k)return [0,0];var v=windV(),sg=BT.hit&&BT.hit[0]===1?-1:1;return [v[0]*k*sg,v[1]*k]}
+/* How far away you can still get to it. Hard balls are winners past 2-2.5 m; a floating lob can be chased much further */
+var BMAXD={smash:2.0,push:2.5,hook:2.5,block:3.5,drop:3.5,neutral:4.0,serve:4.0,lob:6.5};
 function bAim(c){if(c.x!=null&&c.y!=null)return [c.x,c.y];var R=BRISK[c.risk],tx=BDEPTH[c.d],ty=c.y!=null?c.y:BLANES[c.l];if(c.d==="deep")tx=8-R.margin;if(c.d==="short")tx=Math.max(0.8,R.margin+0.6);if(c.y==null){if(c.l===0)ty=R.margin;if(c.l===2)ty=8-R.margin}else ty=Math.max(R.margin*0.6,Math.min(8-R.margin*0.6,ty));return [tx,ty]}
 function bResolve(st,hp,c,defs,dps,covers){var S=BSHOT[c.shot],R=BRISK[c.risk],E=bErr(st,hp,c);
   if(Math.random()<E.net)return {end:"err",why:"net"};if(Math.random()<E.frame)return {end:"err",why:"frame"};
@@ -1701,7 +1703,7 @@ function bResolve(st,hp,c,defs,dps,covers){var S=BSHOT[c.shot],R=BRISK[c.risk],E
   var v=S.v*R.pace;if(c.shot==="smash"||c.shot==="push")v*=Math.max(0.75,Math.min(1.25,1+0.25*(st.h-2)))*Math.max(0.6,Math.min(1.1,1.15-0.08*st.pos[0]));
   var tBall=Math.hypot(st.pos[0]+land[0],st.pos[1]-land[1])/v+S.hang,best=null;
   defs.forEach(function(p,i){var dp=dps[i],cp=bCovPt(covers[i],i),pre=toward(p,cp,1.6),readOK=Math.hypot(cp[0]-land[0],cp[1]-land[1])<2.2,
-      d=Math.max(0,Math.hypot(pre[0]-land[0],pre[1]-land[1])-dp.reach),bw=land[0]>pre[0]+0.5,tNeed=d>0?(readOK?dp.react*0.5:dp.react+0.12)+d/(dp.run*(bw?dp.back:1)):0.05,m=tBall-tNeed;
+      d=Math.hypot(pre[0]-land[0],pre[1]-land[1])>(BMAXD[c.shot]||4)?99:Math.max(0,Math.hypot(pre[0]-land[0],pre[1]-land[1])-dp.reach),bw=land[0]>pre[0]+0.5,tNeed=d>0?(readOK?dp.react*0.5:dp.react+0.12)+d/(dp.run*(bw?dp.back:1)):0.05,m=tBall-tNeed;
     if(!best||m>best.m)best={i:i,m:m,tNeed:tNeed,readOK:readOK,pre:pre}});
   var m=best.m,base={land:land,m:m,i:best.i,tBall:tBall,tNeed:best.tNeed,readOK:best.readOK,pre:best.pre};
   if(m<-0.25||(m<0&&Math.random()<-m/0.25))return Object.assign(base,{end:"winner"});
@@ -1755,7 +1757,7 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
   if(r.end==="winner"&&r.i!=null)setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bSet(bKey(D,r.i),"dive")},Math.round(Math.max(0.45,r.tBall||0.8)*1500*0.7));
   setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur&&!BT.cur.done){FLIP[bKey(hT,0)]=FLIP[bKey(hT,1)]=false;bTeamPose(hT,"ready")}},Math.round(Math.max(0.45,r.tBall||0.8)*1500*0.45));
   sfx(choice.shot==="smash"||choice.shot==="push"?"hitF":"hit");
-  var from=bCourt(hT,BT.st.pos),to=r.land?bCourt(D,r.land):bCourt(D,[0.1,BT.st.pos[1]]),ms=Math.round(Math.max(0.45,(r.tBall||0.8))*1000*1.5);
+  var from=bCourt(hT,BT.st.pos),to=r.land?bCourt(D,r.land):bCourt(D,[0.1,BT.st.pos[1]]),ms=Math.round(Math.max(0.4,(r.tBall||0.8))*1000*(choice.shot==="lob"?1.9:choice.shot==="smash"||choice.shot==="push"?1.2:1.5));
   for(var i=0;i<2;i++){var pre=toward(BT.pos[D][i],bCovPt(covers[i],i),r.end==="winner"?1.2:1.6);BT.pos[D][i]=pre;var k=bKey(D,i);PL[k].g.style.transitionDuration=Math.round(ms*0.9)+"ms";place(k,bCourt(D,pre),false)}
   bRevealChip(choice,covers,r,hT);if(hT===0&&hI===bMeI()&&!r.end)bMoveMode(r.tBall||0.8);
   if(r.end==="err"&&r.why!=="out"){errBall(from,to[1],r.why==="net")}else{var pr=PROF[BOLD[choice.shot]]||PROF.neutral;PROF._bt={d:ms/1.3,h:pr.h};runBall({f:from,to:to,shot:"_bt",land:true},true)}
@@ -1769,7 +1771,7 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
     BT.pos[hT]=BT.pos[hT].map(function(p,i){var mine=hT===0&&i===bMeI()&&BT.moving;if(mine)return BT.myGo?toward(p,BT.myGo,T[hT].p[i].run*Math.max(0,recT-0.1)):p;return toward(p,[home,i===0?2.5:5.5],T[hT].p[i].run*Math.max(0,recT-0.25))});BT.moving=false;BT.myGo=null;
     var contact=[Math.max(0.7,Math.min(8,r.land[0]-(timing==="early"?1.2:timing==="on"?0.5:-0.3))),r.land[1]];BT.pos[D][rI]=contact;
     BT.pos[D][1-rI]=toward(BT.pos[D][1-rI],[3.8,rI===0?5.5:2.5],2);
-    BT.st={pos:contact,B:r.B*(timing==="early"?0.85:1),h:Math.max(0.2,h),timing:timing};BT.inShot=choice.shot;BT.hit=[D,rI];bPlace(700);
+    BT.st={pos:contact,B:r.B*(timing==="early"?0.85:1),h:Math.max(0.2,h),timing:timing,stretch:Math.max(0,Math.min(1,(dst(r.pre||contact,r.land)-1)/((BMAXD[choice.shot]||4)-1)))};BT.inShot=choice.shot;BT.hit=[D,rI];bPlace(700);
     if(BT.st.h>=2.1){bSet(bKey(D,rI),"smashsetup");if(contact[0]<=3)bTeamPose(hT,"defsmash")}
     var pz=Math.max(0,Math.min(3,Math.round((1-BT.st.B)*3)));setPips(D===0?0:pz/3);
     if(D===0&&rI===bMeI())setTimeout(bAskShot,650);
@@ -1777,7 +1779,7 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
 /* ---------- Receiving: tap where it lands before it hits the sand ----------
    The window is real flight time slowed for thumbs (a smash is quick, a lob gives you time).
    Tap early and you get there early: you meet it higher. Too far or too slow and it's past you. */
-var BSLOW={beginner:3.2,intermediate:2.7,advanced:2.3,pro:1.9},BFLOOR={beginner:1.8,intermediate:1.5,advanced:1.25,pro:1.05};
+var BSLOW={beginner:3.2,intermediate:2.7,advanced:2.3,pro:1.9},BFLOOR={beginner:1.3,intermediate:1.05,advanced:0.9,pro:0.75};
 function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBand(BT.st.h),cv=[{d:"mid",l:1},{d:"mid",l:1}];
   var r=bResolve(BT.st,hp,choice,BT.pos[0],T[0].p,cv);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:"opp",shot:BOLD[choice.shot]});BT.last={choice:choice,covers:cv,r:r,mine:false,hT:1,st:BT.st};
   if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[1].landMem,bk,ci,9)}
@@ -1785,9 +1787,9 @@ function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBan
   var from=bCourt(1,BT.st.pos);
   if(r.end==="err"){var to=r.land?bCourt(0,r.land):bCourt(0,[0.1,BT.st.pos[1]]);setPrompt("Them: "+bName(choice.shot));if(r.why!=="out")errBall(from,to[1],r.why==="net");else{PROF._bt={d:700,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:from,to:to,shot:"_bt",land:true},true)}
     setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(true,r,choice,cv,1)},1100);return}
-  BT.inLand=r.land[0];var land=r.land,tB=r.tBall,W=Math.round(Math.min(3000,Math.max((BFLOOR[state.level]||1.5)*1000,tB*(BSLOW[state.level]||2.7)*1000))*bPace());if((+load("recvTaught","0")||0)<3)W=Math.round(W*1.5);var to=bCourt(0,land);
+  BT.inLand=r.land[0];var land=r.land,tB=r.tBall,W=Math.round(Math.min(choice.shot==="lob"?3800:3000,Math.max((BFLOOR[state.level]||1.5)*1000,tB*(BSLOW[state.level]||2.7)*1000))*bPace());if((+load("recvTaught","0")||0)<3)W=Math.round(W*1.5);var to=bCourt(0,land);
   /* Whoever is nearer takes it; you steer them */
-  var mp=BT.pos[0][bMeI()];bRemember(T[0].covMem,bk,(mp[0]<3?0:mp[0]<6?1:2)*3+(mp[1]<2.7?0:mp[1]<5.3?1:2),9);var me=bMeI(),onMate=me===0?land[1]>4.4:land[1]<3.6,M=MATCH,rn=(M.rcvN=(M.rcvN||0)+1),mn=M.rcvMate||0,ri=onMate&&(mn+1)/rn<=0.25?1-me:me,auto=ri!==me;if(auto)M.rcvMate=mn+1;rp=T[0].p[ri],t0=performance.now(),done=false;BT.recv={ri:ri,land:land,W:W};
+  var mp=BT.pos[0][bMeI()];bRemember(T[0].covMem,bk,(mp[0]<3?0:mp[0]<6?1:2)*3+(mp[1]<2.7?0:mp[1]<5.3?1:2),9);var me=bMeI(),onMate=me===0?land[1]>4.4:land[1]<3.6,M=MATCH,rn=(M.rcvN=(M.rcvN||0)+1),mn=M.rcvMate||0,ri=onMate?1-me:me,auto=ri!==me;/* their side is theirs: you never run across in front of your partner */if(auto)M.rcvMate=mn+1;rp=T[0].p[ri],t0=performance.now(),done=false;BT.recv={ri:ri,land:land,W:W};
   if(choice.shot==="lob"&&land[0]>BT.pos[0][ri][0]+0.5)bSet(bKey(0,ri),"ready",true);
   setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur&&!BT.cur.done){FLIP.A=FLIP.B=false;["A","B"].forEach(function(k){if(POSE[k]!=="defsmash")bSet(k,"ready")})}},Math.round(W*0.45));
   PROF._bt={d:W/1.3,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:from,to:to,shot:"_bt",land:false},false);
@@ -1808,7 +1810,7 @@ function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBan
   [0,1].forEach(function(i){var kk=bKey(0,i);PL[kk].g.style.transitionDuration="0ms";place(kk,bCourt(0,BT.pos[0][i]),true)});
   setPrompt(auto?"Partner's ball":"Tap where it lands!");bPhase(auto?"PARTNER":"RETURN");if(!auto)cue("aim");bDock("");
   var go=function(){if(done)return;done=true;var tt=(performance.now()-t0)/W;if(BT.clk)clearTimeout(BT.clk);
-    var p=BT.pos[0][ri],d=Math.max(0,dst(p,land)-rp.reach),bw=land[0]>p[0]+0.5,trav=d/(rp.run*(bw?rp.back:1)),a=tt+trav/tB,s=1-a;
+    var p=BT.pos[0][ri],d=Math.max(0,dst(p,land)-rp.reach),bw=land[0]>p[0]+0.5,trav=d/(rp.run*(bw?rp.back:1)),a=tt+trav/tB,s=1-a;if(dst(p,land)>(BMAXD[choice.shot]||4))s=-1;
     var k=bKey(0,ri);PL[k].g.style.transitionDuration=Math.round(Math.max(200,trav*(BSLOW[state.level]||2.7)*1000))+"ms";
     var reachPt=toward(p,land,Math.max(0,dst(p,land)-0.4));BT.pos[0][ri]=reachPt;place(k,bCourt(0,reachPt),false);sfx("run");
     gA.innerHTML="";cue(null);bPhase("");document.body.classList.remove("btrecv");if(!auto&&s>=0)save("recvTaught",String((+load("recvTaught","0")||0)+1));
@@ -1821,7 +1823,7 @@ function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBan
     var recT=tB+0.3,home=BHOMEX[choice.shot==="lob"||choice.shot==="smash"||choice.shot==="push"?"net":"mid"];
     BT.pos[1]=BT.pos[1].map(function(p,i){return toward(p,[home,i===0?2.5:5.5],T[1].p[i].run*Math.max(0,recT-0.25))});
     BT.pos[0][1-ri]=toward(BT.pos[0][1-ri],[3.8,ri===0?5.5:2.5],2);
-    BT.st={pos:contact,B:B,h:hh,timing:timing};BT.inShot=choice.shot;BT.hit=[0,ri];BT.mateHit=ri!==bMeI();
+    BT.st={pos:contact,B:B,h:hh,timing:timing,stretch:Math.max(0,Math.min(1,(dst(p,land)-1)/((BMAXD[choice.shot]||4)-1)))};BT.inShot=choice.shot;BT.hit=[0,ri];BT.mateHit=ri!==bMeI();
     var mv=Math.max(450,Math.min(1200,trav*(BSLOW[state.level]||2.7)*1000)),cur0=[from[0]+(to[0]-from[0])*Math.min(0.9,tt),from[1]+(to[1]-from[1])*Math.min(0.9,tt)],cc=bCourt(0,contact);
     PROF._ff={d:mv/1.3,h:function(k){return 1.6*(1-k)+hh*k+0.4*Math.sin(Math.PI*k)}};runBall({f:cur0,to:cc,shot:"_ff",land:false},false);
     setTimeout(function(){if(!MATCH||MATCH.cur!==BT.cur)return;var att=choice.shot==="smash"||choice.shot==="push",lab=(timing==="early"?"Early! ":timing==="late"?"Late · ":"")+hh.toFixed(1)+" m"+(att&&hh<NET_H?" · dig it up":"");
@@ -1847,7 +1849,7 @@ function bRevealChip(choice,covers,r,hT){var hd=(hT===0?"You: ":"Them: ")+bName(
   var cv=(hT===0?"They covered ":"You covered ")+bCovLabel(covers[hT===0?r.i||0:bMeI()],hT===0?(r.i||0):bMeI());
   var od=BT.odds&&hT===0&&BT.last&&BT.last.mine?BT.odds:null;setPrompt(od?"That shot: "+od.win+"% winner · "+od.err+"% error":hd+(r.readOK?" · READ!":""));if(!od)BT.odds=null;$("c-sr").textContent=hd+". "+cv}
 /* ---------- Your decisions ---------- */
-var BCLOCK={beginner:10,intermediate:10,advanced:8,pro:6},BPACE={quick:0.7,normal:1,relaxed:1.6,off:1.6};function bPace(){return BPACE[state.btpace]||1}
+var BCLOCK={beginner:15,intermediate:14,advanced:11,pro:9},BPACE={quick:0.7,normal:1,relaxed:1.6,off:1.6};function bPace(){return BPACE[state.btpace]||1}
 function bClock(fn){clearTimeout(BT.clk);if(state.btpace==="off"){startBar(0);return}var s=Math.round((BCLOCK[state.level]||10)*bPace());startBar(s,0);BT.clk=setTimeout(fn,s*1000)}
 function bDock(html){var d=$("btdock");if(!d){d=document.createElement("div");d.id="btdock";d.className="btdock"}var cp=$("cpanel"),wide=window.innerWidth>=900;if(wide&&cp){if(d.previousSibling!==cp)cp.parentNode.insertBefore(d,cp.nextSibling)}else if(d.parentNode!==document.body)document.body.appendChild(d);d.classList.toggle("inl",wide);var pr=$("cs-prompt");d.hidden=!html;document.body.classList.toggle("btdocked",!!html);d.innerHTML=html?'<p class="bttitle">'+(pr?pr.textContent:"")+'</p>'+html:""}
 function bDefault(st,inShot){var h=st.h,x=st.pos[0],O=BT.pos[1],ox=(O[0][0]+O[1][0])/2,atNet=ox<3,back=ox>5,open=Math.abs(O[0][1]-O[1][1])>5,inShort=BT.inLand!=null&&BT.inLand<3;
@@ -2205,7 +2207,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="24 Nov · 7";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="24 Nov · 10";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
