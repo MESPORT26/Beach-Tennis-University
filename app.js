@@ -1721,7 +1721,7 @@ function beatNewPoint(){clearPosture();setPips(0);lvStop();var m=MATCH,srv=serve
   if(serveTeam===0&&serverI===meI)bAskServe();else{var pm={};pm[bKey(serveTeam,serverI)]="serve";setPoses(pm);bDefend({shot:"serve",d:Math.random()<0.7?"deep":"mid",l:(Math.random()*3)|0,risk:wpick([["safe",3],["normal",5],["bold",2]])})}}
 /* The hitter's choice is made; the other side commits covers at the same moment */
 function bDefend(choice){var hT=BT.hit[0],D=1-hT,bk=bBand(BT.st.h),T=BT.teams;
-  if(D===0){/* we defend: you pick your cover, your partner picks theirs. On the serve you just return it */if(choice.shot==="serve"){var cv=[];cv[bMeI()]={d:"deep",l:1};cv[1-bMeI()]={d:"net",l:1};BT.pendingChoice=choice;bReveal(choice,cv)}else bAskCover(choice)}
+  if(D===0){/* coming to us: you tap where it will land before it hits the sand */bReceive(choice)}
   else bReveal(choice,[bAIcover(T[0].landMem?T[0]:T[0],T[1].p[0],bk),bAIcover(T[0],T[1].p[1],bk)])}
 function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,hp=T[hT].p[hI],bk=bBand(BT.st.h);
   bRemember(T[D].covMem,bk,bCovIdx(covers[0]),9);bRemember(T[D].covMem,bk,bCovIdx(covers[1]),9);
@@ -1749,6 +1749,50 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
     var pz=Math.max(0,Math.min(3,Math.round((1-BT.st.B)*3)));setPips(D===0?0:pz/3);
     if(D===0&&rI===bMeI())setTimeout(bAskShot,650);
     else{var g=bGuessCovers(T[1-D],T[D].p[rI],bBand(BT.st.h)),c=bAIshot(BT.st,T[D].p[rI],BT.pos[1-D],T[1-D].p,BT.inShot,g);setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bDefend(c)},D===0?650:450)}},ms+120)}
+/* ---------- Receiving: tap where it lands before it hits the sand ----------
+   The window is real flight time slowed for thumbs (a smash is quick, a lob gives you time).
+   Tap early and you get there early: you meet it higher. Too far or too slow and it's past you. */
+var BSLOW={beginner:3.2,intermediate:2.7,advanced:2.3,pro:1.9};
+function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBand(BT.st.h),cv=[{d:"mid",l:1},{d:"mid",l:1}];
+  var r=bResolve(BT.st,hp,choice,BT.pos[0],T[0].p,cv);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:"opp",shot:BOLD[choice.shot]});BT.last={choice:choice,covers:cv,r:r,mine:false,hT:1,st:BT.st};
+  if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[1].landMem,bk,ci,9)}
+  var hk=bKey(1,hI),pm={};pm[hk]=BOLD[choice.shot];setPoses(pm);sfx(choice.shot==="smash"||choice.shot==="push"?"hitF":"hit");
+  var from=bCourt(1,BT.st.pos);
+  if(r.end==="err"){var to=r.land?bCourt(0,r.land):bCourt(0,[0.1,BT.st.pos[1]]);setPrompt("Them: "+bName(choice.shot));if(r.why!=="out")errBall(from,to[1],r.why==="net");else{PROF._bt={d:700,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:from,to:to,shot:"_bt",land:true},true)}
+    setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(true,r,choice,cv,1)},1100);return}
+  var land=r.land,tB=r.tBall,W=Math.round(Math.min(3600,Math.max(1100,tB*(BSLOW[state.level]||2.7)*1000))),to=bCourt(0,land);
+  /* Whoever is nearer takes it; you steer them */
+  var dd=BT.pos[0].map(function(p){return dst(p,land)}),ri=dd[0]<=dd[1]?0:1,rp=T[0].p[ri],t0=performance.now(),done=false;BT.recv={ri:ri,land:land,W:W};
+  PROF._bt={d:W/1.3,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:from,to:to,shot:"_bt",land:false},false);
+  gA.innerHTML="";var g=el("g",{"class":"ac btland",role:"button","aria-label":"Tap where the ball lands"},gA);
+  el("circle",{cx:X(to[0]),cy:Y(to[1]),r:46,fill:"#FFD23F","fill-opacity":0.01},g);
+  var ring=el("circle",{cx:X(to[0]),cy:Y(to[1]),r:22,fill:"#FFD23F","fill-opacity":0.35,stroke:"#E08A00","stroke-width":3,"class":"btpulse"},g);
+  el("circle",{cx:X(to[0]),cy:Y(to[1]),r:4,fill:"#E08A00"},g);
+  var shr=el("circle",{cx:X(to[0]),cy:Y(to[1]),r:22,fill:"none",stroke:"#E08A00","stroke-width":2,opacity:0.8},g);
+  /* A closing ring shows the time left */
+  shr.innerHTML='<animate attributeName="r" from="60" to="22" dur="'+W+'ms" fill="freeze"/>';
+  setPrompt((ri===bMeI()?"Yours":"Partner's ball")+": tap where it lands!");cue("aim");bDock("");
+  var go=function(){if(done)return;done=true;var tt=(performance.now()-t0)/W;if(BT.clk)clearTimeout(BT.clk);
+    var p=BT.pos[0][ri],d=Math.max(0,dst(p,land)-rp.reach),bw=land[0]>p[0]+0.5,trav=d/(rp.run*(bw?rp.back:1)),a=tt+trav/tB,s=1-a;
+    var k=bKey(0,ri);PL[k].g.style.transitionDuration=Math.round(Math.max(200,trav*(BSLOW[state.level]||2.7)*1000))+"ms";
+    var reachPt=toward(p,land,Math.max(0,dst(p,land)-0.4));BT.pos[0][ri]=reachPt;place(k,bCourt(0,reachPt),false);sfx("run");
+    gA.innerHTML="";cue(null);
+    if(s<-0.12){bPop(to,"Too late","#C2334A");setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(false,Object.assign({},r,{end:"winner",tNeed:a*tB,why:"late"}),choice,cv,1)},Math.max(400,W*(1-tt)+200));return}
+    var K=[bHcon(choice.shot,0,land[0]),bHcon(choice.shot,1,land[0]),bHcon(choice.shot,2,land[0])],hh;
+    if(s>=0.5)hh=K[0];else if(s>=0.2)hh=K[1]+(K[0]-K[1])*(s-0.2)/0.3;else if(s>=0)hh=K[2]+(K[1]-K[2])*s/0.2;else hh=Math.max(0.25,K[2]*0.6);
+    hh=Math.max(0.2,hh*(1+0.05*bGauss()));var timing=s>=0.5?"early":s>=0.15?"on":"late",B=Math.max(0.15,Math.min(1,0.35+s*1.3));
+    bPop(to,hh.toFixed(1)+" m",hh>=2.1?"#1F8A4C":hh>=NET_H?"#00A39A":hh>=1?"#C77700":"#C2334A");buzz(15);
+    var contact=[Math.max(0.7,Math.min(8,land[0]-(timing==="early"?1.0:timing==="on"?0.4:-0.2))),land[1]];BT.pos[0][ri]=contact;
+    var recT=tB+0.3,home=BHOMEX[choice.shot==="lob"||choice.shot==="smash"||choice.shot==="push"?"net":"mid"];
+    BT.pos[1]=BT.pos[1].map(function(p,i){return toward(p,[home,i===0?2.5:5.5],T[1].p[i].run*Math.max(0,recT-0.25))});
+    BT.pos[0][1-ri]=toward(BT.pos[0][1-ri],[3.8,ri===0?5.5:2.5],2);
+    BT.st={pos:contact,B:B,h:hh,timing:timing};BT.inShot=choice.shot;BT.hit=[0,ri];BT.mateHit=ri!==bMeI();
+    var wait=Math.max(700,Math.min(W*(1-tt),trav*(BSLOW[state.level]||2.7)*1000)+500);
+    setTimeout(function(){if(!MATCH||MATCH.cur!==BT.cur)return;bPlace(500);bAskShot()},wait)};
+  g.addEventListener("click",go);
+  BT.clk=setTimeout(function(){if(done)return;done=true;gA.innerHTML="";cue(null);bPop(to,"Missed it","#C2334A");
+    setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(false,Object.assign({},r,{end:"winner",tNeed:tB*1.3,why:"late"}),choice,cv,1)},500)},W+150)}
+function bPop(p,txt,col){p=[Math.max(1.2,Math.min(14.8,p[0])),Math.max(1.4,Math.min(6.6,p[1]))];var t=el("text",{x:X(p[0]),y:Y(p[1])-30,"text-anchor":"middle",fill:col,stroke:"#fff","stroke-width":5,"paint-order":"stroke","class":"btpop",style:"font:800 26px Montserrat,system-ui,sans-serif"},gTag);t.textContent=txt;orientText(t);setTimeout(function(){t.remove()},1800)}
 /* What both sides chose, shown when the shot is struck */
 var BCOVNM={net:"Net",mid:"Mid",deep:"Back"};
 function bCovLabel(c,i){var mid=(i===0&&c.l===2)||(i===1&&c.l===0);return BCOVNM[c.d]+" · "+(c.l===1?"centre":mid?"middle":"line")}
@@ -1804,8 +1848,8 @@ function bHabits(def){var T=BT.teams[1],bk=bBand(BT.st.h),M=def?(T.landMem&&T.la
 /* ---------- Point over ---------- */
 function bPointEnd(won,r,choice,covers,hT){var m=MATCH,cur=m.cur;if(!cur||cur.done)return;var OD=BT.odds;BT.odds=null;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();var e=$("bthab");if(e)e.hidden=true;
   if(r.end==="err"&&choice&&choice.shot==="serve")r.why="fault";var kind=r.end==="winner"?(won?"winner":"gap"):(won?"theymiss":"miss");pointEnd(m,won,kind);renderScore();
-  var you=hT===0,mh=you&&BT.hit&&BT.hit[1]===bMeI(),head=r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?(mh?"Into the net.":"Your partner netted it."):"They netted it."):r.why==="out"?(you?(mh?"Out.":"Your partner hit it out."):"They hit it out."):(you?(mh?"You missed.":"Your partner missed."):"They missed.");
-  var why=r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
+  var you=hT===0,mh=you&&BT.hit&&BT.hit[1]===bMeI(),head=r.why==="late"?"Too late.":r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?(mh?"Into the net.":"Your partner netted it."):"They netted it."):r.why==="out"?(you?(mh?"Out.":"Your partner hit it out."):"They hit it out."):(you?(mh?"You missed.":"Your partner missed."):"They missed.");
+  var why=r.why==="late"?"You didn't reach it before it hit the sand. Tap the landing spot sooner, or start closer to where they like to hit.":r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
     r.why==="net"?"Hitting down from "+BT.st.h.toFixed(1)+" m, below the net, mostly finds the net. Lift it instead.":r.why==="out"?"Bold aims near the lines miss more often.":"Off balance, the error chance goes up.";
   var G=BT.grade||null,o=over();function over(){return (m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2}
   var html='<div class="ptres '+(won?"w":"l")+'"><b>'+head+'</b> '+why+'</div>'+(G?'<div class="fbbest"><b>Best play</b><p>'+bName(G.best.shot)+' '+G.best.d+' '+["left","middle","right"][G.best.l]+', '+G.best.risk+'.</p></div>':'')+'<!--more-->'+
