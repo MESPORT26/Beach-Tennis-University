@@ -1324,7 +1324,7 @@ function eb(e){return '<span class="eb" aria-hidden="true">'+avImg(e)+'</span>'}
 function pairSvg(r){return '<span class="av-pair">'+eb(rAv(r,0))+eb(rAv(r,1))+'</span>'}
 /* Decision clock. Short, like the real thing. Set by your level, the ball coming at you and the pair you play. Practice mode has no clock */
 var LVT={beginner:12,intermediate:9,advanced:6,pro:4},BALLT={push:.6,flatsmash:.55,hook:.75,dig:.85,neutral:1,drop:.9,lob:1.2};
-state.clock=load("clock","match");state.pmode=load("pmode","beat");state.btpace=load("btpace","normal");
+state.clock=load("clock","match");state.pmode=load("pmode","beat");state.btpace=load("btpace","normal");state.btpick=load("btpick","choose");
 function decideSecs(r,kind){if(state.clock==="practice")return 0;var b=LVT[state.level]||9,cur=MATCH&&MATCH.cur,f=1;
   if(kind==="serve")f=1.6;else if(cur&&cur.mate)f=0.9;else if(cur&&cur.srv==="opp"&&!cur.rally)f=0.8;else if(cur&&cur.sit)f=BALLT[cur.sit.shot||oppPose(cur.sit)]||1;
   return Math.max(kind==="serve"?5:3,Math.round(b*f*(1-((r.level||1)-1)*0.08)*10)/10)}
@@ -1333,7 +1333,8 @@ var lobSel=null;
 function rivalOpen(i){var bt=beaten();return i===0||!!bt[RIVALS[i-1].id]||!!bt[RIVALS[i].id]}
 function sayLine(r,key){var t=(r.talk&&r.talk[key])||[];return t.length?t[Math.floor(Math.random()*t.length)]:""}
 function renderLobby(list){var bt=beaten(),w=document.createElement("div");w.className="lobby";var md=document.createElement("div");md.className="pmode";md.innerHTML='<div class="seg" role="group" aria-label="Game type"><button data-m="beat" aria-pressed="'+(state.pmode!=="arcade")+'"><b>Tactics</b><small>Both sides choose at once</small></button><button data-m="arcade" aria-pressed="'+(state.pmode==="arcade")+'"><b>Arcade</b><small>Real-time, unranked</small></button></div>';
-  md.insertAdjacentHTML("beforeend",'<div class="seg pace" role="group" aria-label="Timer"><span>Timer</span>'+[["quick","Quick"],["normal","Normal"],["relaxed","Relaxed"],["off","Off"]].map(function(o){return '<button data-pace="'+o[0]+'" aria-pressed="'+(state.btpace===o[0])+'">'+o[1]+'</button>'}).join("")+'</div><small class="build">Build '+BTU_BUILD+'</small>');
+  md.insertAdjacentHTML("beforeend",'<div class="seg pace" role="group" aria-label="Timer"><span>Timer</span>'+[["quick","Quick"],["normal","Normal"],["relaxed","Relaxed"],["off","Off"]].map(function(o){return '<button data-pace="'+o[0]+'" aria-pressed="'+(state.btpace===o[0])+'">'+o[1]+'</button>'}).join("")+'</div><div class="seg pace" role="group" aria-label="Shot choice"><span>Shots</span>'+[["auto","Auto-pick"],["choose","I choose"]].map(function(o){return '<button data-pick="'+o[0]+'" aria-pressed="'+(state.btpick===o[0])+'">'+o[1]+'</button>'}).join("")+'</div><small class="build">Build '+BTU_BUILD+'</small>');
+  [].forEach.call(md.querySelectorAll("[data-pick]"),function(b){b.onclick=function(){state.btpick=b.dataset.pick;save("btpick",state.btpick);[].forEach.call(md.querySelectorAll("[data-pick]"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});
   [].forEach.call(md.querySelectorAll("[data-pace]"),function(b){b.onclick=function(){state.btpace=b.dataset.pace;save("btpace",state.btpace);[].forEach.call(md.querySelectorAll("[data-pace]"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});list.appendChild(md);[].forEach.call(md.querySelectorAll("[data-m]"),function(b){b.onclick=function(){state.pmode=b.dataset.m;save("pmode",state.pmode);[].forEach.call(md.querySelectorAll("[data-m]"),function(x){x.setAttribute("aria-pressed",String(x===b))})}});
   if(lobSel==null){lobSel=0;for(var j=0;j<RIVALS.length;j++){if(rivalOpen(j)&&!bt[RIVALS[j].id]){lobSel=j;break}lobSel=j}}
   w.innerHTML=RIVALS.map(function(x,i){var op=rivalOpen(i),b2=bt[x.id],on=i===lobSel&&op,who=Math.random()<.5?0:1;
@@ -1414,8 +1415,9 @@ function renderScore(){var m=MATCH,r=m.r;$("score").innerHTML='<div class="team"
   '<div class="log">'+m.log.map(function(x){return '<span class="'+x+'"></span>'}).join("")+'</div><button class="cmus ctime" id="c-time" aria-label="Timer: '+(state.btpace||"normal")+'" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 9v4l3 2M9 3h6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button><button class="cexit" id="c-exit" aria-label="Leave match"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></button>';
   $("c-time").onclick=function(e){e.stopPropagation();var b=this,pp=$("timepop");if(pp){pp.remove();b.setAttribute("aria-expanded","false");return}
     pp=document.createElement("div");pp.id="timepop";pp.className="timepop";pp.setAttribute("role","menu");
-    pp.innerHTML='<b>Timer</b>'+[["quick","Quick"],["normal","Normal"],["relaxed","Relaxed"],["off","Off"]].map(function(o){return '<button role="menuitemradio" data-pace="'+o[0]+'" aria-checked="'+(state.btpace===o[0])+'">'+o[1]+'</button>'}).join("")+'<small>Applies from your next shot</small>';
+    pp.innerHTML='<b>Timer</b>'+[["quick","Quick"],["normal","Normal"],["relaxed","Relaxed"],["off","Off"]].map(function(o){return '<button role="menuitemradio" data-pace="'+o[0]+'" aria-checked="'+(state.btpace===o[0])+'">'+o[1]+'</button>'}).join("")+'<b>Shots</b>'+[["auto","Auto-pick"],["choose","I choose"]].map(function(o){return '<button role="menuitemradio" data-pick="'+o[0]+'" aria-checked="'+(state.btpick===o[0])+'">'+o[1]+'</button>'}).join("")+'<small>Applies from your next shot</small>';
     $("score").appendChild(pp);b.setAttribute("aria-expanded","true");
+    [].forEach.call(pp.querySelectorAll("[data-pick]"),function(x){x.onclick=function(ev){ev.stopPropagation();state.btpick=x.dataset.pick;save("btpick",state.btpick);pp.remove();b.setAttribute("aria-expanded","false");toast("Shots: "+x.textContent)}});
     [].forEach.call(pp.querySelectorAll("[data-pace]"),function(x){x.onclick=function(ev){ev.stopPropagation();state.btpace=x.dataset.pace;save("btpace",state.btpace);b.setAttribute("aria-label","Timer: "+state.btpace);pp.remove();b.setAttribute("aria-expanded","false");toast("Timer: "+x.textContent)}});
     setTimeout(function(){document.addEventListener("click",function cl(){var q=$("timepop");if(q)q.remove();b.setAttribute("aria-expanded","false");document.removeEventListener("click",cl)})},0)};
   $("c-exit").onclick=function(){runBall(null);leaveMatch();if(typeof renderList==="function")renderList();if(typeof lobbyPanel==="function")lobbyPanel()}}
@@ -1748,7 +1750,13 @@ function bDefend(choice){var hT=BT.hit[0],D=1-hT,bk=bBand(BT.st.h),T=BT.teams;
 function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,hp=T[hT].p[hI],bk=bBand(BT.st.h);
   bRemember(T[D].covMem,bk,bCovIdx(covers[0]),9);bRemember(T[D].covMem,bk,bCovIdx(covers[1]),9);
   var odds=null;if(hT===0&&hI===bMeI()){var o={err:0,win:0,n:400};for(var k=0;k<o.n;k++){var q=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);if(q.end==="err")o.err++;else if(q.end==="winner")o.win++}odds={err:Math.round(o.err/o.n*100),win:Math.round(o.win/o.n*100)};odds.play=100-odds.err-odds.win;BT.odds=odds}
-  var r=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:hT===0?(hI===bMeI()?"me":"mate"):"opp",shot:BOLD[choice.shot]});
+  var r=bResolve(BT.st,hp,choice,BT.pos[D],T[D].p,covers);
+  if(hT===0&&hI===bMeI()&&BT.wrong){BT.odds=null;odds=null;var W0=BT.wrong,att=choice.shot==="smash"||choice.shot==="push"||choice.shot==="hook",roll=Math.random(),a0=bAim(choice);
+    if(att&&BT.st.h<NET_H||roll<0.34)r={end:"err",why:"net",wrong:W0};
+    else if(roll<0.67){var oy=a0[1]<4?-0.4:8.4,ox=Math.min(8.6,a0[0]+1.2);r={end:"err",why:"out",wrong:W0,land:Math.random()<0.5?[8.5,a0[1]]:[ox,oy]}}
+    else{BT.punish=W0;r.end=null;r.B=1;r.tim=["early"];r.land=r.land||a0;r.wrong=W0;if(r.i==null)r.i=0;if(!r.pre)r.pre=BT.pos[D][r.i];r.m=1}
+    BT.wrong=null}
+  BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:hT===0?(hI===bMeI()?"me":"mate"):"opp",shot:BOLD[choice.shot]});
   if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[hT].landMem,bk,ci,9)}
   var mine=hT===0&&hI===bMeI();BT.last={choice:choice,covers:covers,r:r,mine:mine,hT:hT,st:BT.st};
   /* Animate: defenders step to their cover, the ball flies */
@@ -1782,12 +1790,15 @@ function bReveal(choice,covers){var hT=BT.hit[0],hI=BT.hit[1],D=1-hT,T=BT.teams,
 var BSLOW={beginner:3.2,intermediate:2.7,advanced:2.3,pro:1.9},BFLOOR={beginner:1.3,intermediate:1.05,advanced:0.9,pro:0.75};
 function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBand(BT.st.h),cv=[{d:"mid",l:1},{d:"mid",l:1}];
   var r=bResolve(BT.st,hp,choice,BT.pos[0],T[0].p,cv);BT.touch++;BT.cur.rally=BT.touch-1;BT.cur.hist.push({by:"opp",shot:BOLD[choice.shot]});BT.last={choice:choice,covers:cv,r:r,mine:false,hT:1,st:BT.st};
+  if(BT.punish){var P=BT.punish;BT.punish=null;var cand=[[7.2,0.6],[7.2,7.4],[1.2,0.8],[1.2,7.2],[4,4],[6,4]],best=cand[0],bd=-1;cand.forEach(function(c){var d=Math.min(dst(c,BT.pos[0][0]),dst(c,BT.pos[0][1]));if(d>bd){bd=d;best=c}});
+    var fromW=bCourt(1,BT.st.pos),toW=bCourt(0,best);bSet(bKey(1,hI),bShotPose(choice.shot));bTeamPose(0,"defsmash");sfx("hitF");setPrompt("They put it away");PROF._bt={d:700,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:fromW,to:toW,shot:"_bt",land:true},true);
+    setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur){var near=dst(BT.pos[0][0],best)<dst(BT.pos[0][1],best)?0:1;bSet(bKey(0,near),"dive");bPointEnd(false,{end:"winner",why:"wrongshot",wrong:P,tBall:0.4,tNeed:1.6,land:best},choice,cv,1)}},1000);return}
   if(r.land){var ci=(r.land[0]<3.1?0:r.land[0]<4.5?1:2)*3+(r.land[1]<2.7?0:r.land[1]<5.3?1:2);bRemember(T[1].landMem,bk,ci,9)}
   var hk=bKey(1,hI);bSet(hk,bShotPose(choice.shot));bTeamPose(0,(choice.shot==="smash"||choice.shot==="push"||choice.shot==="hook")?"defsmash":"ready");FLIP.L=FLIP.R=false;sfx(choice.shot==="smash"||choice.shot==="push"?"hitF":"hit");
   var from=bCourt(1,BT.st.pos);
   if(r.end==="err"){var to=r.land?bCourt(0,r.land):bCourt(0,[0.1,BT.st.pos[1]]);setPrompt("Them: "+bName(choice.shot));if(r.why!=="out")errBall(from,to[1],r.why==="net");else{PROF._bt={d:700,h:(PROF[BOLD[choice.shot]]||PROF.neutral).h};runBall({f:from,to:to,shot:"_bt",land:true},true)}
     setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(true,r,choice,cv,1)},1100);return}
-  BT.inLand=r.land[0];var land=r.land,tB=r.tBall,W=Math.round(Math.min(choice.shot==="lob"?3800:3000,Math.max((BFLOOR[state.level]||1.5)*1000,tB*(BSLOW[state.level]||2.7)*1000))*bPace());if((+load("recvTaught","0")||0)<3)W=Math.round(W*1.5);var to=bCourt(0,land);
+  BT.inLand=r.land[0];var land=r.land,tB=r.tBall,W=Math.round(Math.min(choice.shot==="lob"?(r.land[0]>5?4800:4000):3200,Math.max((BFLOOR[state.level]||1.5)*1000,tB*(BSLOW[state.level]||2.7)*1000))*bPace());if((+load("recvTaught","0")||0)<3)W=Math.round(W*1.5);var to=bCourt(0,land);
   /* Whoever is nearer takes it; you steer them */
   var mp=BT.pos[0][bMeI()];bRemember(T[0].covMem,bk,(mp[0]<3?0:mp[0]<6?1:2)*3+(mp[1]<2.7?0:mp[1]<5.3?1:2),9);var me=bMeI(),onMate=me===0?land[1]>4.4:land[1]<3.6,M=MATCH,rn=(M.rcvN=(M.rcvN||0)+1),mn=M.rcvMate||0,ri=onMate?1-me:me,auto=ri!==me;/* their side is theirs: you never run across in front of your partner */if(auto)M.rcvMate=mn+1;rp=T[0].p[ri],t0=performance.now(),done=false;BT.recv={ri:ri,land:land,W:W};
   if(choice.shot==="lob"&&land[0]>BT.pos[0][ri][0]+0.5)bSet(bKey(0,ri),"ready",true);
@@ -1810,11 +1821,11 @@ function bReceive(choice){var hT=1,hI=BT.hit[1],T=BT.teams,hp=T[1].p[hI],bk=bBan
   [0,1].forEach(function(i){var kk=bKey(0,i);PL[kk].g.style.transitionDuration="0ms";place(kk,bCourt(0,BT.pos[0][i]),true)});
   setPrompt(auto?"Partner's ball":"Tap where it lands!");bPhase(auto?"PARTNER":"RETURN");if(!auto)cue("aim");bDock("");
   var go=function(){if(done)return;done=true;var tt=(performance.now()-t0)/W;if(BT.clk)clearTimeout(BT.clk);
-    var p=BT.pos[0][ri],d=Math.max(0,dst(p,land)-rp.reach),bw=land[0]>p[0]+0.5,trav=d/(rp.run*(bw?rp.back:1)),a=tt+trav/tB,s=1-a;if(dst(p,land)>(BMAXD[choice.shot]||4))s=-1;
+    var p=BT.pos[0][ri],d=Math.max(0,dst(p,land)-rp.reach),bw=land[0]>p[0]+0.5,trav=d/(rp.run*(bw?rp.back:1)),hang=choice.shot==="lob"?(land[0]>5?1.5:1.25):choice.shot==="neutral"||choice.shot==="drop"?1.1:1,a=0.4*tt+trav/(tB*hang),s=1-a,capd=false;if({smash:1,push:1,hook:1,block:1}[choice.shot]&&tB<1.2&&dst(p,land)>BMAXD[choice.shot]+(tt<0.3?0.5:0)){s=-1;capd=true}
     var k=bKey(0,ri);PL[k].g.style.transitionDuration=Math.round(Math.max(200,trav*(BSLOW[state.level]||2.7)*1000))+"ms";
     var reachPt=toward(p,land,Math.max(0,dst(p,land)-0.4));BT.pos[0][ri]=reachPt;place(k,bCourt(0,reachPt),false);sfx("run");
     gA.innerHTML="";cue(null);bPhase("");document.body.classList.remove("btrecv");if(!auto&&s>=0)save("recvTaught",String((+load("recvTaught","0")||0)+1));
-    if(s<-0.12){bSet(k,"dive");bPop(to,"Too late","#D9304F");setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(false,Object.assign({},r,{end:"winner",tNeed:a*tB,why:"late"}),choice,cv,1)},Math.max(400,W*(1-tt)+200));return}
+    if(s<-0.22){bSet(k,"dive");bPop(to,"Too late","#D9304F");setTimeout(function(){if(MATCH&&MATCH.cur===BT.cur)bPointEnd(false,Object.assign({},r,{end:"winner",tNeed:capd?Math.max(a,1.3)*tB:a*tB,why:"late",capd:capd}),choice,cv,1)},Math.max(400,W*(1-tt)+200));return}
     var K=[bHcon(choice.shot,0,land[0]),bHcon(choice.shot,1,land[0]),bHcon(choice.shot,2,land[0])],hh;
     if(s>=0.4)hh=K[0];else if(s>=0.15)hh=K[1]+(K[0]-K[1])*(s-0.15)/0.25;else if(s>=0)hh=K[2]+(K[1]-K[2])*s/0.15;else hh=Math.max(0.25,K[2]*0.6);hh*=1.15;
     hh=Math.max(0.2,hh*(1+0.05*bGauss()));if(s<0)bSet(k,"dive");else if(hh>=2.1){bSet(k,"smashsetup");if(land[0]<=3.4)bTeamPose(1,"defsmash")}var timing=s>=0.4?"early":s>=0.12?"on":"late",B=Math.max(0.15,Math.min(1,0.35+s*1.3));
@@ -1853,21 +1864,21 @@ var BCLOCK={beginner:15,intermediate:14,advanced:11,pro:9},BPACE={quick:0.7,norm
 function bClock(fn){clearTimeout(BT.clk);if(state.btpace==="off"){startBar(0);return}var s=Math.round((BCLOCK[state.level]||10)*bPace());startBar(s,0);BT.clk=setTimeout(fn,s*1000)}
 function bDock(html){var d=$("btdock");if(!d){d=document.createElement("div");d.id="btdock";d.className="btdock"}var cp=$("cpanel"),wide=window.innerWidth>=900;if(wide&&cp){if(d.previousSibling!==cp)cp.parentNode.insertBefore(d,cp.nextSibling)}else if(d.parentNode!==document.body)document.body.appendChild(d);d.classList.toggle("inl",wide);var pr=$("cs-prompt");d.hidden=!html;document.body.classList.toggle("btdocked",!!html);d.innerHTML=html?'<p class="bttitle">'+(pr?pr.textContent:"")+'</p>'+html:""}
 function bDefault(st,inShot){var h=st.h,x=st.pos[0],O=BT.pos[1],ox=(O[0][0]+O[1][0])/2,atNet=ox<3,back=ox>5,open=Math.abs(O[0][1]-O[1][1])>5,inShort=BT.inLand!=null&&BT.inLand<3;
-  if(inShot==="smash")return ["block","They smashed it: block"];
-  if(inShot==="lob"&&h>=1.9)return ["hook","Lobbed over you: hook it"];
-  if(h>=2.1&&x<=3)return ["smash","High ball inside 3 m: smash"];
-  if(h>=2.1)return ["push","High but deep: push it"];
-  if(h>=NET_H)return ["push","Just above the net: push"];
-  if(inShort)return ["drop","They hit it short: drop it back"];
-  if(h<1.2&&x<=3)return atNet?["lob","Low, and they're at the net: lob"]:(back||open)?["drop",back?"Low, and they're back: drop":"Low, with an opening: drop"]:["lob","Low ball: lob"];
-  if(h<1.2)return atNet?["lob","Low, and they're at the net: lob"]:["neutral","Low and deep: neutral"];
-  return ["neutral","Just below the net: neutral"]}
+  if(inShot==="smash")return ["block","They smashed it: block",["block"]];
+  if(inShot==="lob"&&h>=1.9)return ["hook","Lobbed over you: hook it",["hook","push"]];
+  if(h>=2.1&&x<=3)return ["smash","High ball inside 3 m: smash",["smash","push"]];
+  if(h>=2.1)return ["push","High but deep: push it",["push","hook","neutral"]];
+  if(h>=NET_H)return ["push","Just above the net: push",["push","neutral"]];
+  if(inShort)return ["drop","They hit it short: drop it back",["drop","lob"]];
+  if(h<1.2&&x<=3)return atNet?["lob","Low, and they're at the net: lob",["lob"]]:(back||open)?["drop",back?"Low, and they're back: drop":"Low, with an opening: drop",["drop","lob"]]:["lob","Low ball: lob",["lob","drop","neutral"]];
+  if(h<1.2)return atNet?["lob","Low, and they're at the net: lob",["lob","neutral"]]:["neutral","Low and deep: neutral",["neutral","lob"]];
+  return ["neutral","Just below the net: neutral",["neutral","lob","drop"]]}
 function bAskShot(){bPhase("SHOT");var st=BT.st,opts=bOptions(BT.inShot),legal={};opts.forEach(function(o){legal[o.shot]=1});
-  var dr=bDefault(st,BT.inShot),def=dr[0];if(!legal[def]){def="neutral";dr=[def,"Neutral"]}BT.why=dr[1];BT.whyShot=def;BT.pick={shot:def,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H,ret=BT.inShot==="serve";
-  shotRail(BOLD[def],function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
+  var dr=bDefault(st,BT.inShot),def=dr[0];if(!legal[def]){def="neutral";dr=[def,"Neutral"]}BT.why=dr[1];BT.whyShot=def;BT.okShots=dr[2]||[def];var choose=state.btpick==="choose";BT.pick={shot:choose?null:def,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H,ret=BT.inShot==="serve";
+  shotRail(choose?null:BOLD[def],function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
   var r=$("shotrail");if(r)[].forEach.call(r.children,function(x){var s=BNEW[x.dataset.v]||x.dataset.v;x.disabled=x.dataset.v==="serve"||!legal[s]});
-  setPrompt((ret?"Return it":"Your shot")+" · ball at "+st.h.toFixed(1)+" m, "+(hb?"above":"below")+" the net");bHabits();bTargets();bDockShot();
-  bClock(function(){if(BT.pick.tg)return;bCommit({shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":BT.pick.shot==="lob"?"deep":"mid",l:(Math.random()*3)|0,risk:"safe"})})}
+  setPrompt((ret?"Return it":"Your shot")+" · ball at "+st.h.toFixed(1)+" m, "+(hb?"above":"below")+" the net");bHabits();if(!choose)bTargets();bDockShot();
+  bClock(function(){if(BT.pick.tg)return;if(!BT.pick.shot)BT.pick.shot=def;bCommit({shot:BT.pick.shot,d:BT.pick.shot==="drop"?"short":BT.pick.shot==="lob"?"deep":"mid",l:(Math.random()*3)|0,risk:"safe"})})}
 function bErrPct(st,hp,c){var E=bErr(st,hp,c),S=BSHOT[c.shot],a=bAim(c),sd=bSD(st,hp,c),out=0;
   for(var n=0;n<300;n++){var x=a[0]+bGauss()*sd,y=a[1]+bGauss()*sd;if(x<0.15||x>8||y<0||y>8)out++}var pn=Math.min(0.95,E.net),pf=E.frame;return Math.round(Math.min(0.99,pn+(1-pn)*pf+(1-pn)*(1-pf)*out/300)*100)}
 function bRiskSeg(){var p=BT.pick,D={safe:"Fewer errors",normal:"Balanced",bold:"More pace, more errors"};return '<div class="seg btrisk" role="group" aria-label="Risk">'+["safe","normal","bold"].map(function(r){
@@ -1877,7 +1888,8 @@ function bDockShot(){var p=BT.pick;if(p.shot&&$("g-aim")&&gA.querySelector(".bt"
 function bRows(s){return s==="serve"?["deep"]:s==="drop"?["short"]:s==="lob"?["mid","deep"]:s==="block"?["short","mid"]:s==="hook"?["mid","deep"]:["short","mid","deep"]}
 function bTargets(){gA.innerHTML="";var p=BT.pick,rows=bRows(p.shot),hp=BT.teams[0].p[bMeI()],Y0=[[0,8/3],[8/3,16/3],[16/3,8]];
   rows.forEach(function(d){[0,1,2].forEach(function(l){bZone(8+BBAND[d][0],8+BBAND[d][1],Y0[l][0],Y0[l][1],"#00A79E",l===1?BBNM[d]:"",d+" "+["left","middle","right"][l],"",function(w){p.tg=[d,l];bCommit(Object.assign({shot:p.shot,d:d,l:l,risk:p.risk},bTapOpp(w)))})})});cue("aim")}
-function bCommit(c){bPhase("");clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDock("");railOff();
+function bMarkRail(bad,good){var r=$("shotrail");if(!r)return;r.hidden=false;[].forEach.call(r.children,function(b){var s=BNEW[b.dataset.v]||b.dataset.v;b.classList.remove("pk-x","pk-ok");if(s===bad)b.classList.add("pk-x");else if(s===good)b.classList.add("pk-ok")})}
+function bCommit(c){bPhase("");BT.wrong=BT.okShots&&BT.okShots.indexOf(c.shot)<0?{shot:c.shot,best:BT.whyShot,why:BT.why}:null;clearTimeout(BT.clk);stopBar();gA.innerHTML="";cue(null);bDock("");railOff();if(BT.wrong)bMarkRail(BT.wrong.shot,BT.wrong.best);
   /* Grade your choice against the best option, given how they usually cover */
   var st=BT.st,hp=BT.teams[0].p[bMeI()],D=BT.teams[1],g=bGuessCovers(D,{read:0.7},bBand(st.h)),opts=bOptions(BT.inShot),best=null,bv=-9,mine=bEval(st,hp,c,BT.pos[1],D.p,g,40);
   opts.forEach(function(o){var v=bEval(st,hp,o,BT.pos[1],D.p,g,5);if(v>bv){bv=v;best=o}});bv=bEval(st,hp,best,BT.pos[1],D.p,g,40);if(mine>bv){bv=mine;best=c}
@@ -1904,17 +1916,17 @@ function bHabits(def){var T=BT.teams[1],bk=bBand(BT.st.h),M=def?(T.landMem&&T.la
   var top=arr[0],pc=Math.round(top[1]/tot*100),lab=def?["short","mid","deep"][(top[0]/3)|0]+" "+["left","middle","right"][top[0]%3]:BCOVNM[BCOV[top[0]].d]+" "+["","",""][0];
   e.hidden=false;e.textContent=(def?"They usually hit ":"They usually cover ")+(def?lab:BCOVNM[BCOV[top[0]].d].toLowerCase())+" · "+pc+"%"}
 /* ---------- Point over ---------- */
-function bPointEnd(won,r,choice,covers,hT){bPhase("");var m=MATCH,cur=m.cur;document.body.classList.remove("btrecv");if(!cur||cur.done)return;var OD=BT.odds;BT.odds=null;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();var e=$("bthab");if(e)e.hidden=true;
+function bPointEnd(won,r,choice,covers,hT){bPhase("");var m=MATCH,cur=m.cur;document.body.classList.remove("btrecv");if(!cur||cur.done)return;var OD=BT.odds;BT.odds=null;cur.done=true;clearTimeout(BT.clk);stopBar();bDock("");gA.innerHTML="";railOff();if(r&&r.wrong)bMarkRail(r.wrong.shot,r.wrong.best);var e=$("bthab");if(e)e.hidden=true;
   if(r.end==="err"&&choice&&choice.shot==="serve")r.why="fault";var kind=r.end==="winner"?(won?"winner":"gap"):(won?"theymiss":"miss");pointEnd(m,won,kind);renderScore();
-  var you=hT===0,mh=you&&BT.hit&&BT.hit[1]===bMeI(),head=r.why==="late"?"Too late.":r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?(mh?"Into the net.":"Your partner netted it."):"They netted it."):r.why==="out"?(you?(mh?"Out.":"Your partner hit it out."):"They hit it out."):(you?(mh?"You missed.":"Your partner missed."):"They missed.");
-  var why=r.why==="late"?"You didn't reach it before it hit the sand. Tap the landing spot sooner, or start closer to where they like to hit.":r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
+  var you=hT===0,mh=you&&BT.hit&&BT.hit[1]===bMeI(),head=r.why==="wrongshot"?"Their winner.":r.why==="late"?"Too late.":r.why==="fault"?(you?"Service fault.":"They faulted."):r.end==="winner"?(won?"Winner!":"Their winner."):r.why==="net"?(you?(mh?"Into the net.":"Your partner netted it."):"They netted it."):r.why==="out"?(you?(mh?"Out.":"Your partner hit it out."):"They hit it out."):(you?(mh?"You missed.":"Your partner missed."):"They missed.");
+  var why=r.wrong?"✗ "+bName(r.wrong.shot)+" doesn't work here. ✓ "+bName(r.wrong.best)+": "+(r.wrong.why.split(": ")[0])+".":r.why==="late"&&r.capd?"A fast "+bName(choice.shot).toLowerCase()+" that far from you can't be reached. Stand closer to where they attack.":r.why==="late"?"You didn't reach it before it hit the sand. Tap the landing spot sooner, or start closer to where they like to hit.":r.why==="fault"?"One serve only. A safer serve faults less.":r.end==="winner"?"The ball took "+r.tBall.toFixed(2)+" s. They needed "+r.tNeed.toFixed(2)+" s"+(r.readOK?", even though they read it.":", and they had covered the wrong spot."):
     r.why==="net"?"Hitting down from "+BT.st.h.toFixed(1)+" m, below the net, mostly finds the net. Lift it instead.":r.why==="out"?"Bold aims near the lines miss more often.":"Off balance, the error chance goes up.";
   var G=BT.grade||null,o=over();function over(){return (m.me>=WIN_AT||m.them>=WIN_AT)&&Math.abs(m.me-m.them)>=2}
   var html='<div class="ptres '+(won?"w":"l")+'"><b>'+head+'</b> '+why+'</div>'+(G?'<div class="fbbest"><b>Best play</b><p>'+bName(G.best.shot)+' '+G.best.d+' '+["left","middle","right"][G.best.l]+', '+G.best.risk+'.</p></div>':'')+'<!--more-->'+
     (covers&&r.end!=="err"?fbSec("The read",(you?"They covered ":"You covered ")+bCovLabel(covers[r.i||0],r.i||0)+". "+(r.readOK?"That was the right spot.":"That left the space open.")):"")+
     (OD?fbSec("The odds of that shot","Against where they stood: "+OD.win+"% winner, "+OD.err+"% error, "+OD.play+"% in play."):"")+(G?fbSec("Your last choice",G.lab+". From "+G.h.toFixed(1)+" m the best option was "+bName(G.best.shot).toLowerCase()+" "+G.best.d+" "+["left","middle","right"][G.best.l]+", "+G.best.risk+"."):"")+fbSec("How points are won","Earn a high ball, hit where they aren't covering, and keep your own choices mixed. They learn your habits.");
   if(!won&&G)saveLost({sit:{height:G.h>=2.1?"high":G.h>=1?"med":"low",depth:"mid",speed:"med",side:"body",A:[1,0],B:[1,2]},pick:{shot:BOLD[G.c.shot],cell:[["short","mid","deep"].indexOf(G.c.d),G.c.l*2]},ans:{shot:BOLD[G.best.shot],cell5:[["short","mid","deep"].indexOf(G.best.d),G.best.l*2]},kind:kind,tier:LABSC[G.lab]===2?2:0,aimT:0,moveOk:true,why:"",rival:m.r.pair});
-  FBTICKS=(G?[[G.lab,LABSC[G.lab],true],[G.h.toFixed(1)+" m",G.h>=NET_H?2:G.h>=1?1:0,true]]:[]).concat(OD?[[OD.win+"% winner",OD.win>=30?2:1,true],[OD.err+"% error",OD.err>=20?0:OD.err>=10?1:2,true]]:[]);if(!FBTICKS.length)FBTICKS=null;FBRACE=r.tBall?{b:r.tBall,n:r.tNeed,who:"Them"}:null;BT.grade=null;
+  FBTICKS=(G?[[G.lab,LABSC[G.lab],true],[G.h.toFixed(1)+" m",G.h>=NET_H?2:G.h>=1?1:0,true]]:[]).concat(OD?[[OD.win+"% winner",OD.win>=30?2:1,true],[OD.err+"% error",OD.err>=20?0:OD.err>=10?1:2,true]]:[]);if(!FBTICKS.length)FBTICKS=null;FBRACE=r.tBall&&!r.wrong?{b:r.tBall,n:r.tNeed,who:hT===0?"Them":"You"}:null;BT.grade=null;
   buzz(won?[30,40,30]:[60]);track("point_played",{rival:m.r.id,mode:"beat",won:won,end:kind,touches:BT.touch,lab:G?G.lab:null});
   setTimeout(function(){if(!MATCH||MATCH.cur!==cur)return;fbShow(html,o?"See the result":"Next point",function(){playOn(o)})},700)}
 
@@ -2207,7 +2219,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="24 Nov · 10";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="25 Nov · 1";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
