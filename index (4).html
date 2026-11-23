@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Beach Tennis University</title>
+<meta name="description" content="Learn beach tennis tactics: every shot, when to play it, and where both players move, with animated top-down court diagrams.">
+<meta name="theme-color" content="#0077B6">
+<meta property="og:title" content="Beach Tennis University">
+<meta property="og:description" content="Every beach tennis shot, when to play it, and where both players move. Learn. Play. Win.">
+<meta property="og:type" content="website">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="styles.css?v=202611231553">
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>window.SPRDIR="sprites-";</script>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg class="logo" viewBox="0 0 100 100" aria-hidden="true">
+        <defs>
+          <linearGradient id="lg-sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF4D6D"/><stop offset=".55" stop-color="#FF9F1C"/><stop offset="1" stop-color="#FFD23F"/></linearGradient>
+          <clipPath id="lg-disc"><circle cx="50" cy="50" r="46"/></clipPath>
+        </defs>
+        <g clip-path="url(#lg-disc)">
+          <rect width="100" height="64" fill="url(#lg-sun)"/>
+          <rect y="62" width="100" height="40" fill="#00C2B8"/>
+          <rect y="70" width="100" height="4" fill="#F7F4E9" opacity=".85"/>
+          <rect y="79" width="100" height="6" fill="#0077B6"/>
+          <rect y="89" width="100" height="12" fill="#FF4D6D"/>
+        </g>
+        <path d="M53 63 Q49 46 57 30" fill="none" stroke="#FFFFFF" stroke-width="4" stroke-linecap="round"/>
+        <path d="M57 30 Q45 20 30 28 Q45 25 57 31Z" fill="#FFFFFF"/>
+        <path d="M57 30 Q70 19 84 27 Q69 24 57 31Z" fill="#FFFFFF"/>
+        <path d="M57 30 Q42 30 36 44 Q46 33 57 31Z" fill="#FFFFFF"/>
+        <path d="M57 30 Q72 31 76 45 Q67 34 57 31Z" fill="#FFFFFF"/>
+        <path d="M57 30 Q55 17 62 10 Q59 20 58 30Z" fill="#FFFFFF"/>
+        <circle cx="50" cy="50" r="46" fill="none" stroke="#FFFFFF" stroke-width="3"/>
+      </svg>
+      <div>
+        <h1><span>Beach Tennis</span><span>University</span></h1>
+        <div class="tag">Learn. Play. Win.</div>
+      </div>
+    </div>
+    <button class="prof-btn" id="prof-btn" aria-haspopup="dialog" aria-controls="profile"><span class="pe" id="pb-emoji" aria-hidden="true"></span><span class="pn"><b id="pb-name">Profile</b><small id="pb-level"></small></span></button>
+  </header>
+
+  <nav class="tabs" role="tablist">
+    <button id="tab-home" role="tab" aria-selected="false" data-tab="home">Home</button>
+    <button id="tab-learn" role="tab" aria-selected="true" data-tab="learn">Learn</button>
+    <button id="tab-play" role="tab" aria-selected="false" data-tab="play">Play</button>
+    <button id="tab-shots" hidden data-tab="shots">Shots</button><button id="tab-pick" hidden data-tab="pick">Train</button><button id="tab-compete" hidden data-tab="compete">Computer</button>
+  </nav>
+  <div class="seg subnav" id="subnav" role="tablist" hidden></div>
+  <section id="friends" class="pane" hidden></section>
+  <section id="ladder" class="pane" hidden></section>
+
+  <section id="home" hidden></section>
+  <section id="selector">
+    <h2 class="sec" id="sel-title" hidden></h2>
+    <nav class="list" id="list" aria-label="Choose"></nav>
+    <h2 class="sec sec2" id="sel2-title" hidden></h2>
+    <nav class="list" id="list2" aria-label="More" hidden></nav>
+  </section>
+
+  <div class="main">
+    <section class="card-w court-card" aria-live="polite">
+      <div class="score" id="score" hidden></div><div class="banter" id="banter" aria-live="polite"></div>
+      <div class="csit" id="csit" hidden></div>
+      <p class="vh" id="c-sr" aria-live="polite"></p>
+      <div class="c-head">
+        <h2 id="title">Serve</h2>
+        <span class="cat" id="cat"></span>
+        <button class="lvl-chip" id="lvl-chip" hidden></button>
+        <div class="wind" id="wind-ctl"><span>Wind</span><svg id="wdial" viewBox="0 0 64 64" tabindex="0" role="slider" aria-label="Wind direction. Drag or use the arrow keys" aria-valuemin="0" aria-valuemax="359"></svg><div class="seg" id="seg-wind"><button data-v="calm" aria-pressed="true">Calm</button><button data-v="breezy" aria-pressed="false">Breezy</button><button data-v="gusty" aria-pressed="false">Gusty</button></div></div>
+      </div>
+      <div class="court-box">
+        <div class="ctimer" id="ctimer" hidden><i id="ctbar"></i></div>
+        <div class="shout" id="shout" aria-hidden="true"></div>
+        <button class="btn primary retgo" id="retgo" hidden>Play your return &#8594;</button>
+        <div class="hgauge" id="hgauge" hidden><svg viewBox="0 0 64 200" role="img" aria-label="Height of the ball when you hit it"><title>Contact height</title>
+          <rect x="0" y="0" width="64" height="200" rx="12" fill="#0D1B2A" fill-opacity="0.88"/>
+          <rect class="hb hb-high" x="6" y="22" width="52" height="54" rx="6" fill="#FF4D6D" fill-opacity="0.22"/>
+          <rect class="hb hb-med" x="6" y="76" width="52" height="40" rx="0" fill="#FF9F1C" fill-opacity="0.22"/>
+          <rect class="hb hb-low" x="6" y="116" width="52" height="62" rx="6" fill="#00C2B8" fill-opacity="0.22"/>
+          <line x1="4" y1="178" x2="60" y2="178" stroke="#E8D6AE" stroke-width="4" stroke-linecap="round"/>
+          <line x1="10" y1="116" x2="10" y2="178" stroke="#F7F4E9" stroke-width="2"/><line x1="54" y1="116" x2="54" y2="178" stroke="#F7F4E9" stroke-width="2"/>
+          <line x1="10" y1="116" x2="54" y2="116" stroke="#F7F4E9" stroke-width="3"/><path d="M10 124H54M10 134H54M10 144H54M10 154H54M10 164H54M18 116V178M26 116V178M34 116V178M42 116V178" stroke="#F7F4E9" stroke-opacity="0.25" stroke-width="1"/>
+          <text x="32" y="15" text-anchor="middle" fill="#F7F4E9" style="font:800 9px Montserrat,sans-serif;letter-spacing:.08em">HEIGHT</text>
+          <text class="hl hl-high" x="32" y="52" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">HIGH</text>
+          <text class="hl hl-med" x="32" y="100" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">MID</text>
+          <text class="hl hl-low" x="32" y="152" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">LOW</text>
+          <text x="32" y="194" text-anchor="middle" fill="#F7F4E9" fill-opacity="0.7" style="font:700 8px Montserrat,sans-serif">NET 1.7 m</text>
+          <g id="hg-ball"><circle r="9" fill="#DDF02B" stroke="#9C9A12" stroke-width="1"/><path d="M0 -9C-8 -3 8 3 0 9A9 9 0 0 0 0 -9Z" fill="#FF4D6D"/></g>
+        </svg></div>
+        <div class="cmd" id="cmd" hidden aria-live="polite"></div>
+        <div class="cwind" id="cwind" hidden></div>
+        <div class="svpop fbpop" id="fbpop" hidden role="dialog" aria-label="Feedback"></div>
+        <button class="svtab fbtab" id="fbtab" hidden aria-label="Open feedback"></button>
+        <div class="svpop trpop" id="trsit" hidden role="dialog" aria-label="Real situations"></div>
+        <div class="svpop trpop" id="trball" hidden role="dialog" aria-label="Describe the ball"></div>
+        <button class="svtab trtab" id="trsit-tab" hidden aria-label="Open real situations"></button>
+        <button class="svtab trtab trtab2" id="trball-tab" hidden aria-label="Open describe the ball"></button>
+        <div class="svpop" id="svpop" hidden role="dialog" aria-label="Serve settings"></div>
+        <button class="svtab" id="svtab" hidden aria-label="Open serve settings"></button>
+        <svg id="court" viewBox="0 0 760 400" role="img" aria-labelledby="court-t">
+          <title id="court-t">Top-down beach tennis court showing player positions and the ball</title>
+          <defs>
+            <marker id="ar-you" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#00A79E"/></marker>
+            <marker id="ar-opp" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M1 1L9 5L1 9z" fill="#E2365A"/></marker>
+          </defs>
+          <g id="world">
+          <g id="g-court"></g>
+          <g id="g-zones"></g>
+          <g id="g-grid"></g>
+          <g id="g-lines"></g>
+          <g id="g-moves"></g>
+          <g id="g-trail"></g>
+          <g id="g-players"></g>
+          <g id="g-wind"></g>
+          <g id="g-ball"></g>
+          </g>
+        </svg>
+      </div>
+      <div class="controls" id="ctrls">
+        <button class="btn" id="prev" aria-label="Previous step">&#8592; Back</button>
+        <div class="mid">
+          <div class="dots" id="dots"></div>
+          <div class="mini" hidden>
+            <button class="btn soft" id="replay">Replay</button>
+            <button class="btn soft" id="play">Play all</button>
+          </div>
+        </div>
+        <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
+      </div>
+      <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
+      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><button class="whybtn" id="whybtn" type="button">Why?</button></div>
+      <div class="legend" id="legend"></div>
+      <section class="result" id="result" hidden>
+        <div class="call" id="call">
+          <span class="kicker">Your call</span>
+          <h3>What would you play?</h3>
+          <p class="hint" id="call-hint">Tap a shot in the row above, then pick where you'd aim it.</p>
+          <div class="call-btns" id="call-btns" hidden></div>
+          <div class="step2" id="aim-step" hidden><b>Now pick where you'd aim it</b>
+            <div class="aim-grid" id="aim-grid" role="group" aria-label="Where to aim on the opponents' side"></div></div>
+        </div>
+        <div id="reveal" hidden>
+          <div class="verdict" id="verdict"></div>
+          <div class="res-top"><div><span class="kicker">Guto plays</span><h3 id="r-shot"></h3></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="shotchip" id="r-watch" hidden>Watch the point</button><button class="shotchip" id="r-open">See the shot</button></div></div>
+          <p class="say" id="r-why"></p>
+          <div class="cards">
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><span id="r-target"></span></div>
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Opponents</b><span id="r-form"></span></div>
+            <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Other option</b><span id="r-backup"></span></div>
+          </div>
+          <div class="jobs">
+            <div class="job you"><b>Then you</b><span id="r-you"></span></div>
+            <div class="job partner"><b>Your partner</b><span id="r-partner"></span></div>
+          </div>
+        </div>
+      </section>
+  <div class="cards tips" id="cards" hidden>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>When to play it</b><ul class="bl" id="c-when"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><ul class="bl" id="c-aim"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Avoid</b><ul class="bl" id="c-avoid"></ul></div>
+    <div class="card" id="c-windc"><b><i style="background:var(--shotc,var(--fg))"></i>In the wind</b><ul class="bl" id="c-wind"></ul></div>
+  </div>
+    </section>
+
+    <aside class="card-w panel"><div class="trtray" id="trtray" hidden></div>
+      <div class="cpanel" id="cpanel" hidden></div>
+      <div class="step" id="stepbox">
+        <div class="shotvid" id="shotvid" hidden></div>
+        <span class="kicker" id="step-k"></span>
+        <h3 id="step-title"></h3>
+        <div class="iara"><span class="av" aria-hidden="true">G</span><div class="iara-b"><b>Coach Guto</b><p class="say" id="say"></p></div></div>
+        <p class="lvl-note" id="lvl-note" hidden></p>
+        <p class="windtip" id="windtip" hidden></p>
+        <div class="outro" id="outro" hidden><b>Point.</b> <span id="outro-t"></span></div>
+        <ol class="zlist" id="say-list" hidden></ol>
+        <figure class="illus" id="say-img" hidden></figure>
+        <p class="say" id="say-after" hidden></p>
+        <button class="shotchip" id="shotchip" hidden></button>
+        <div class="options" id="options" hidden><b id="ask"></b><div class="opt-btns" id="opt-btns"></div></div>
+        <div class="jobs" id="jobs">
+          <div class="job you"><b id="you-label">You</b><span id="you-text"></span></div>
+          <div class="job partner"><b>Partner</b><span id="partner-text"></span></div>
+        </div>
+        <p class="note" id="note" hidden></p>
+      </div>
+
+      <div id="pk-home"></div>
+      <div class="picker" id="picker" hidden>
+        <span class="kicker">Describe the ball</span>
+        <div class="pgroup"><span>The ball comes to my</span><div class="seg" id="pk-side"><button id="pk-side-bh" data-v="bh">Backhand</button><button id="pk-side-body" data-v="body">Body</button><button id="pk-side-fh" data-v="fh">Forehand</button></div></div>
+        <div class="pgroup"><span>I'm standing</span><div class="seg" id="pk-depth"><button id="pk-depth-front" data-v="front">Inside 3 m</button><button id="pk-depth-mid" data-v="mid">3–6 m</button><button id="pk-depth-back" data-v="back">6–8 m</button></div></div>
+        <div class="pgroup"><span>Ball speed</span><div class="seg" id="pk-speed"><button id="pk-speed-fast" data-v="fast">Fast</button><button id="pk-speed-med" data-v="med">Medium</button><button id="pk-speed-slow" data-v="slow">Slow</button></div></div>
+        <div class="pgroup"><span>Height when I hit it</span><div class="hbody"><img class="hfig" id="pk-hfig" src="poses/a01-push.webp" alt="" decoding="async"><div class="hbands" id="pk-height" role="group" aria-label="Height when I hit it"></div></div></div>
+        <div class="pgroup"><span>Opponents</span><p class="hint">Drag the opponents on the court to place them.</p><b id="pk-next" hidden></b></div>
+      </div>
+    </aside>
+  </div>
+
+  <div class="cards tips m-only" id="cards-m" hidden>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>When to play it</b><ul class="bl" id="m-when"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Aim</b><ul class="bl" id="m-aim"></ul></div>
+    <div class="card"><b><i style="background:var(--shotc,var(--fg))"></i>Avoid</b><ul class="bl" id="m-avoid"></ul></div>
+    <div class="card" id="m-windc"><b><i style="background:var(--shotc,var(--fg))"></i>In the wind</b><ul class="bl" id="m-wind"></ul></div>
+  </div>
+
+
+</div>
+<div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="w-title">
+  <div class="welcome-card">
+    <h2 id="w-title">Pick your player</h2>
+    <div class="pgroup"><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
+    <div class="pgroup"><span>Your level</span><div class="seg lv4" id="w-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div></div>
+    <div class="pgroup"><span>Your side</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
+    <div class="pgroup"><span>Net height</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">1.70 m</button><button data-v="men" aria-pressed="false">1.80 m</button></div></div>
+    <button class="btn primary" id="w-go">Play &#8594;</button>
+    <button class="btn soft" id="w-skip">Skip</button>
+  </div>
+</div>
+<div class="welcome" id="profile" hidden role="dialog" aria-modal="true" aria-labelledby="p-title">
+  <div class="welcome-card prof-card">
+    <div class="prof-head"><span class="pe big" id="p-big" aria-hidden="true"></span><div><span class="kicker">Your account</span><h2 id="p-title">Profile</h2></div><button class="px" id="p-close" aria-label="Close">&times;</button></div>
+    <div class="ptabs" role="tablist">
+      <button role="tab" id="pt-b-profile" aria-selected="true" data-p="profile">Profile</button>
+      <button role="tab" id="pt-b-password" aria-selected="false" data-p="password">Password</button>
+      <button role="tab" id="pt-b-notify" aria-selected="false" data-p="notify">Notifications</button>
+    </div>
+    <section class="psec" id="pt-profile">
+      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="Your name"></label>
+      <div class="pgroup"><span>Your player</span><div class="emojis" id="p-emo" role="radiogroup" aria-label="Your player"></div></div>
+      <div class="pgroup"><span>Your partner</span><div class="emojis" id="p-emo2" role="radiogroup" aria-label="Your partner"></div></div>
+      <div class="pgroup"><span>Level</span><div class="seg lv4" id="seg-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div><p class="hint" id="lvl-hint"></p></div>
+      <div class="pgroup"><span>Match clock</span><div class="seg" id="seg-clock"><button data-v="match">Timed</button><button data-v="practice">No clock</button></div></div>
+      <div class="pgroup"><span>I play</span><div class="seg" id="seg-side"><button id="side-L" data-v="L" aria-pressed="true">Left</button><button id="side-R" data-v="R" aria-pressed="false">Right</button></div></div>
+      <div class="pgroup"><span>Playing hand</span><div class="seg" id="seg-hand"><button data-v="R" aria-pressed="true">Right</button><button data-v="L" aria-pressed="false">Left</button></div></div>
+      <div class="pgroup"><span>Rules</span><div class="seg" id="seg-rules"><button id="rules-men" data-v="men" aria-pressed="true">Men's open &amp; ITF</button><button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; mixed</button></div></div>
+    </section>
+    <section class="psec" id="pt-password" hidden>
+      <label class="fld"><span>Email</span><input type="email" id="pw-email" autocomplete="username"></label>
+      <label class="fld"><span>Current password</span><input type="password" id="pw-cur" autocomplete="current-password"></label>
+      <label class="fld"><span>New password</span><input type="password" id="pw-new" autocomplete="new-password" aria-describedby="pw-rule"></label>
+      <label class="fld"><span>Confirm new password</span><input type="password" id="pw-conf" autocomplete="new-password"></label>
+      <p class="hint" id="pw-rule">At least 8 characters, including a number.</p>
+      <button class="btn primary" id="pw-save">Update password</button>
+      <p class="pmsg" id="pw-msg" role="status"></p>
+    </section>
+    <section class="psec" id="pt-notify" hidden>
+      <label class="tgl"><input type="checkbox" id="n-content"><span><b>New lessons and content</b><small>New shots, drills and videos as they land</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-tips"><span><b>Weekly tip from Coach Guto</b><small>One tactic to try at your next session</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-sound"><span><b>Sound</b><small>Paddle, sand and point sounds</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-vibe"><span><b>Vibration</b><small>A short buzz when you pick and when a point ends</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-compete"><span><b>Sand Series</b><small>New opponents and challenges</small></span></label>
+      <label class="fld"><span>Send updates to</span><input type="email" id="n-email" autocomplete="email" placeholder="you@example.com"></label>
+      <button class="btn" id="n-device">Also notify me on this device</button>
+      <p class="pmsg" id="n-msg" role="status"></p>
+    </section>
+    <button class="btn primary" id="p-done">Done</button>
+  </div>
+</div>
+<div class="rotate" aria-hidden="true"><div><span>&#10227;</span><b>Turn your phone upright</b><p>The court is built for portrait.</p></div></div>
+<div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+<script src="app.js?v=202611231553"></script></body></html>
