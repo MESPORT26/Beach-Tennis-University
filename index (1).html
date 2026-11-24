@@ -13,9 +13,13 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="styles.css?v=202611241424">
+<script>window.va=window.va||function(){(window.vaq=window.vaq||[]).push(arguments)};</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<script>window.SPRDIR="sprites-";</script>
 </head>
 <body>
+
 <div class="wrap">
   <header class="top">
     <div class="brand">
@@ -48,13 +52,19 @@
   </header>
 
   <nav class="tabs" role="tablist">
-    <button id="tab-shots" role="tab" aria-selected="true" data-tab="shots">Shots</button>
-    <button id="tab-pick" role="tab" aria-selected="false" data-tab="pick">Train</button>
-    <button id="tab-compete" role="tab" aria-selected="false" data-tab="compete">Compete</button>
+    <button id="tab-home" role="tab" aria-selected="false" data-tab="home">Home</button>
+    <button id="tab-learn" role="tab" aria-selected="true" data-tab="learn">Learn</button>
+    <button id="tab-play" role="tab" aria-selected="false" data-tab="play">Play</button>
+    <button id="tab-shots" hidden data-tab="shots">Shots</button><button id="tab-pick" hidden data-tab="pick">Train</button><button id="tab-compete" hidden data-tab="compete">Computer</button>
   </nav>
+  <div class="seg subnav" id="subnav" role="tablist" hidden></div>
+  <section id="play3d" hidden aria-label="Play against the computer in 3D"><div class="p3d-load" id="p3d-load">Loading the 3D court…</div></section>
+  <section id="friends" class="pane" hidden></section>
+  <section id="ladder" class="pane" hidden></section>
 
+  <section id="home" hidden></section>
   <section id="selector">
-    <h2 class="sec" id="sel-title">Choose a shot</h2>
+    <h2 class="sec" id="sel-title" hidden></h2>
     <nav class="list" id="list" aria-label="Choose"></nav>
     <h2 class="sec sec2" id="sel2-title" hidden></h2>
     <nav class="list" id="list2" aria-label="More" hidden></nav>
@@ -62,7 +72,7 @@
 
   <div class="main">
     <section class="card-w court-card" aria-live="polite">
-      <div class="score" id="score" hidden></div>
+      <div class="score" id="score" hidden></div><div class="banter" id="banter" aria-live="polite"></div>
       <div class="csit" id="csit" hidden></div>
       <p class="vh" id="c-sr" aria-live="polite"></p>
       <div class="c-head">
@@ -88,7 +98,7 @@
           <text class="hl hl-med" x="32" y="100" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">MID</text>
           <text class="hl hl-low" x="32" y="152" text-anchor="middle" style="font:800 10px Montserrat,sans-serif">LOW</text>
           <text x="32" y="194" text-anchor="middle" fill="#F7F4E9" fill-opacity="0.7" style="font:700 8px Montserrat,sans-serif">NET 1.7 m</text>
-          <g id="hg-ball"><circle r="9" fill="#DDF02B" stroke="#9C9A12" stroke-width="1"/><path d="M0 -9C-8 -3 8 3 0 9A9 9 0 0 0 0 -9Z" fill="#FF5A1F"/></g>
+          <g id="hg-ball"><circle r="9" fill="#DDF02B" stroke="#9C9A12" stroke-width="1"/><path d="M0 -9C-8 -3 8 3 0 9A9 9 0 0 0 0 -9Z" fill="#FF4D6D"/></g>
         </svg></div>
         <div class="cmd" id="cmd" hidden aria-live="polite"></div>
         <div class="cwind" id="cwind" hidden></div>
@@ -131,7 +141,7 @@
         <button class="btn primary" id="next" aria-label="Next step">Next &#8594;</button>
       </div>
       <svg id="side" viewBox="0 0 760 84" role="img" aria-label="Side view of the ball height compared with the net"></svg>
-      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><a href="#stepbox">More detail &#8595;</a></div>
+      <div class="mcap" id="mcap"><span id="mcap-k"></span><b id="mcap-t"></b><p id="mcap-s"></p><button class="whybtn" id="whybtn" type="button">Why?</button></div>
       <div class="legend" id="legend"></div>
       <section class="result" id="result" hidden>
         <div class="call" id="call">
@@ -165,9 +175,10 @@
   </div>
     </section>
 
-    <aside class="card-w panel">
+    <aside class="card-w panel"><div class="trtray" id="trtray" hidden></div>
       <div class="cpanel" id="cpanel" hidden></div>
       <div class="step" id="stepbox">
+        <div class="shotvid" id="shotvid" hidden></div>
         <span class="kicker" id="step-k"></span>
         <h3 id="step-title"></h3>
         <div class="iara"><span class="av" aria-hidden="true">G</span><div class="iara-b"><b>Coach Guto</b><p class="say" id="say"></p></div></div>
@@ -192,7 +203,7 @@
         <div class="pgroup"><span>The ball comes to my</span><div class="seg" id="pk-side"><button id="pk-side-bh" data-v="bh">Backhand</button><button id="pk-side-body" data-v="body">Body</button><button id="pk-side-fh" data-v="fh">Forehand</button></div></div>
         <div class="pgroup"><span>I'm standing</span><div class="seg" id="pk-depth"><button id="pk-depth-front" data-v="front">Inside 3 m</button><button id="pk-depth-mid" data-v="mid">3–6 m</button><button id="pk-depth-back" data-v="back">6–8 m</button></div></div>
         <div class="pgroup"><span>Ball speed</span><div class="seg" id="pk-speed"><button id="pk-speed-fast" data-v="fast">Fast</button><button id="pk-speed-med" data-v="med">Medium</button><button id="pk-speed-slow" data-v="slow">Slow</button></div></div>
-        <div class="pgroup"><span>Height when I hit it</span><div class="seg" id="pk-height"><button id="pk-height-low" data-v="low">Low</button><button id="pk-height-med" data-v="med">Medium</button><button id="pk-height-high" data-v="high">High</button></div><p class="hint">Low is below the net. Medium is net to shoulder. High is overhead.</p></div>
+        <div class="pgroup"><span>Height when I hit it</span><div class="hbody"><img class="hfig" id="pk-hfig" src="poses/a01-push.webp" alt="" decoding="async"><div class="hbands" id="pk-height" role="group" aria-label="Height when I hit it"></div></div></div>
         <div class="pgroup"><span>Opponents</span><p class="hint">Drag the opponents on the court to place them.</p><b id="pk-next" hidden></b></div>
       </div>
     </aside>
@@ -209,13 +220,12 @@
 </div>
 <div class="welcome" id="welcome" hidden role="dialog" aria-modal="true" aria-labelledby="w-title">
   <div class="welcome-card">
-    <span class="kicker">Welcome</span>
-    <h2 id="w-title">Let's set up your court</h2>
-    <div class="pgroup"><span>Pick your player</span><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
+    <h2 id="w-title">Pick your player</h2>
+    <div class="pgroup"><div class="emojis" id="w-emo" role="radiogroup" aria-label="Your player"></div></div>
     <div class="pgroup"><span>Your level</span><div class="seg lv4" id="w-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div></div>
-    <div class="pgroup"><span>Which side do you play?</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
-    <div class="pgroup"><span>How do you play?</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">Women's &amp; mixed</button><button data-v="men" aria-pressed="false">Men's open &amp; ITF</button></div></div>
-    <button class="btn primary" id="w-go">Start learning &#8594;</button>
+    <div class="pgroup"><span>Your side</span><div class="seg" id="w-side"><button data-v="L" aria-pressed="true">Left</button><button data-v="R" aria-pressed="false">Right</button></div></div>
+    <div class="pgroup"><span>Net height</span><div class="seg" id="w-rules"><button data-v="open" aria-pressed="true">1.70 m</button><button data-v="men" aria-pressed="false">1.80 m</button></div></div>
+    <button class="btn primary" id="w-go">Play &#8594;</button>
     <button class="btn soft" id="w-skip">Skip</button>
   </div>
 </div>
@@ -228,10 +238,11 @@
       <button role="tab" id="pt-b-notify" aria-selected="false" data-p="notify">Notifications</button>
     </div>
     <section class="psec" id="pt-profile">
-      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="What should Guto call you?"></label>
+      <label class="fld"><span>Name</span><input id="p-name" maxlength="24" autocomplete="nickname" placeholder="Your name"></label>
       <div class="pgroup"><span>Your player</span><div class="emojis" id="p-emo" role="radiogroup" aria-label="Your player"></div></div>
       <div class="pgroup"><span>Your partner</span><div class="emojis" id="p-emo2" role="radiogroup" aria-label="Your partner"></div></div>
       <div class="pgroup"><span>Level</span><div class="seg lv4" id="seg-level"><button data-v="beginner" aria-pressed="true">Beginner</button><button data-v="intermediate" aria-pressed="false">Intermediate</button><button data-v="advanced" aria-pressed="false">Advanced</button><button data-v="pro" aria-pressed="false">Pro</button></div><p class="hint" id="lvl-hint"></p></div>
+      <div class="pgroup"><span>Match clock</span><div class="seg" id="seg-clock"><button data-v="match">Timed</button><button data-v="practice">No clock</button></div></div>
       <div class="pgroup"><span>I play</span><div class="seg" id="seg-side"><button id="side-L" data-v="L" aria-pressed="true">Left</button><button id="side-R" data-v="R" aria-pressed="false">Right</button></div></div>
       <div class="pgroup"><span>Playing hand</span><div class="seg" id="seg-hand"><button data-v="R" aria-pressed="true">Right</button><button data-v="L" aria-pressed="false">Left</button></div></div>
       <div class="pgroup"><span>Rules</span><div class="seg" id="seg-rules"><button id="rules-men" data-v="men" aria-pressed="true">Men's open &amp; ITF</button><button id="rules-open" data-v="open" aria-pressed="false">Women's &amp; mixed</button></div></div>
@@ -248,6 +259,7 @@
     <section class="psec" id="pt-notify" hidden>
       <label class="tgl"><input type="checkbox" id="n-content"><span><b>New lessons and content</b><small>New shots, drills and videos as they land</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-tips"><span><b>Weekly tip from Coach Guto</b><small>One tactic to try at your next session</small></span></label>
+      <label class="tgl"><input type="checkbox" id="n-sound"><span><b>Sound</b><small>Paddle, sand and point sounds</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-vibe"><span><b>Vibration</b><small>A short buzz when you pick and when a point ends</small></span></label>
       <label class="tgl"><input type="checkbox" id="n-compete"><span><b>Sand Series</b><small>New opponents and challenges</small></span></label>
       <label class="fld"><span>Send updates to</span><input type="email" id="n-email" autocomplete="email" placeholder="you@example.com"></label>
@@ -259,6 +271,5 @@
 </div>
 <div class="rotate" aria-hidden="true"><div><span>&#10227;</span><b>Turn your phone upright</b><p>The court is built for portrait.</p></div></div>
 <div class="stripe" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-<script src="app.js"></script>
-</body>
-</html>
+
+<script src="app.js?v=202611241424"></script></body></html>
