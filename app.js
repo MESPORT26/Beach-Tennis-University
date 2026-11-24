@@ -2221,7 +2221,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="26 Nov · 3 (ready stance)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="26 Nov · 4 (calmer sea)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2982,7 +2982,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
   $("w-go").onclick=function(){closeW(false)};$("w-skip").onclick=function(){closeW(true)}}
 
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
-var P3Q=null,P3READY=false,P3D_V="2.3";
+var P3Q=null,P3READY=false,P3D_V="2.4";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
