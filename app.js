@@ -2221,7 +2221,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="26 Nov · 4 (calmer sea)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="26 Nov · 6 (original players)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2982,15 +2982,17 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
   $("w-go").onclick=function(){closeW(false)};$("w-skip").onclick=function(){closeW(true)}}
 
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
-var P3Q=null,P3READY=false,P3D_V="2.4";
+/* avatar faces for the 3D players: you, your partner, and the two opponents */
+function p3dAv(r){var o0="a03",o1="a07";try{if(r){o0=rAv(r,0);o1=rAv(r,1)}else{var f=OPP_E.filter(function(x){return x!==state.emoji&&x!==state.mate});o0=f[0]||o0;o1=f[1]||o1}}catch(e){}return [state.emoji||"a01",state.mate||"a06",o0,o1].join(",")}
+var P3Q=null,P3READY=false,P3D_V="2.6";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
-    f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
+    f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&av="+p3dAv(null)+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
 function p3dPost(m){var f=p3dFrame();m.btu3d=1;if(!P3READY){P3Q=m;return}try{f.contentWindow.postMessage(m,"*")}catch(e){}}
 function p3dSize(){var s=$("play3d");if(!s||s.hidden||document.body.classList.contains("p3d-live"))return;var top=s.getBoundingClientRect().top+window.scrollY;s.style.height=Math.max(420,window.innerHeight-top-12)+"px"}
 function p3dShow(){window.scrollTo(0,0);p3dFrame();p3dSize();p3dPost({type:"level",level:state.level});track("play3d_open",{})}
 function p3dLive(on){document.body.classList.toggle("p3d-live",!!on);window.scrollTo(0,0);if(!on)setTimeout(p3dSize,30)}
-function p3dStart(r){var i=RIVALS.indexOf(r);p3dPost({type:"start",level:state.level,rival:r?{name:r.pair,lv:i>=0?i+1:1}:null});track("match_started",{rival:r&&r.id,mode:"3d"})}
+function p3dStart(r){var i=RIVALS.indexOf(r);p3dPost({type:"start",av:p3dAv(r).split(","),level:state.level,rival:r?{name:r.pair,lv:i>=0?i+1:1}:null});track("match_started",{rival:r&&r.id,mode:"3d"})}
 window.addEventListener("message",function(e){var m=e.data;if(!m||!m.btu3d)return;var lf=$("l3d");if(lf&&e.source===lf.contentWindow){l3dMsg(m);return}
   if(m.type==="ready"){P3READY=true;var l=$("p3d-load");if(l)l.remove();if(P3Q){var q=P3Q;P3Q=null;p3dPost(q)}}
   if(m.type==="live")p3dLive(m.on);
@@ -3003,7 +3005,7 @@ var LP={},L3READY=false;
 function l3dOn(){return load("l3d","1")!=="0"}
 function l3dActive(){return (state.tab==="shots"||state.tab==="pick")&&l3dOn()}
 function l3dFrame(){var f=$("l3d");if(!f){var box=document.querySelector(".court-box");if(!box)return null;f=document.createElement("iframe");f.id="l3d";f.title="Lesson in 3D";f.setAttribute("tabindex","-1");
-    f.src="play3d.html?embed=1&mode=lesson&v="+(typeof P3D_V!=="undefined"?P3D_V:"1");box.appendChild(f);
+    f.src="play3d.html?embed=1&mode=lesson&v="+(typeof P3D_V!=="undefined"?P3D_V:"1")+"&av="+p3dAv(null);box.appendChild(f);
     var t=document.createElement("button");t.id="l3d-tog";t.className="l3d-tog";t.onclick=function(){save("l3d",l3dOn()?"0":"1");l3dSync();track("learn_view",{view:l3dOn()?"3d":"diagram"})};box.appendChild(t)}return f}
 function l3dPost(m){var f=$("l3d");if(!f||!L3READY)return;m.btu3d=1;try{f.contentWindow.postMessage(m,"*")}catch(e){}}
 function l3dInit(){l3dPost({type:"lesson-init",side:state.side,pos:LP});l3dOverlay()}
