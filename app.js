@@ -921,7 +921,7 @@ function play(){if(state.playing){stop();return}state.playing=true;$("play").tex
 /* ---------------- Controls ---------------- */
 function setTab(t){stop();if(typeof lvStop==="function")lvStop();railOff(true);if(t!=="compete"&&typeof resBar==="function"){resBar(null);document.body.classList.remove("hasres")}if(typeof gTag!=="undefined"&&gTag){gTag.innerHTML="";ballTag=null;oppPill=null}if(typeof fbToastOff==="function")fbToastOff();if(typeof cmd==="function")cmd("");document.body.classList.remove("lobby-on");var sh0=$("shout");if(sh0)sh0.className="shout";[].forEach.call(document.querySelectorAll(".cbub"),function(b){b.remove()});clearTimeout(pkTimer);if(t==="learn")t=load("learn-sub","shots")==="pick"?"pick":"shots";if(t==="play")t=["compete","friends","ladder"].indexOf(load("play-sub","compete"))>=0?load("play-sub","compete"):"compete";
   if(t==="compete3d"||t==="classic"){var was=p3dOn();save("p3d",t==="classic"?"0":"1");t="compete";if(was!==p3dOn()&&state.tab==="compete"){if(typeof leaveMatch==="function")leaveMatch();if(typeof p3dLive==="function")p3dLive(false);state.tab=""}}
-  if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);
+  if(state.tab==="compete"&&t!=="compete")leaveMatch();state.tab=t;save("tab",t);l3dSync();
   ["home","shots","pick","compete"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===t))});
   var grp=t==="home"?"home":/shots|pick/.test(t)?"learn":"play";if(grp==="learn")save("learn-sub",t);if(grp==="play")save("play-sub",t);
   ["home","learn","play"].forEach(function(k){$("tab-"+k).setAttribute("aria-selected",String(k===grp))});renderSubnav(grp,t);
@@ -2221,7 +2221,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="25 Nov · 7 (3D + 2D)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="25 Nov · 8 (3D Learn)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2982,7 +2982,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
   $("w-go").onclick=function(){closeW(false)};$("w-skip").onclick=function(){closeW(true)}}
 
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
-var P3Q=null,P3READY=false,P3D_V="0.9";
+var P3Q=null,P3READY=false,P3D_V="1.0";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
@@ -2991,9 +2991,26 @@ function p3dSize(){var s=$("play3d");if(!s||s.hidden||document.body.classList.co
 function p3dShow(){window.scrollTo(0,0);p3dFrame();p3dSize();p3dPost({type:"level",level:state.level});track("play3d_open",{})}
 function p3dLive(on){document.body.classList.toggle("p3d-live",!!on);window.scrollTo(0,0);if(!on)setTimeout(p3dSize,30)}
 function p3dStart(r){var i=RIVALS.indexOf(r);p3dPost({type:"start",level:state.level,rival:r?{name:r.pair,lv:i>=0?i+1:1}:null});track("match_started",{rival:r&&r.id,mode:"3d"})}
-window.addEventListener("message",function(e){var m=e.data;if(!m||!m.btu3d)return;
+window.addEventListener("message",function(e){var m=e.data;if(!m||!m.btu3d)return;var lf=$("l3d");if(lf&&e.source===lf.contentWindow){l3dMsg(m);return}
   if(m.type==="ready"){P3READY=true;var l=$("p3d-load");if(l)l.remove();if(P3Q){var q=P3Q;P3Q=null;p3dPost(q)}}
   if(m.type==="live")p3dLive(m.on);
   if(m.type==="nav"){p3dLive(false);setTab(m.tab==="learn"?"learn":"home")}});
 window.addEventListener("resize",p3dSize);
 (function(){var sm=startMatch;startMatch=function(r){if(p3dOn()&&state.tab==="compete"){p3dStart(r);return}return sm.apply(this,arguments)}})();
+
+/* ---------- Learn in 3D: the same 3D court plays every lesson step (Shots). The flat diagram is one tap away ---------- */
+var LP={},L3READY=false;
+function l3dOn(){return load("l3d","1")!=="0"}
+function l3dActive(){return state.tab==="shots"&&l3dOn()}
+function l3dFrame(){var f=$("l3d");if(!f){var box=document.querySelector(".court-box");if(!box)return null;f=document.createElement("iframe");f.id="l3d";f.title="Lesson in 3D";f.setAttribute("tabindex","-1");
+    f.src="play3d.html?embed=1&mode=lesson&v="+(typeof P3D_V!=="undefined"?P3D_V:"1");box.appendChild(f);
+    var t=document.createElement("button");t.id="l3d-tog";t.className="l3d-tog";t.onclick=function(){save("l3d",l3dOn()?"0":"1");l3dSync();track("learn_view",{view:l3dOn()?"3d":"diagram"})};box.appendChild(t)}return f}
+function l3dPost(m){var f=$("l3d");if(!f||!L3READY)return;m.btu3d=1;try{f.contentWindow.postMessage(m,"*")}catch(e){}}
+function l3dInit(){l3dPost({type:"lesson-init",side:state.side,pos:LP})}
+function l3dSync(){var tab=state.tab==="shots";document.body.classList.toggle("l3dtab",tab);if(tab)l3dFrame();var on=l3dActive();document.body.classList.toggle("l3d",on);
+  var t=$("l3d-tog");if(t){t.textContent=on?"Diagram":"3D view";t.setAttribute("aria-label",on?"Show the flat diagram":"Show the lesson in 3D")}if(on)l3dInit()}
+function l3dMsg(m){if(m.type==="ready"){L3READY=true;l3dInit()}}
+(function(){var pl=place;place=function(id,p,instant){var r=pl.apply(this,arguments);if(p)LP[id]=[p[0],p[1]];
+    if(l3dActive()){var g=PL[id]&&PL[id].g,dur=g?parseFloat(g.style.transitionDuration)||0:0;l3dPost({type:"place",k:id,p:p,instant:!!instant,dur:dur})}return r};
+  var rb=runBall;runBall=function(b,mark){var r=rb.apply(this,arguments);if(l3dActive()){if(!b)l3dPost({type:"ball",b:null});else{var pr=PROF[b.shot]||PROF.neutral,hs=[];for(var i=0;i<=16;i++)hs.push(Math.max(0.07,pr.h(i/16)));l3dPost({type:"ball",b:{f:b.f,to:b.to,dur:r||pr.d*1.3,hs:hs}})}}return r};
+  var sp=setPoses;setPoses=function(map){var r=sp.apply(this,arguments);if(l3dActive()&&map)l3dPost({type:"pose",pm:map});return r}})();
