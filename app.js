@@ -2221,7 +2221,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="25 Nov · 8 (3D Learn)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="26 Nov · 2 (real swings)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2982,7 +2982,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
   $("w-go").onclick=function(){closeW(false)};$("w-skip").onclick=function(){closeW(true)}}
 
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
-var P3Q=null,P3READY=false,P3D_V="1.0";
+var P3Q=null,P3READY=false,P3D_V="2.2";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
@@ -3001,15 +3001,28 @@ window.addEventListener("resize",p3dSize);
 /* ---------- Learn in 3D: the same 3D court plays every lesson step (Shots). The flat diagram is one tap away ---------- */
 var LP={},L3READY=false;
 function l3dOn(){return load("l3d","1")!=="0"}
-function l3dActive(){return state.tab==="shots"&&l3dOn()}
+function l3dActive(){return (state.tab==="shots"||state.tab==="pick")&&l3dOn()}
 function l3dFrame(){var f=$("l3d");if(!f){var box=document.querySelector(".court-box");if(!box)return null;f=document.createElement("iframe");f.id="l3d";f.title="Lesson in 3D";f.setAttribute("tabindex","-1");
     f.src="play3d.html?embed=1&mode=lesson&v="+(typeof P3D_V!=="undefined"?P3D_V:"1");box.appendChild(f);
     var t=document.createElement("button");t.id="l3d-tog";t.className="l3d-tog";t.onclick=function(){save("l3d",l3dOn()?"0":"1");l3dSync();track("learn_view",{view:l3dOn()?"3d":"diagram"})};box.appendChild(t)}return f}
 function l3dPost(m){var f=$("l3d");if(!f||!L3READY)return;m.btu3d=1;try{f.contentWindow.postMessage(m,"*")}catch(e){}}
-function l3dInit(){l3dPost({type:"lesson-init",side:state.side,pos:LP})}
-function l3dSync(){var tab=state.tab==="shots";document.body.classList.toggle("l3dtab",tab);if(tab)l3dFrame();var on=l3dActive();document.body.classList.toggle("l3d",on);
+function l3dInit(){l3dPost({type:"lesson-init",side:state.side,pos:LP});l3dOverlay()}
+function l3dSync(){var tab=state.tab==="shots"||state.tab==="pick";document.body.classList.toggle("l3dtab",tab);if(tab)l3dFrame();var on=l3dActive();document.body.classList.toggle("l3d",on);
   var t=$("l3d-tog");if(t){t.textContent=on?"Diagram":"3D view";t.setAttribute("aria-label",on?"Show the flat diagram":"Show the lesson in 3D")}if(on)l3dInit()}
-function l3dMsg(m){if(m.type==="ready"){L3READY=true;l3dInit()}}
+function l3dMsg(m){if(m.type==="ready"){L3READY=true;l3dInit()}if(m.type==="tap"&&m.p)l3dTap(m.p)}
+/* Train: mirror what's tappable on the diagram (aim cells, move spots) into 3D, and turn 3D taps into taps on the diagram */
+var L3OT=0;function l3dOverlay(){if(L3OT)return;L3OT=requestAnimationFrame(function(){L3OT=0;if(!l3dActive())return;var cells=[],spots=[];
+  [gA,gG].forEach(function(G){if(!G)return;[].forEach.call(G.querySelectorAll("[data-c]"),function(g){var k=g.getAttribute("data-c").split(","),r=g.querySelector("rect"),f=r?String(r.getAttribute("fill")||"").toUpperCase():"",op=r?+r.getAttribute("fill-opacity"):0;
+    cells.push({d:+k[0],l:+k[1],s:f==="#2ECC71"&&op>0?"ok":f==="#FFD23F"&&op>0?"on":""})})});
+  if(gM)[].forEach.call(gM.querySelectorAll(".trspot"),function(g){var c=g.querySelector("circle");if(!c)return;spots.push({p:[(+c.getAttribute("cx")-60)/40,(+c.getAttribute("cy")-40)/40],label:g.getAttribute("aria-label")||""})});
+  l3dPost({type:"overlay",o:{cells:cells,spots:spots,AX:AX,AY:AY}})})}
+function l3dClick(el,cx,cy){if(!el)return false;el.dispatchEvent(new MouseEvent("click",{bubbles:true,cancelable:true,clientX:cx||0,clientY:cy||0}));return true}
+function l3dTap(p){if(p[0]>=8){var d=-1,l=-1;AX.forEach(function(r,i){if(p[0]>=r[0]&&p[0]<=r[1])d=i});AY.forEach(function(r,i){if(p[1]>=r[0]&&p[1]<=r[1])l=i});
+    if(d>=0&&l>=0){var sel='[data-c="'+d+","+l+'"]';if(l3dClick((gA&&gA.querySelector(sel))||(gG&&gG.querySelector(sel))))return}}
+  var best=null,bd=1.6;if(gM)[].forEach.call(gM.querySelectorAll(".trspot"),function(g){var c=g.querySelector("circle");if(!c)return;var q=[(+c.getAttribute("cx")-60)/40,(+c.getAttribute("cy")-40)/40],dd=Math.hypot(q[0]-p[0],q[1]-p[1]);if(dd<bd){bd=dd;best=g}});
+  if(best){l3dClick(best);return}
+  var mv=gA&&gA.querySelector(".mvarea");if(mv&&p[0]<8&&WORLD){var pt=SVGC.createSVGPoint();pt.x=60+40*p[0];pt.y=40+40*p[1];var sp=pt.matrixTransform(WORLD.getScreenCTM());l3dClick(mv,sp.x,sp.y)}}
+(function(){if(typeof MutationObserver==="undefined")return;var mo=new MutationObserver(function(){l3dOverlay()});[gA,gG,gM].forEach(function(G){if(G)mo.observe(G,{childList:true,subtree:true,attributes:true,attributeFilter:["fill","fill-opacity","cx","cy"]})})})();
 (function(){var pl=place;place=function(id,p,instant){var r=pl.apply(this,arguments);if(p)LP[id]=[p[0],p[1]];
     if(l3dActive()){var g=PL[id]&&PL[id].g,dur=g?parseFloat(g.style.transitionDuration)||0:0;l3dPost({type:"place",k:id,p:p,instant:!!instant,dur:dur})}return r};
   var rb=runBall;runBall=function(b,mark){var r=rb.apply(this,arguments);if(l3dActive()){if(!b)l3dPost({type:"ball",b:null});else{var pr=PROF[b.shot]||PROF.neutral,hs=[];for(var i=0;i<=16;i++)hs.push(Math.max(0.07,pr.h(i/16)));l3dPost({type:"ball",b:{f:b.f,to:b.to,dur:r||pr.d*1.3,hs:hs}})}}return r};
