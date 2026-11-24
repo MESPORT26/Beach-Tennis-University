@@ -1,0 +1,27 @@
+BEACH TENNIS UNIVERSITY - full website (Home, Learn, Play with the 3D game)
+Build: 25 Nov · 6 (3D + 2D)
+
+Upload to GitHub repo: MESPORT26/Beach-Tennis-University
+Always from the repo's MAIN page: Add file > Upload files.
+
+GitHub accepts up to 100 files per upload, so there are 5 uploads.
+For each one: open the folder below, select EVERYTHING inside it
+(Cmd+A on Mac), drag it into the GitHub upload box, then click
+"Commit changes". Don't drag the UPLOAD folder itself, only what's inside.
+
+  UPLOAD-1 (app + 3D game)   about 25 files  <- the important one
+  UPLOAD-2 (poses)           72 files
+  UPLOAD-3 (players 1-4)     96 files
+  UPLOAD-4 (players 5-8)     96 files
+  UPLOAD-5 (players 9-12)    96 files
+
+Uploads 2 to 5 are pictures that haven't changed. If your repo already
+has the poses and sprites-a01 ... sprites-a12 folders, you can skip them.
+
+After upload, your repo's main page should show:
+  index.html, app.js, styles.css, favicon.svg, signal.jpg, README.md
+  folders: avatars, play3d, poses, sprites-a01 ... sprites-a12, supabase, vendor
+and play3d should contain index.html and an assets folder.
+
+Safe to delete from the repo if you see them: play3d.zip, any "sprites"
+folder (without a number), and anything named btu-3d.
