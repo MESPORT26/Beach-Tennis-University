@@ -236,29 +236,29 @@ var ZTIPS={
   avoid:["Serving it without the signal, because the return comes straight down your partner's line","Floating it, because a slow wide serve gives them time to drive the line","Zone 5 when a crosswind is blowing towards that sideline, as it can carry the ball out"]}};
 var TIPS={
  serve:{when:["Every point you serve","After you agree the zone (1–5) with a finger signal"],
-  aim:["Zone 3 down the middle is the most common","Zone 2 at the receiver's body or backhand hip","Mix in 1, 4 and 5 so they can't settle","Vary the speed, spin and dip so the receiver can't time their return","A serve that dips low makes them hit up, so your team gets the first attacking ball"],
-  avoid:["Going for aces with no margin, as there's no second serve","Serving to the same zone too often, so the receiver gets used to it","Serving to 5 without telling your partner, because the wide serve opens a return straight down their line"]},
- push:{when:["The ball reaches you at or above net height","You're 2–4 m from the net"],
-  aim:["At a backhand","At the body, feet or hip","Down the middle between them"],
-  avoid:["Pushing a ball from below net height, because it goes up and gets smashed"]},
- flatsmash:{when:["The ball is above your head","Inside about 3 m, hit it flatter and harder","High ball, or more than 4 m from the net, add more brush"],
-  aim:["Down the middle, hitting down","At an opponent's body or backhand","Deep into the middle when you're at the back"],
-  avoid:["Going for a winner from the back of the court","Smashing while off balance"]},
- neutral:{when:["You're under pressure or off balance","You're hitting from below net height"],
-  aim:["Deep, to a backhand","Medium height and medium pace","Against two right-handers, the outside of B or the middle side of A"],
-  avoid:["Hitting it high, which gives them a smash","Hitting it fast, then it's not a neutral ball","Playing it when the ball is high near the net and you could attack"]},
- lob:{when:["The opponents are close to the net","You need time to recover"],
-  aim:["Always deep","Over the left shoulder of the net player (a right-hander's backhand)"],
+  aim:["Zone 3 down the middle is the usual serve","Zones 3/4 at the receiver's backhand","Make it dip below the net so they have to hit up, giving your team the first attacking ball","Expect the return back to you: usually a drop in front of you as you run in","If you keep running in, expect a lob back over your head"],
+  avoid:["Zone 1, which is risky because it can go out","Zone 5, which can go out and leaves your partner exposed to a return down the line","Your partner rushing in straight away, as it opens 1 and 5 for the return","Floating it in the wind. Mixed doubles men may serve high, but keep it away from the player on the right, who can smash it"]},
+ push:{when:["The ball is above net height, but not high enough to smash or hook","You want to take time away from them, as a push gives little time to react"],
+  aim:["At their backhand","Down the middle","At the body, good against lower-ranked players"],
+  avoid:["Their forehand, which gives them an easy swing","At the body of advanced players, who block it back over your head like a fast lob","Any ball below net height (that's the rule: no push, smash or hook from below the net)"]},
+ flatsmash:{when:["The ball is high above your head","From 4 m in, hit it hard","Further back, brush it with spin so it dips"],
+  aim:["From the right: zones 2, 3 or 4, through the middle","From the left: anywhere but 1","Zone 3 is the safest, but they may block it back"],
+  avoid:["Zone 1 from the left side, which leaves your line exposed if it isn't a winner","Hitting flat and hard from deep","Smashing a ball below the net (not allowed)"]},
+ neutral:{when:["You want to slow the game down","You can get it to land low, just under the net height","As the 3rd ball after your serve, if they're back behind their 3 m line"],
+  aim:["At their backhands","Medium height and medium pace, slightly below net height as it reaches them"],
+  avoid:["Playing it when they're close to the net, because they push or smash it back","Hitting it high or fast"]},
+ lob:{when:["The opponents are at 3 m or closer","To answer a drop when they're close in","On the return, when the server keeps running in"],
+  aim:["Always deep","Away from the player on the smashing side"],
   avoid:["Short or flat lobs, because they get smashed","Lobbing straight off a hard smash, so block it instead"]},
- drop:{when:["The player you drop to is mid-court or deep","Often after your lob has pushed them back","They're off balance or tired"],
-  aim:["Short, just over the net","Straight, in front of the deeper player"],
-  avoid:["Dropping to a player at their 3 m line or closer","Cross-court drops, because they open the line on your partner"]},
- hook:{when:["A high ball goes over your backhand shoulder","There's no time to run around it onto your forehand"],
-  aim:["Down the middle or at a body when you're balanced","Deep into the middle when you're stretched"],
-  avoid:["Forcing it while falling backwards","Big angles, keep it simple"]},
- dig:{when:["An opponent pushes or smashes hard at your feet or body"],
-  aim:["Long over them, deep","Or straight down the line at medium height","Either way, no easy smash for them"],
-  avoid:["Blocking short, which is only for very advanced players","Popping it up mid-court","Trying to lob a hard smash"]}};
+ drop:{when:["There's open space short in their court","As a counter drop to their drop","On the return of serve: in front of the server as they run in"],
+  aim:["Short, just over the net, into the open space","In front of the deeper player or the incoming server"],
+  avoid:["A loose drop, which gives them an easy push to win the point","Dropping when they're at 3 m or closer, so lob deep instead"]},
+ hook:{when:["A high ball goes behind you and you can get underneath it"],
+  aim:["From 4 m in: play it aggressively","Very deep and hard to reach: a very high counter-lob hook","Reachable but deep: a neutral ball, often short, as they'll be back expecting a fast return"],
+  avoid:["Forcing it while falling backwards","Hooking a ball below the net (not allowed)"]},
+ dig:{when:["Only against a smash, push or hook. Never off a soft ball","Get down low, often on one knee, and block it quickly"],
+  aim:["Deep, so they don't get an easy smash","Advanced: block a drop just over the net, or lob it if they're running in"],
+  avoid:["Blocking high and short, which gets put away","Blocking a soft ball. Play a proper shot instead"]}};
 var PATTERNS=[];
 /* Level content. Intermediate uses the base tips. Other levels replace a list, or add to it. */
 var LV={
@@ -1865,16 +1865,19 @@ function bRevealChip(choice,covers,r,hT){var hd=(hT===0?"You: ":"Them: ")+bName(
 var BCLOCK={beginner:15,intermediate:14,advanced:11,pro:9},BPACE={quick:0.7,normal:1,relaxed:1.6,off:1.6};function bPace(){return BPACE[state.btpace]||1}
 function bClock(fn){clearTimeout(BT.clk);if(state.btpace==="off"){startBar(0);return}var s=Math.round((BCLOCK[state.level]||10)*bPace());startBar(s,0);BT.clk=setTimeout(fn,s*1000)}
 function bDock(html){var d=$("btdock");if(!d){d=document.createElement("div");d.id="btdock";d.className="btdock"}var cp=$("cpanel"),wide=window.innerWidth>=900;if(wide&&cp){if(d.previousSibling!==cp)cp.parentNode.insertBefore(d,cp.nextSibling)}else if(d.parentNode!==document.body)document.body.appendChild(d);d.classList.toggle("inl",wide);var pr=$("cs-prompt");d.hidden=!html;document.body.classList.toggle("btdocked",!!html);d.innerHTML=html?'<p class="bttitle">'+(pr?pr.textContent:"")+'</p>'+html:""}
-function bDefault(st,inShot){var h=st.h,x=st.pos[0],O=BT.pos[1],ox=(O[0][0]+O[1][0])/2,atNet=ox<3,back=ox>5,open=Math.abs(O[0][1]-O[1][1])>5,inShort=BT.inLand!=null&&BT.inLand<3;
-  if(inShot==="smash")return ["block","They smashed it: block",["block"]];
-  if(inShot==="lob"&&h>=1.9)return ["hook","Lobbed over you: hook it",["hook","push"]];
-  if(h>=2.1&&x<=3)return ["smash","High ball inside 3 m: smash",["smash","push"]];
-  if(h>=2.1)return ["push","High but deep: push it",["push","hook","neutral"]];
-  if(h>=NET_H)return ["push","Just above the net: push",["push","neutral"]];
-  if(inShort)return ["drop","They hit it short: drop it back",["drop","lob"]];
-  if(h<1.2&&x<=3)return atNet?["lob","Low, and they're at the net: lob",["lob"]]:(back||open)?["drop",back?"Low, and they're back: drop":"Low, with an opening: drop",["drop","lob"]]:["lob","Low ball: lob",["lob","drop","neutral"]];
-  if(h<1.2)return atNet?["lob","Low, and they're at the net: lob",["lob","neutral"]]:["neutral","Low and deep: neutral",["neutral","lob"]];
-  return ["neutral","Just below the net: neutral",["neutral","lob","drop"]]}
+function bDefault(st,inShot){var h=st.h,x=st.pos[0],O=BT.pos[1],ox=(O[0][0]+O[1][0])/2,near=Math.min(O[0][0],O[1][0]),close=near<=3,atNet=ox<3,open=Math.abs(O[0][1]-O[1][1])>5,inShort=BT.inLand!=null&&BT.inLand<3,below=h<NET_H,att=inShot==="smash"||inShot==="push"||inShot==="hook";
+  /* Rules: no smash, push or hook from below the net; a block only answers a smash, push or hook */
+  if(att)return ["block","They attacked it: get low and block it deep",below?["block","lob"]:["block","push"]];
+  if(inShot==="lob"&&h>=1.9){if(x<=4)return ["hook","High ball behind you, 4 m or closer: hook it aggressively",["hook","smash"]];
+    if(x>=6.5)return ["hook","Very deep: a very high counter-lob hook",["hook","neutral","lob"]];return ["neutral","Reachable but deep: a short neutral, they'll be back",["neutral","hook"]]}
+  if(h>=2.1&&x<=4)return ["smash","High ball, 4 m or closer: smash it hard",["smash","push","hook"]];
+  if(h>=2.1)return ["smash","High but deep: brush the smash with spin so it dips",["smash","push","hook","neutral"]];
+  if(h>=NET_H)return ["push","Above the net, below smash height: push at their backhand",["push","neutral"]];
+  if(inShot==="serve")return close?["lob","They're rushing in: lob it over the server",["lob","drop","neutral"]]:["drop","Return: drop it in front of the server as they run in",["drop","neutral","lob"]];
+  if(inShort)return close?["lob","Their drop, and they're at 3 m or closer: lob deep",["lob"]]:["drop","Their drop: counter-drop into the open space",["drop","lob"]];
+  if(close||atNet)return ["lob","They're at 3 m or closer: lob deep, away from the smasher",open?["lob","drop"]:["lob"]];
+  if(open&&x<=3)return ["drop","Low, with an opening: drop it into the space",["drop","lob","neutral"]];
+  return ["neutral","They're back: a neutral ball at their backhand, just under net height",["neutral","drop","lob"]]}
 function bAskShot(){bPhase("SHOT");var st=BT.st,opts=bOptions(BT.inShot),legal={};opts.forEach(function(o){legal[o.shot]=1});
   var dr=bDefault(st,BT.inShot),def=dr[0];if(!legal[def]){def="neutral";dr=[def,"Neutral"]}BT.why=dr[1];BT.whyShot=def;BT.okShots=dr[2]||[def];var choose=state.btpick==="choose";BT.pick={shot:choose?null:def,risk:"normal"};BT.cur=MATCH.cur;var hb=st.h>=NET_H,ret=BT.inShot==="serve";
   shotRail(choose?null:BOLD[def],function(id){var s=BNEW[id]||id;if(!legal[s]){toast("Block only against a smash or push");return}BT.pick.shot=s;bTargets();bDockShot()},null);
@@ -2221,7 +2224,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="26 Nov · 6 (original players)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="26 Nov · 8 (coach tactics)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2984,7 +2987,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
 /* avatar faces for the 3D players: you, your partner, and the two opponents */
 function p3dAv(r){var o0="a03",o1="a07";try{if(r){o0=rAv(r,0);o1=rAv(r,1)}else{var f=OPP_E.filter(function(x){return x!==state.emoji&&x!==state.mate});o0=f[0]||o0;o1=f[1]||o1}}catch(e){}return [state.emoji||"a01",state.mate||"a06",o0,o1].join(",")}
-var P3Q=null,P3READY=false,P3D_V="2.6";
+var P3Q=null,P3READY=false,P3D_V="2.8";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&av="+p3dAv(null)+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
