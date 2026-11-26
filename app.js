@@ -1146,7 +1146,20 @@ function formationText(){var a=PK.A,b=PK.B,d,l;
 function dropTarget(){var a=PK.A,b=PK.B,c=[[a,b],[b,a]].sort(function(x,y){return y[0][0]-x[0][0]});
   for(var i=0;i<2;i++){var t=c[i][0],o=c[i][1];if(t[0]<1)continue;if(o[0]===0&&o[1]===t[1])continue;return t}return null}
 function dropOK(){return !!dropTarget()}
-function choose(){var H=PK.height,D=DI[PK.depth],Sp=PK.speed,Sd=PK.side;
+/* One rulebook: the Train answer comes from the same coach as the game (bDefault), then picks the Learn variant of that shot */
+var TRAIN_H={low:1.2,med:1.9,high:2.6},TRAIN_X=[2.0,4.5,7.0];
+function choose(){var H=PK.height,D=DI[PK.depth],Sp=PK.speed,Sd=PK.side,old=chooseOld();
+  var inShot=Sp==="fast"?"push":H==="high"?(D===2?"lob":"neutral"):(Sp==="slow"&&D===0?"drop":"neutral");
+  var keep={pos:BT.pos,inLand:BT.inLand};BT.pos=[null,[[OX[PK.A[0]]-8,8-OY[PK.A[1]]],[OX[PK.B[0]]-8,8-OY[PK.B[1]]]]];BT.inLand=inShot==="drop"?1.5:null;
+  var r;try{r=bDefault({h:TRAIN_H[H],pos:[TRAIN_X[D],state.side==="R"?5.5:2.5]},inShot)}finally{BT.pos=keep.pos;BT.inLand=keep.inLand}
+  var c=r[0],why=r[1]+".",id;
+  if(c==="block")id="dig";
+  else if(c==="smash")id=D>=2?"recoverysmash":(Sd==="bh"?"bhsmash":(/brush/.test(old.shot)?"brush":"flatsmash"));
+  else if(c==="hook")id="hook";
+  else if(c==="lob")id=(Sd==="bh"&&old.shot==="rainbow")?"rainbow":"lob";
+  else id=c;
+  return {shot:id,why:why,ok:r[2]}}
+function chooseOld(){var H=PK.height,D=DI[PK.depth],Sp=PK.speed,Sd=PK.side;
   var minD=Math.min(PK.A[0],PK.B[0]),bothBack=minD===2,anyFront=minD===0,bunched=PK.A[1]===1&&PK.B[1]===1,r;
   if(H==="high"){
     if(D<=1){
@@ -2225,7 +2238,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="27 Nov · 11 (jump bottom left)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="27 Nov · 12 (positioning counts)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2471,19 +2484,16 @@ function theirShotHtml(cur){var sit=cur.sit,m=MATCH,sk=cur.srv==="opp"?cur.os:(c
 function maybeResolve(){var p=MATCH.cur.pick;if(MATCH.cur.mate?p.pos:(p.shot&&p.cell&&p.move)){clearTimeout(cTimer);setTimeout(function(){resolvePoint(false)},350)}}
 var SVB={good:.06,ok:0,risky:-.12};
 /* Shot percentages for this ball. High, medium or low */
-function shotTiers(sit,best){var H=sit.height,t={};
-  var base={low:{dig:2,neutral:2,lob:1,drop:1,push:0,flatsmash:0,hook:0},med:{push:2,neutral:1,dig:1,drop:1,lob:1,flatsmash:0,hook:0},high:{flatsmash:2,hook:1,push:1,neutral:1,lob:0,drop:0,dig:0}}[H];
-  for(var k in base)t[k]=base[k];
-  var oppFront=sit.A[0]===0&&sit.B[0]===0,oppDeep=sit.A[0]===2||sit.B[0]===2;
-  if(H==="high"&&sit.depth==="back"){t.flatsmash=1;t.neutral=1}
-  if(H==="high"&&sit.depth==="front"){t.flatsmash=2;t.hook=1}
-  if(H==="low"&&sit.speed==="fast"){t.dig=2;t.neutral=1;t.lob=0}
-  if(oppFront){t.drop=0;if(!(H==="low"&&sit.speed==="fast"))t.lob=Math.max(t.lob,2)}
-  if(!oppDeep)t.drop=Math.min(t.drop,0);
-  if(oppDeep&&H!=="high")t.lob=0;
+/* Tiers come from the same coach: best = high percentage, the coach's other good options = medium, the rest low */
+function shotTiers(sit,best){var keys=["height","depth","speed","side","A","B"],keep={},t={},c;
+  keys.forEach(function(k){keep[k]=PK[k];if(sit[k]!=null)PK[k]=sit[k]});
+  try{c=choose()}finally{keys.forEach(function(k){PK[k]=keep[k]})}
+  var L={block:"dig",smash:"flatsmash"};
+  VISIBLE.forEach(function(v){if(v!=="serve")t[v]=0});
+  (c.ok||[]).forEach(function(x){var id=L[x]||x;if(t[id]!=null)t[id]=1});
+  var cb=simple(c.shot);if(t[cb]!=null)t[cb]=2;
   if(sit.ret){t.flatsmash=0;t.hook=0}
-  if(H==="high"&&sit.depth==="back"){t.flatsmash=Math.min(t.flatsmash,1);t.hook=2}
-  if(best&&t[best]!=null)t[best]=2;var b2=BACK2[best];if(b2&&t[b2]!=null)t[b2]=Math.max(t[b2],1);
+  if(best&&t[best]!=null)t[best]=2;
   return t}
 function tiersHtml(sit,best,picked){var t=shotTiers(sit,best),rows=[[2,"High percentage","","hi"],[1,"Medium percentage","","md"],[0,"Low percentage","","lo"]];
   return '<div class="tiers">'+rows.map(function(r){var ids=VISIBLE.filter(function(v){return v!=="serve"&&t[v]===r[0]});if(!ids.length)return "";
@@ -2988,7 +2998,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
 /* avatar faces for the 3D players: you, your partner, and the two opponents */
 function p3dAv(r){var o0="a03",o1="a07";try{if(r){o0=rAv(r,0);o1=rAv(r,1)}else{var f=OPP_E.filter(function(x){return x!==state.emoji&&x!==state.mate});o0=f[0]||o0;o1=f[1]||o1}}catch(e){}return [state.emoji||"a01",state.mate||"a06",o0,o1].join(",")}
-var P3Q=null,P3READY=false,P3D_V="3.9";
+var P3Q=null,P3READY=false,P3D_V="4.0";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&av="+p3dAv(null)+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
