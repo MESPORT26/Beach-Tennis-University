@@ -2225,7 +2225,7 @@ function noise(t,dur,ftype,fc,q,g){var a=acx();if(!a)return;var n=a.createBuffer
 
 /* Beach party music: an original samba groove, synthesised live (no recordings).
    Surdo on 2 and 4, telecoteco tamborim, shaker 16ths, agogô bells, bass and cavaquinho stabs over C6 - A7 - Dm7 - G7 */
-var BTU_BUILD="27 Nov · 2 (orbit view)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
+var BTU_BUILD="27 Nov · 3 (faster play)";var MUS={on:false,bus:null,next:0,step:0,timer:0,bpm:104};
 function musOn(){return load("music","1")==="1"}
 function musStart(){/* music removed until a real samba recording is added */return;if(MUS.on||!musOn())return;var a=acx();if(!a)return;if(!MUS.bus){MUS.bus=a.createGain();MUS.bus.connect(MASTER)}
   MUS.bus.gain.cancelScheduledValues(a.currentTime);MUS.bus.gain.setValueAtTime(0.0001,a.currentTime);MUS.bus.gain.exponentialRampToValueAtTime(0.32,a.currentTime+1.2);
@@ -2988,7 +2988,7 @@ if(!load("welcomed","")&&!HASH0){var wv={side:"L",rules:"open",level:"beginner",
 /* ---------- Play vs the computer: the 3D game (play3d/) lives inside the Play tab ---------- */
 /* avatar faces for the 3D players: you, your partner, and the two opponents */
 function p3dAv(r){var o0="a03",o1="a07";try{if(r){o0=rAv(r,0);o1=rAv(r,1)}else{var f=OPP_E.filter(function(x){return x!==state.emoji&&x!==state.mate});o0=f[0]||o0;o1=f[1]||o1}}catch(e){}return [state.emoji||"a01",state.mate||"a06",o0,o1].join(",")}
-var P3Q=null,P3READY=false,P3D_V="3.0";
+var P3Q=null,P3READY=false,P3D_V="3.1";
 function p3dOn(){return load("p3d","1")!=="0"}
 function p3dFrame(){var f=$("p3d-frame");if(!f){f=document.createElement("iframe");f.id="p3d-frame";f.title="Beach tennis 3D";f.setAttribute("allow","fullscreen; autoplay");
     f.src=(window.P3D_URL||"play3d.html")+"?embed=1&v="+P3D_V+"&av="+p3dAv(null)+"&level="+encodeURIComponent(state.level||"intermediate");$("play3d").appendChild(f)}return f}
